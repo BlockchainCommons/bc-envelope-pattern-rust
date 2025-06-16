@@ -2,14 +2,34 @@
 name = "bc-envelope-pattern"
 version = "0.1.0"
 edition = "2024"
+description = "Pattern matcher for Gordian Envelope"
+authors = ["Blockchain Commons"]
+repository = "https://github.com/BlockchainCommons/bc-envelope-pattern-rust"
+readme = "README.md"
+license = "BSD-2-Clause-Patent"
+documentation = "https://docs.rs/bc-envelope-pattern"
+keywords = [
+    "encoding",
+    "cbor",
+    "binary",
+    "format",
+    "serialization",
+] # Up to five
+categories = [
+    "data-structures",
+    "encoding",
+] # https://crates.io/category_slugs
 
 [dependencies]
 bc-envelope = "^0.30.0"
-regex = "1.11.1"
 known-values = "^0.6.0"
 dcbor = { version = "^0.21.0", features = ["anyhow", "multithreaded"] }
 bc-components = "^0.23.0"
+
+regex = "1.11.1"
 hex = "^0.4.3"
+thiserror = "^1.0.48"
+logos = "0.15.0"
 
 [dev-dependencies]
 hex-literal = "^0.4.1"
