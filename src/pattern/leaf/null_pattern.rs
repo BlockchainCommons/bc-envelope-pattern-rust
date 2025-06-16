@@ -1,5 +1,7 @@
+use bc_envelope::Envelope;
+
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
@@ -44,8 +46,9 @@ impl Compilable for NullPattern {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bc_envelope::Envelope;
+
+    use super::*;
 
     #[test]
     fn test_null_pattern_any() {

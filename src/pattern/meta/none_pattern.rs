@@ -1,5 +1,8 @@
-use crate::{
-    pattern::{compile_as_atomic, meta::MetaPattern, vm::Instr, Compilable, Matcher, Path, Pattern}, Envelope
+use bc_envelope::Envelope;
+
+use crate::pattern::{
+    Compilable, Matcher, Path, Pattern, compile_as_atomic, meta::MetaPattern,
+    vm::Instr,
 };
 
 /// A pattern that matches if any contained pattern matches.
@@ -8,15 +11,11 @@ pub struct NonePattern;
 
 impl NonePattern {
     /// Creates a new `NonePattern`.
-    pub fn new() -> Self {
-        NonePattern
-    }
+    pub fn new() -> Self { NonePattern }
 }
 
 impl Default for NonePattern {
-    fn default() -> Self {
-        NonePattern
-    }
+    fn default() -> Self { NonePattern }
 }
 
 impl Matcher for NonePattern {

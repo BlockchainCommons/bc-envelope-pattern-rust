@@ -1,8 +1,10 @@
 //! Simple capture wrapper.  For now we only emit SAVE instructions;
 //! future work can attach names to paths.
 
+use bc_envelope::Envelope;
+
 use crate::{
-    Envelope, Matcher, Path,
+    Matcher, Path,
     pattern::{Compilable, Pattern, vm::Instr},
 };
 

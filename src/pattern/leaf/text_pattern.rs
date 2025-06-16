@@ -1,5 +1,11 @@
+use bc_envelope::Envelope;
+
 use crate::{
-    pattern::{compile_as_atomic, leaf::LeafPattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        vm::Instr,
+    },
 };
 
 /// Pattern for matching text values.

@@ -1,7 +1,8 @@
+use bc_envelope::Envelope;
 use dcbor::prelude::*;
 
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,

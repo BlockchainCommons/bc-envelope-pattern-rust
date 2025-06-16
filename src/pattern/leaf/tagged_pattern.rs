@@ -1,8 +1,12 @@
+use bc_envelope::{Envelope, prelude::with_tags};
 use dcbor::prelude::*;
-use bc_envelope::prelude::with_tags;
 
 use crate::{
-    pattern::{compile_as_atomic, leaf::LeafPattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        vm::Instr,
+    },
 };
 
 /// Pattern for matching tag values.
@@ -153,8 +157,9 @@ impl Compilable for TaggedPattern {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bc_envelope::Envelope;
+
+    use super::*;
 
     #[test]
     fn test_tag_pattern_any() {

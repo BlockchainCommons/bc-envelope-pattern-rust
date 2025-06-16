@@ -2,10 +2,12 @@
 //!
 //! The VM runs byte-code produced by `Pattern::compile` (implemented later).
 
-use super::{Greediness, Matcher, Path, Pattern};
-use crate::{EdgeType, Envelope};
 use bc_components::DigestProvider;
+use bc_envelope::{EdgeType, Envelope};
 
+use super::{Greediness, Matcher, Path, Pattern};
+
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Axis {
     Subject,
@@ -56,6 +58,7 @@ impl Axis {
 }
 
 /// Bytecode instructions for the pattern VM.
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum Instr {
     /// Match predicate: `literals[idx].matches(env)`
@@ -151,7 +154,8 @@ fn repeat_paths(
     max: Option<usize>,
     mode: Greediness,
 ) -> Vec<(Envelope, Path)> {
-    let mut states: Vec<Vec<(Envelope, Path)>> = vec![vec![(env.clone(), path.clone())]];
+    let mut states: Vec<Vec<(Envelope, Path)>> =
+        vec![vec![(env.clone(), path.clone())]];
     let bound = max.unwrap_or(usize::MAX);
     for _ in 0..bound {
         let mut next = Vec::new();
@@ -413,7 +417,8 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
                 }
                 Repeat { pat_idx, min, max, mode } => {
                     let pat = &prog.literals[pat_idx];
-                    let results = repeat_paths(pat, &th.env, &th.path, min, max, mode);
+                    let results =
+                        repeat_paths(pat, &th.env, &th.path, min, max, mode);
                     if results.is_empty() {
                         break;
                     }
@@ -437,7 +442,8 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
                         }
                     }
                     if !success {
-                        // None of the repetition counts allowed the rest to match
+                        // None of the repetition counts allowed the rest to
+                        // match
                     }
                     break;
                 }

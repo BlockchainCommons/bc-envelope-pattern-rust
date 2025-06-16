@@ -1,7 +1,13 @@
 use std::ops::RangeInclusive;
 
+use bc_envelope::Envelope;
+
 use crate::{
-    pattern::{compile_as_atomic, leaf::LeafPattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        vm::Instr,
+    },
 };
 
 /// Pattern for matching arrays.
@@ -50,9 +56,7 @@ impl Matcher for ArrayPattern {
 impl Compilable for ArrayPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
-            &Pattern::Leaf(LeafPattern::Array(
-                self.clone(),
-            )),
+            &Pattern::Leaf(LeafPattern::Array(self.clone())),
             code,
             literals,
         );
@@ -61,10 +65,10 @@ impl Compilable for ArrayPattern {
 
 #[cfg(test)]
 mod tests {
+    use bc_envelope::Envelope;
     use dcbor::prelude::*;
 
     use super::*;
-    use bc_envelope::Envelope;
 
     #[test]
     fn test_array_pattern_any() {

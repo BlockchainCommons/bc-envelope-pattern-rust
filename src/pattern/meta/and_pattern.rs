@@ -1,7 +1,6 @@
-use crate::{
-    Envelope,
-    pattern::{Compilable, Matcher, Path, Pattern, vm::Instr},
-};
+use bc_envelope::Envelope;
+
+use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
 
 /// A pattern that matches if all contained patterns match.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]

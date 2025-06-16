@@ -1,9 +1,16 @@
+use bc_envelope::Envelope;
+
 use super::{
     AndPattern, CapturePattern, NotPattern, OrPattern, RepeatPattern,
     SearchPattern, SequencePattern,
 };
 use crate::{
-    pattern::{meta::AnyPattern, meta::NonePattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path,
+        meta::{AnyPattern, NonePattern},
+        vm::Instr,
+    },
 };
 
 /// Pattern for combining and modifying other patterns.

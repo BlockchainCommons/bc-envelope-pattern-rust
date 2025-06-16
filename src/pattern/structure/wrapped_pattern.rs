@@ -1,5 +1,7 @@
+use bc_envelope::Envelope;
+
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path,
         structure::StructurePattern,

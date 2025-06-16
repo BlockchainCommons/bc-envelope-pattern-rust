@@ -1,7 +1,13 @@
 use std::ops::RangeInclusive;
 
+use bc_envelope::Envelope;
+
 use crate::{
-    pattern::{compile_as_atomic, structure::StructurePattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path, compile_as_atomic,
+        structure::StructurePattern, vm::Instr,
+    },
 };
 
 /// Pattern for matching node envelopes.

@@ -1,7 +1,9 @@
 use std::ops::RangeInclusive;
 
+use bc_envelope::Envelope;
+
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
@@ -63,10 +65,10 @@ impl Compilable for MapPattern {
 
 #[cfg(test)]
 mod tests {
+    use bc_envelope::Envelope;
     use dcbor::prelude::*;
 
     use super::*;
-    use bc_envelope::Envelope;
 
     #[test]
     fn test_map_pattern_any() {

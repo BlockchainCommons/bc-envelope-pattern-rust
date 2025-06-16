@@ -1,7 +1,9 @@
 //! AST node + compiler for `{min,max}` quantifiers.
 
+use bc_envelope::Envelope;
+
 use crate::{
-    Envelope, Matcher, Path,
+    Matcher, Path,
     pattern::{Compilable, Greediness, Pattern, vm::Instr},
 };
 
@@ -18,7 +20,6 @@ impl Matcher for RepeatPattern {
         todo!();
     }
 }
-
 
 impl Compilable for RepeatPattern {
     /// Emit a high-level `Repeat` instruction for the VM.

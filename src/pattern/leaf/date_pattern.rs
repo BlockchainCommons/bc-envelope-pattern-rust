@@ -1,9 +1,10 @@
 use std::ops::RangeInclusive;
 
+use bc_envelope::Envelope;
 use dcbor::{Date, prelude::*};
 
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
@@ -204,8 +205,9 @@ impl Compilable for DatePattern {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bc_envelope::Envelope;
+
+    use super::*;
 
     #[test]
     fn test_date_pattern_any() {

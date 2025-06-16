@@ -1,7 +1,8 @@
+use bc_envelope::Envelope;
 use known_values::{KNOWN_VALUES, KnownValue};
 
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
@@ -144,13 +145,14 @@ impl Compilable for KnownValuePattern {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use bc_envelope::Envelope;
+    use crate::{Matcher, pattern::leaf::KnownValuePattern};
 
     #[test]
     fn test_known_value_pattern_any() {
         use known_values::KnownValue;
-
-        use crate::{Envelope, Matcher, pattern::leaf::KnownValuePattern};
 
         let value = KnownValue::new(1);
         let envelope = Envelope::new(value.clone());
@@ -167,8 +169,6 @@ mod tests {
 
     #[test]
     fn test_known_value_pattern_specific() {
-        use crate::{Envelope, Matcher, pattern::leaf::KnownValuePattern};
-
         let value = known_values::DATE;
         let envelope = Envelope::new(value.clone());
         let pattern = KnownValuePattern::known_value(value.clone());
@@ -185,8 +185,6 @@ mod tests {
 
     #[test]
     fn test_known_value_pattern_named() {
-        use crate::{Envelope, Matcher, pattern::leaf::KnownValuePattern};
-
         let value = known_values::DATE;
         let envelope = Envelope::new(value.clone());
 
@@ -215,8 +213,6 @@ mod tests {
 
     #[test]
     fn test_known_value_pattern_regex() {
-        use crate::{Envelope, Matcher, pattern::leaf::KnownValuePattern};
-
         // Test regex that matches "date"
         let value = known_values::DATE;
         let envelope = Envelope::new(value.clone());

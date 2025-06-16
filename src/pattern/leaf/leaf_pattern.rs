@@ -1,10 +1,12 @@
-use super::KnownValuePattern;
+use bc_envelope::Envelope;
+
 use super::{
     ArrayPattern, BoolPattern, ByteStringPattern, CBORPattern, DatePattern,
-    MapPattern, NullPattern, NumberPattern, TaggedPattern, TextPattern,
+    KnownValuePattern, MapPattern, NullPattern, NumberPattern, TaggedPattern,
+    TextPattern,
 };
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{Compilable, Matcher, Path, compile_as_atomic, vm::Instr},
 };
 

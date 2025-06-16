@@ -1,7 +1,8 @@
 use bc_components::{Digest, DigestProvider};
+use bc_envelope::Envelope;
 
 use crate::{
-    Envelope, Pattern,
+    Pattern,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic,
         structure::StructurePattern, vm::Instr,

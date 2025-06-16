@@ -57,15 +57,16 @@ use std::{
     ops::{Bound, RangeBounds, RangeInclusive},
 };
 
+use bc_envelope::Envelope;
 use dcbor::prelude::*;
 use known_values::KnownValue;
 
-use super::leaf::KnownValuePattern;
 use super::{
     Greediness, Matcher, Path,
     leaf::{
-        ArrayPattern, BoolPattern, ByteStringPattern, DatePattern, LeafPattern,
-        MapPattern, NullPattern, NumberPattern, TaggedPattern, TextPattern,
+        ArrayPattern, BoolPattern, ByteStringPattern, DatePattern,
+        KnownValuePattern, LeafPattern, MapPattern, NullPattern, NumberPattern,
+        TaggedPattern, TextPattern,
     },
     meta::{
         AndPattern, CapturePattern, MetaPattern, NotPattern, OrPattern,
@@ -78,14 +79,11 @@ use super::{
     },
     vm,
 };
-use crate::{
-    Envelope,
-    pattern::{
-        Compilable,
-        leaf::CBORPattern,
-        meta::{AnyPattern, NonePattern},
-        vm::Instr,
-    },
+use crate::pattern::{
+    Compilable,
+    leaf::CBORPattern,
+    meta::{AnyPattern, NonePattern},
+    vm::Instr,
 };
 
 /// The main pattern type used for matching envelopes.

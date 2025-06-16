@@ -1,10 +1,9 @@
 use std::cell::RefCell;
 
 use bc_components::DigestProvider;
+use bc_envelope::{EdgeType, Envelope};
 
-use crate::{
-    pattern::{vm::Instr, Compilable, Matcher, Path, Pattern}, EdgeType, Envelope
-};
+use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct SearchPattern(Box<Pattern>);

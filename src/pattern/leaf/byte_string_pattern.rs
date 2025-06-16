@@ -1,5 +1,11 @@
+use bc_envelope::Envelope;
+
 use crate::{
-    pattern::{compile_as_atomic, leaf::LeafPattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        vm::Instr,
+    },
 };
 
 /// Pattern for matching byte string values.
@@ -95,9 +101,7 @@ impl Matcher for ByteStringPattern {
 impl Compilable for ByteStringPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
-            &Pattern::Leaf(LeafPattern::ByteString(
-                self.clone(),
-            )),
+            &Pattern::Leaf(LeafPattern::ByteString(self.clone())),
             code,
             literals,
         );
@@ -106,10 +110,10 @@ impl Compilable for ByteStringPattern {
 
 #[cfg(test)]
 mod tests {
+    use bc_envelope::Envelope;
     use dcbor::prelude::*;
 
     use super::*;
-    use bc_envelope::Envelope;
 
     #[test]
     fn test_byte_string_pattern_any() {

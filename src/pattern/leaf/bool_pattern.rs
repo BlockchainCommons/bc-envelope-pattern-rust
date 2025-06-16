@@ -1,5 +1,11 @@
+use bc_envelope::Envelope;
+
 use crate::{
-    pattern::{compile_as_atomic, leaf::LeafPattern, vm::Instr, Compilable, Matcher, Path}, Envelope, Pattern
+    Pattern,
+    pattern::{
+        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        vm::Instr,
+    },
 };
 
 /// Pattern for matching boolean values.
@@ -41,9 +47,7 @@ impl Matcher for BoolPattern {
 impl Compilable for BoolPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
-            &Pattern::Leaf(LeafPattern::Bool(
-                self.clone(),
-            )),
+            &Pattern::Leaf(LeafPattern::Bool(self.clone())),
             code,
             literals,
         );

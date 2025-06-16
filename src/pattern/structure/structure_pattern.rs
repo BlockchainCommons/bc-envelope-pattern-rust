@@ -1,11 +1,10 @@
+use bc_envelope::Envelope;
+
 use super::{
     AssertionsPattern, DigestPattern, NodePattern, ObjectPattern,
     ObscuredPattern, PredicatePattern, SubjectPattern, WrappedPattern,
 };
-use crate::{
-    Envelope,
-    pattern::{Compilable, Matcher, Path, Pattern, vm::Instr},
-};
+use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
 
 /// Pattern for matching envelope structure elements.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
