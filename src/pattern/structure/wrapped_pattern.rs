@@ -26,7 +26,7 @@ impl Compilable for WrappedPattern {
         // println!("Compiling WrappedPattern: {:?}", self);
         // 1) atomic predicate “is wrapped”
         let idx = lits.len();
-        lits.push(Pattern::Structure(StructurePattern::wrapped(self.clone())));
+        lits.push(Pattern::Structure(StructurePattern::Wrapped(self.clone())));
         code.push(Instr::MatchStructure(idx));
 
         // 2) then move into inner envelope

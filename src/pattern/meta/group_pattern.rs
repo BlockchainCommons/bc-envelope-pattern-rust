@@ -1,5 +1,5 @@
-//! Simple capture wrapper.  For now we only emit SAVE instructions;
-//! future work can attach names to paths.
+//! Simple group wrapper.  For now we only emit SAVE instructions;
+//! future work can acquire captures and named captures.
 
 use bc_envelope::Envelope;
 
@@ -9,18 +9,18 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct CapturePattern {
+pub struct GroupPattern {
     pub name: String,
     pub inner: Box<Pattern>,
 }
 
-impl Matcher for CapturePattern {
+impl Matcher for GroupPattern {
     fn paths(&self, _envelope: &Envelope) -> Vec<Path> {
         todo!();
     }
 }
 
-impl Compilable for CapturePattern {
+impl Compilable for GroupPattern {
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         code.push(Instr::Save); // start
         self.inner.compile(code, lits);

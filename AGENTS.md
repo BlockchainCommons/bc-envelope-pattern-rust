@@ -29,6 +29,8 @@ The syntax integrates the dCBOR diagnostic notation for matching CBOR values, so
 
 The result of successful parsing is a `Pattern` object, which can be used to match against Gordian Envelopes.
 
+White space is ignored between tokens, so you can use it to make patterns more readable. The syntax examples below includ white space both to show where it can be used and to show where it *cannot* be used (i.e., between characters of a token like `*?`)
+
 ### Leaf Patterns
 
 All leaf patterns match Envelope leaves, which are CBOR values.
@@ -36,57 +38,59 @@ All leaf patterns match Envelope leaves, which are CBOR values.
 - Array
     - `ARRAY`
         - Matches any array.
-    - `ARRAY(n)`
+    - `ARRAY ( n )`
         - Matches an array with exactly `n` elements.
-    - `ARRAY({n,m})`
+    - `ARRAY ( { n , m } )`
         - Matches an array with between `n` and `m` elements, inclusive.
 - Boolean
     - `BOOL`
         - Matches any boolean value.
-    - `BOOL(true)`
+    - `BOOL ( true )`
         - Matches the boolean value `true`.
-    - `BOOL(false)`
+    - `BOOL ( false )`
         - Matches the boolean value `false`.
 - ByteString
     - `BSTR`
         - Matches any byte string.
-    - `BSTR(hex)`
+    - `BSTR ( hex )`
         - Matches a byte string with the specified hex value.
-    - `BSTR(/regex/)`
+    - `BSTR ( /regex/ )`
         - Matches a byte string that matches the specified binary regex.
 - CBOR
     - `CBOR`
         - Matches any CBOR value.
-    - `CBOR(diagnostic-notation)`
+    - `CBOR ( diagnostic-notation )`
         - Matches a CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
+    - `CBOR ( ur:type/value )`
+        - Matches a CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
 - Date
     - `DATE`
         - Matches any date value.
-    - `DATE(iso-8601)`
+    - `DATE ( iso-8601 )`
         - Matches a date value with the specified ISO 8601 format.
-    - `DATE(iso-8601...iso-8601)`
+    - `DATE ( iso-8601 ... iso-8601 )`
         - Matches a date value within the specified range.
-    - `DATE(iso-8601...)`
+    - `DATE ( iso-8601 ... )`
         - Matches a date value greater than or equal to the specified ISO 8601 date.
-    - `DATE(...iso-8601)`
+    - `DATE ( ... iso-8601 )`
         - Matches a date value less than or equal to the specified ISO 8601 date.
-    - `DATE(/regex/)`
+    - `DATE ( /regex/ )`
         - Matches a date value that matches the specified regex.
 - Known Value
     - `KNOWN`
         - Matches any known value. (See the `known-values` crate for more information.)
-    - `KNOWN(value)`
+    - `KNOWN ( value )`
         - Matches the specified known value.
-    - `KNOWN(name)`
+    - `KNOWN ( name )`
         - Matches the known value with the specified name.
-    - `KNOWN(/regex/)`
+    - `KNOWN ( /regex/ )`
         - Matches a known value with a name that matches the specified regex.
 - Map
     - `MAP`
         - Matches any map.
-      - `MAP(n)`
+    - `MAP ( n )`
         - Matches a map with exactly `n` entries.
-    - `MAP({n,m})`
+    - `MAP ( { n , m } )`
         - Matches a map with between `n` and `m` entries, inclusive.
 - Null
     - `NULL`
@@ -94,35 +98,35 @@ All leaf patterns match Envelope leaves, which are CBOR values.
 - Number
     - `NUMBER`
         - Matches any number.
-    - `NUMBER(value)`
+    - `NUMBER ( value )`
         - Matches the specified number.
-    - `NUMBER(value...value)`
+    - `NUMBER ( value ... value )`
         - Matches a number within the specified range.
-    - `NUMBER(>=value)`
+    - `NUMBER ( >= value )`
         - Matches a number greater than or equal to the specified value.
-    - `NUMBER(<=value)`
+    - `NUMBER ( <= value )`
         - Matches a number less than or equal to the specified value.
-    - `NUMBER(>value)`
+    - `NUMBER ( > value )`
         - Matches a number greater than the specified value.
-    - `NUMBER(<value)`
+    - `NUMBER ( < value )`
         - Matches a number less than the specified value.
-    - `NUMBER(NaN)`
+    - `NUMBER ( NaN )`
         - Matches the NaN (Not a Number) value.
 - Tagged
     - `TAG`
         - Matches any CBOR tagged value.
-    - `TAG(value)`
+    - `TAG ( value )`
         - Matches the specified CBOR tagged value.
-    - `TAG(name)`
+    - `TAG ( name )`
         - Matches the CBOR tagged value with the specified name.
-    - `TAG(/regex/)`
+    - `TAG ( /regex/ )`
         - Matches a CBOR tagged value with a name that matches the specified regex.
 - Text
     - `TEXT`
         - Matches any text value.
-    - `TEXT(string)`
+    - `TEXT ( string )`
         - Matches a text value with the specified string.
-    - `TEXT(/regex/)`
+    - `TEXT ( /regex/ )`
         - Matches a text value that matches the specified regex.
 
 ### Structure Patterns
@@ -132,22 +136,22 @@ Structure patterns match parts of Gordian Envelope structures.
 - Assertions
     - `ASSERTION`
         - Matches any assertion.
-    - `ASSERTION-PRED(pattern)`
+    - `ASSERTION-PRED ( pattern )`
         - Matches an assertion having a predicate that matches the specified pattern.
-    - `ASSERTION-OBJ(pattern)`
+    - `ASSERTION-OBJ ( pattern )`
         - Matches an assertion having an object that matches the specified pattern.
 - Digest
-    - `DIGEST(ur:digest)`
+    - `DIGEST ( ur:digest/value )`
         - Matches the specified `ur:digest` value, parsed using the `bc-ur` crate.
 - Node
     - `NODE`
         - Matches any Gordian Envelope node, which is an envelope with at least one assertion.
-    - `NODE(assertions-count)`
+    - `NODE ( assertions-count )`
         - Matches a Gordian Envelope node with the specified number of assertions (must be greater than 0).
 - Objects
     - `OBJ`
         - Matches any object.
-    - `OBJ(pattern)`
+    - `OBJ ( pattern )`
         - Matches an object that matches the specified pattern.
 - Obscured
     - `OBSCURED`
@@ -161,12 +165,12 @@ Structure patterns match parts of Gordian Envelope structures.
 - Predicates
     - `PRED`
         - Matches any predicate.
-    - `PRED(pattern)`
+    - `PRED ( pattern )`
         - Matches a predicate that matches the specified pattern.
 - Subjects
     - `SUBJECT`
         - Matches any subject. If the envelope is not a NODE, then this is the identity function.
-    - `SUBJECT(pattern)`
+    - `SUBJECT ( pattern )`
         - Matches a subject that matches the specified pattern.
 - Wrapped
     - `WRAPPED`
@@ -174,45 +178,49 @@ Structure patterns match parts of Gordian Envelope structures.
 
 ### Meta Patterns
 
+The following meta patterns are available to combine or modify other patterns.
+
+Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, and then Or. Parentheses can be used to group patterns and change precedence.
+
 - And
-    - `pattern&pattern&pattern`…
+    - `pattern & pattern & pattern`…
         - Matches if all specified patterns match.
 - Any
     - `ANY`
         - Always matches.
-- Capture Group (not the matcher does not support this yet)
-    - `(pattern)`
+- Group (Note: the matcher does not support this yet)
+    - `( pattern )`
         - Matches the specified pattern and captures the match for later use.
-    - `@name(pattern)`
+    - `@name ( pattern )`
         - Matches the specified pattern and captures the match for later use with the given name.
 - None
     - `NONE`
         - Never matches.
 - Not
-    - `!pattern`
+    - `! pattern`
         - Matches if the specified pattern does not match.
 - Or
-    - `pattern|pattern|pattern…`
+    - `pattern | pattern | pattern…`
         - Matches if any of the specified patterns match.
 - Repeat
     - Greedy — grabs as many repetitions as possible, then backtracks if the rest of the pattern cannot match.
-        - `pattern*` (0 or more)
-        - `pattern?` (0 or 1)
-        - `pattern+` (1 or more)
-        - `pattern{n,m}` (`n` to `m` repeats, inclusive)
+        - `pattern *` (0 or more)
+        - `pattern ?` (0 or 1)
+        - `pattern +` (1 or more)
+        - `pattern {n,m}` (`n` to `m` repeats, inclusive)
     - Lazy — starts with as few repetitions as possible, adding more only if the rest of the pattern cannot match.
-        - `pattern*?` (0 or more)
-        - `pattern??` (0 or 1)
-        - `pattern+?` (1 or more)
-        - `pattern{n,m}?` (`n` to `m` repeats, inclusive)
+        - `pattern *?` (0 or more)
+        - `pattern ??` (0 or 1)
+        - `pattern +?` (1 or more)
+        - `pattern {n,m}?` (`n` to `m` repeats, inclusive)
     - Possessive — grabs as many repetitions as possible and never backtracks; if the rest of the pattern cannot match, the whole match fails.
-        - `pattern*+` (0 or more)
-        - `pattern?+` (0 or 1)
-        - `pattern++` (1 or more)
-        - `pattern{n,m}+` (`n` to `m` repeats, inclusive)
+        - `pattern *+` (0 or more)
+        - `pattern ?+` (0 or 1)
+        - `pattern ++` (1 or more)
+        - `pattern {n,m}+` (`n` to `m` repeats, inclusive)
 - Search
-    - `SEARCH(pattern)`
+    - `SEARCH ( pattern )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.
 - Sequence
-    - `pattern>pattern>pattern`
+    - `pattern > pattern > pattern`
         - Matches if the specified patterns match in sequence, with no other nodes in between.

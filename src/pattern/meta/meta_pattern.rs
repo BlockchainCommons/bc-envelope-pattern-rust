@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use super::{
-    AndPattern, CapturePattern, NotPattern, OrPattern, RepeatPattern,
+    AndPattern, GroupPattern, NotPattern, OrPattern, RepeatPattern,
     SearchPattern, SequencePattern,
 };
 use crate::{
@@ -32,24 +32,8 @@ pub enum MetaPattern {
     Sequence(SequencePattern),
     /// Matches with repetition.
     Repeat(RepeatPattern),
-    /// Captures a pattern match.
-    Capture(CapturePattern),
-}
-
-impl MetaPattern {
-    pub fn and(pattern: AndPattern) -> Self { MetaPattern::And(pattern) }
-
-    pub fn or(pattern: OrPattern) -> Self { MetaPattern::Or(pattern) }
-
-    pub fn search(pattern: SearchPattern) -> Self {
-        MetaPattern::Search(pattern)
-    }
-
-    pub fn sequence(pattern: SequencePattern) -> Self {
-        MetaPattern::Sequence(pattern)
-    }
-
-    pub fn not(pattern: NotPattern) -> Self { MetaPattern::Not(pattern) }
+    /// Groups (captures) a pattern match.
+    Group(GroupPattern),
 }
 
 impl Matcher for MetaPattern {
@@ -63,7 +47,7 @@ impl Matcher for MetaPattern {
             MetaPattern::Search(pattern) => pattern.paths(envelope),
             MetaPattern::Sequence(pattern) => pattern.paths(envelope),
             MetaPattern::Repeat(pattern) => pattern.paths(envelope),
-            MetaPattern::Capture(pattern) => pattern.paths(envelope),
+            MetaPattern::Group(pattern) => pattern.paths(envelope),
         }
     }
 }
@@ -79,7 +63,7 @@ impl Compilable for MetaPattern {
             MetaPattern::Search(pattern) => pattern.compile(code, lits),
             MetaPattern::Sequence(pattern) => pattern.compile(code, lits),
             MetaPattern::Repeat(pattern) => pattern.compile(code, lits),
-            MetaPattern::Capture(pattern) => pattern.compile(code, lits),
+            MetaPattern::Group(pattern) => pattern.compile(code, lits),
         }
     }
 }

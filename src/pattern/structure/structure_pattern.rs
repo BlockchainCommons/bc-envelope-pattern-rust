@@ -27,40 +27,6 @@ pub enum StructurePattern {
     Wrapped(WrappedPattern),
 }
 
-impl StructurePattern {
-    pub fn assertions(pattern: AssertionsPattern) -> Self {
-        StructurePattern::Assertions(pattern)
-    }
-
-    pub fn digest(pattern: DigestPattern) -> Self {
-        StructurePattern::Digest(pattern)
-    }
-
-    pub fn node(pattern: NodePattern) -> Self {
-        StructurePattern::Node(pattern)
-    }
-
-    pub fn object(pattern: ObjectPattern) -> Self {
-        StructurePattern::Object(pattern)
-    }
-
-    pub fn obscured(pattern: ObscuredPattern) -> Self {
-        StructurePattern::Obscured(pattern)
-    }
-
-    pub fn predicate(pattern: PredicatePattern) -> Self {
-        StructurePattern::Predicate(pattern)
-    }
-
-    pub fn subject(pattern: SubjectPattern) -> Self {
-        StructurePattern::Subject(pattern)
-    }
-
-    pub fn wrapped(pattern: WrappedPattern) -> Self {
-        StructurePattern::Wrapped(pattern)
-    }
-}
-
 impl Matcher for StructurePattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         match self {

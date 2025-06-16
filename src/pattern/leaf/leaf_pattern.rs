@@ -39,39 +39,6 @@ pub enum LeafPattern {
     KnownValue(KnownValuePattern),
 }
 
-impl LeafPattern {
-    /// Creates a new `LeafPattern` that matches any leaf.
-    pub fn any() -> Self { LeafPattern::Any }
-
-    pub fn cbor(pattern: CBORPattern) -> Self { LeafPattern::Cbor(pattern) }
-
-    pub fn number(pattern: NumberPattern) -> Self {
-        LeafPattern::Number(pattern)
-    }
-
-    pub fn text(pattern: TextPattern) -> Self { LeafPattern::Text(pattern) }
-
-    pub fn byte_string(pattern: ByteStringPattern) -> Self {
-        LeafPattern::ByteString(pattern)
-    }
-
-    pub fn tag(pattern: TaggedPattern) -> Self { LeafPattern::Tag(pattern) }
-
-    pub fn array(pattern: ArrayPattern) -> Self { LeafPattern::Array(pattern) }
-
-    pub fn map(pattern: MapPattern) -> Self { LeafPattern::Map(pattern) }
-
-    pub fn boolean(pattern: BoolPattern) -> Self { LeafPattern::Bool(pattern) }
-
-    pub fn null(pattern: NullPattern) -> Self { LeafPattern::Null(pattern) }
-
-    pub fn date(pattern: DatePattern) -> Self { LeafPattern::Date(pattern) }
-
-    pub fn known_value(pattern: KnownValuePattern) -> Self {
-        LeafPattern::KnownValue(pattern)
-    }
-}
-
 impl Matcher for LeafPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         match self {

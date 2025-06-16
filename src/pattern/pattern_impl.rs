@@ -69,7 +69,7 @@ use super::{
         TaggedPattern, TextPattern,
     },
     meta::{
-        AndPattern, CapturePattern, MetaPattern, NotPattern, OrPattern,
+        AndPattern, GroupPattern, MetaPattern, NotPattern, OrPattern,
         RepeatPattern, SearchPattern, SequencePattern,
     },
     structure::{
@@ -379,25 +379,25 @@ impl Pattern {
 
 impl Pattern {
     pub fn wrapped() -> Self {
-        Pattern::Structure(StructurePattern::wrapped(WrappedPattern::any()))
+        Pattern::Structure(StructurePattern::Wrapped(WrappedPattern::any()))
     }
 }
 
 impl Pattern {
     pub fn any_assertion() -> Self {
-        Pattern::Structure(StructurePattern::assertions(
+        Pattern::Structure(StructurePattern::Assertions(
             AssertionsPattern::any(),
         ))
     }
 
     pub fn assertion_with_predicate(pattern: Pattern) -> Self {
-        Pattern::Structure(StructurePattern::assertions(
+        Pattern::Structure(StructurePattern::Assertions(
             AssertionsPattern::with_predicate(pattern),
         ))
     }
 
     pub fn assertion_with_object(pattern: Pattern) -> Self {
-        Pattern::Structure(StructurePattern::assertions(
+        Pattern::Structure(StructurePattern::Assertions(
             AssertionsPattern::with_object(pattern),
         ))
     }
@@ -405,25 +405,25 @@ impl Pattern {
 
 impl Pattern {
     pub fn subject() -> Self {
-        Pattern::Structure(StructurePattern::subject(SubjectPattern::any()))
+        Pattern::Structure(StructurePattern::Subject(SubjectPattern::any()))
     }
 
     pub fn any_predicate() -> Self {
-        Pattern::Structure(StructurePattern::predicate(PredicatePattern::any()))
+        Pattern::Structure(StructurePattern::Predicate(PredicatePattern::any()))
     }
 
     pub fn predicate(pattern: Pattern) -> Self {
-        Pattern::Structure(StructurePattern::predicate(
+        Pattern::Structure(StructurePattern::Predicate(
             PredicatePattern::pattern(pattern),
         ))
     }
 
     pub fn any_object() -> Self {
-        Pattern::Structure(StructurePattern::object(ObjectPattern::any()))
+        Pattern::Structure(StructurePattern::Object(ObjectPattern::any()))
     }
 
     pub fn object(pattern: Pattern) -> Self {
-        Pattern::Structure(StructurePattern::object(ObjectPattern::pattern(
+        Pattern::Structure(StructurePattern::Object(ObjectPattern::pattern(
             pattern,
         )))
     }
@@ -431,59 +431,59 @@ impl Pattern {
 
 impl Pattern {
     pub fn digest(digest: bc_components::Digest) -> Self {
-        Pattern::Structure(StructurePattern::digest(DigestPattern::digest(
+        Pattern::Structure(StructurePattern::Digest(DigestPattern::digest(
             digest,
         )))
     }
 
     pub fn digest_hex_prefix<T: Into<String>>(prefix: T) -> Self {
-        Pattern::Structure(StructurePattern::digest(DigestPattern::hex_prefix(
+        Pattern::Structure(StructurePattern::Digest(DigestPattern::hex_prefix(
             prefix,
         )))
     }
 
     pub fn digest_binary_regex(regex: regex::bytes::Regex) -> Self {
-        Pattern::Structure(StructurePattern::digest(
-            DigestPattern::binary_regex(regex),
-        ))
+        Pattern::Structure(StructurePattern::Digest(DigestPattern::binary_regex(
+            regex,
+        )))
     }
 
     pub fn any_node() -> Self {
-        Pattern::Structure(StructurePattern::node(NodePattern::any()))
+        Pattern::Structure(StructurePattern::Node(NodePattern::any()))
     }
 
     pub fn node_with_assertions_count_range(
         range: RangeInclusive<usize>,
     ) -> Self {
-        Pattern::Structure(StructurePattern::node(
+        Pattern::Structure(StructurePattern::Node(
             NodePattern::assertions_count_range(range),
         ))
     }
 
     pub fn node_with_assertions_count(count: usize) -> Self {
-        Pattern::Structure(StructurePattern::node(
+        Pattern::Structure(StructurePattern::Node(
             NodePattern::assertions_count(count),
         ))
     }
 
     pub fn obscured() -> Self {
-        Pattern::Structure(StructurePattern::obscured(ObscuredPattern::any()))
+        Pattern::Structure(StructurePattern::Obscured(ObscuredPattern::any()))
     }
 
     pub fn elided() -> Self {
         Pattern::Structure(
-            StructurePattern::obscured(ObscuredPattern::elided()),
+            StructurePattern::Obscured(ObscuredPattern::elided()),
         )
     }
 
     pub fn encrypted() -> Self {
-        Pattern::Structure(StructurePattern::obscured(
+        Pattern::Structure(StructurePattern::Obscured(
             ObscuredPattern::encrypted(),
         ))
     }
 
     pub fn compressed() -> Self {
-        Pattern::Structure(StructurePattern::obscured(
+        Pattern::Structure(StructurePattern::Obscured(
             ObscuredPattern::compressed(),
         ))
     }
@@ -511,20 +511,20 @@ impl Pattern {
     /// Creates a new `Pattern` that only matches if all specified patterns
     /// match.
     pub fn and(patterns: Vec<Pattern>) -> Self {
-        Pattern::Meta(MetaPattern::and(AndPattern::new(patterns)))
+        Pattern::Meta(MetaPattern::And(AndPattern::new(patterns)))
     }
 
     /// Creates a new `Pattern` that matches if at least one of the specified
     /// patterns matches.
     pub fn or(patterns: Vec<Pattern>) -> Self {
-        Pattern::Meta(MetaPattern::or(OrPattern::new(patterns)))
+        Pattern::Meta(MetaPattern::Or(OrPattern::new(patterns)))
     }
 }
 
 impl Pattern {
     /// Creates a new `Pattern` that matches a sequence of patterns in order.
     pub fn sequence(patterns: Vec<Pattern>) -> Self {
-        Pattern::Meta(MetaPattern::sequence(SequencePattern::new(patterns)))
+        Pattern::Meta(MetaPattern::Sequence(SequencePattern::new(patterns)))
     }
 }
 
@@ -533,7 +533,7 @@ impl Pattern {
     /// envelope. Useful for finding patterns that may not be at the root
     /// of the envelope.
     pub fn search(pattern: Pattern) -> Self {
-        Pattern::Meta(MetaPattern::search(SearchPattern::new(pattern)))
+        Pattern::Meta(MetaPattern::Search(SearchPattern::new(pattern)))
     }
 }
 
@@ -541,7 +541,7 @@ impl Pattern {
     /// Creates a new `Pattern` that negates another pattern; matches if the
     /// specified pattern does not match.
     pub fn not_matching(pattern: Pattern) -> Self {
-        Pattern::Meta(MetaPattern::not(NotPattern::new(pattern)))
+        Pattern::Meta(MetaPattern::Not(NotPattern::new(pattern)))
     }
 }
 
@@ -604,7 +604,7 @@ impl Pattern {
 impl Pattern {
     /// Creates a new `Pattern` that will capture a pattern match with a name.
     pub fn capture(name: &str, pattern: Pattern) -> Self {
-        Pattern::Meta(MetaPattern::Capture(CapturePattern {
+        Pattern::Meta(MetaPattern::Group(GroupPattern {
             name: name.to_string(),
             inner: Box::new(pattern),
         }))
