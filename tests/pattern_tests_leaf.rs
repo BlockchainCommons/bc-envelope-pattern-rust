@@ -19,12 +19,16 @@ fn test_bool_pattern() {
     assert!(Pattern::any_bool().matches(&envelope));
     assert!(Pattern::bool(true).matches(&envelope));
     assert!(!Pattern::bool(false).matches(&envelope));
+    assert!(Pattern::cbor(true).matches(&envelope));
+    assert!(!Pattern::cbor(false).matches(&envelope));
 
     // Matches a subject that is a boolean with an assertion.
     let envelope = envelope.add_assertion("an", "assertion");
     assert!(Pattern::any_bool().matches(&envelope));
     assert!(Pattern::bool(true).matches(&envelope));
     assert!(!Pattern::bool(false).matches(&envelope));
+    assert!(Pattern::cbor(true).matches(&envelope));
+    assert!(!Pattern::cbor(false).matches(&envelope));
 
     // The matched paths include the assertion. In other words, the
     // path just includes the envelope itself as its only element.
@@ -61,6 +65,9 @@ fn test_number_pattern() {
     assert!(Pattern::any_number().matches(&envelope));
     assert!(Pattern::number(42).matches(&envelope));
     assert!(!Pattern::number(43).matches(&envelope));
+    assert!(Pattern::cbor(42).matches(&envelope));
+    assert!(!Pattern::cbor(43).matches(&envelope));
+
     assert!(Pattern::number_range(40..=50).matches(&envelope));
     assert!(!Pattern::number_range(43..=50).matches(&envelope));
     assert!(Pattern::number_greater_than(41).matches(&envelope));
@@ -109,6 +116,8 @@ fn test_text_pattern() {
     assert!(Pattern::any_text().matches(&envelope));
     assert!(Pattern::text("hello").matches(&envelope));
     assert!(!Pattern::text("world").matches(&envelope));
+    assert!(Pattern::cbor("hello").matches(&envelope));
+    assert!(!Pattern::cbor("world").matches(&envelope));
     let regex = regex::Regex::new(r"^h.*o$").unwrap();
     assert!(Pattern::text_regex(regex.clone()).matches(&envelope));
 
@@ -157,6 +166,8 @@ fn test_date_pattern() {
     assert!(Pattern::any_date().matches(&envelope));
     assert!(Pattern::date(date.clone()).matches(&envelope));
     assert!(!Pattern::date(Date::from_ymd(2023, 12, 24)).matches(&envelope));
+    assert!(Pattern::cbor(date.clone()).matches(&envelope));
+    assert!(!Pattern::cbor(Date::from_ymd(2023, 12, 24)).matches(&envelope));
 
     // Test date range matching
     let start = Date::from_ymd(2023, 12, 20);
@@ -233,8 +244,10 @@ fn test_known_value_pattern() {
     let envelope = Envelope::new(known_values::DATE);
     assert!(Pattern::any_known_value().matches(&envelope));
     assert!(Pattern::known_value(known_values::DATE).matches(&envelope));
-    assert!(Pattern::known_value_named("date").matches(&envelope));
     assert!(!Pattern::known_value(known_values::LANGUAGE).matches(&envelope));
+    assert!(Pattern::cbor(known_values::DATE).matches(&envelope));
+    assert!(!Pattern::cbor(known_values::LANGUAGE).matches(&envelope));
+    assert!(Pattern::known_value_named("date").matches(&envelope));
     assert!(!Pattern::known_value_named("language").matches(&envelope));
 
     // Matches a subject that is a known value with an assertion.
@@ -354,6 +367,11 @@ fn test_byte_string_pattern() {
 
     // Matches exact byte string
     assert!(Pattern::byte_string(hello_bytes.clone()).matches(&envelope));
+    assert!(
+        Pattern::cbor(CBOR::to_byte_string(hello_bytes.clone()))
+            .matches(&envelope)
+    );
+
     assert!(!Pattern::byte_string(vec![1, 2, 3]).matches(&envelope));
 
     // Matches binary regex
@@ -445,8 +463,11 @@ fn test_array_pattern() {
     assert!(!Pattern::array_count(3).matches(&envelope));
 
     // Test with a CBOR array
-    let array_data = vec![1, 2, 3].to_cbor();
-    let envelope = Envelope::new(array_data);
+    let array = vec![1, 2, 3];
+    let envelope = Envelope::new(array.clone());
+
+    // Matches the exact CBOR array
+    assert!(Pattern::cbor(array).matches(&envelope));
 
     // Matches any array
     assert!(Pattern::any_array().matches(&envelope));
@@ -504,7 +525,10 @@ fn test_map_pattern() {
     let mut map = Map::new();
     map.insert("key1", "value1");
     map.insert("key2", "value2");
-    let envelope = Envelope::new(map);
+    let envelope = Envelope::new(map.clone());
+
+    // Matches the exact CBOR map
+    assert!(Pattern::cbor(map).matches(&envelope));
 
     // Matches any map
     assert!(Pattern::any_map().matches(&envelope));
@@ -558,6 +582,9 @@ fn test_null_pattern() {
     let envelope = Envelope::null();
     assert!(Pattern::null().matches(&envelope));
 
+    // Matches a CBOR null value.
+    assert!(Pattern::cbor(CBOR::null()).matches(&envelope));
+
     // Matches a subject that is null with an assertion.
     let envelope = envelope.add_assertion("type", "null_value");
     assert!(Pattern::null().matches(&envelope));
@@ -594,7 +621,10 @@ fn test_tag_pattern() {
 
     // Test with a tagged CBOR value
     let tagged_cbor = CBOR::to_tagged_value(100, "tagged_content");
-    let envelope = Envelope::new(tagged_cbor);
+    let envelope = Envelope::new(tagged_cbor.clone());
+
+    // Matches a tagged CBOR value
+    assert!(Pattern::cbor(tagged_cbor).matches(&envelope));
 
     // Matches any tag
     assert!(Pattern::any_tag().matches(&envelope));
@@ -672,7 +702,8 @@ fn test_tag_pattern_named() {
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
         3854ff69 2023-12-25
-    "#}.trim();
+    "#}
+    .trim();
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(paths.len(), 1);
     assert_eq!(paths[0].len(), 1);

@@ -22,7 +22,7 @@ impl CBORPattern {
     pub fn any() -> Self { CBORPattern::Any }
 
     /// Creates a new `CborPattern` that matches a specific CBOR value.
-    pub fn exact(cbor: CBOR) -> Self { CBORPattern::Exact(cbor) }
+    pub fn exact(cbor: impl CBOREncodable) -> Self { CBORPattern::Exact(cbor.to_cbor()) }
 }
 
 impl Matcher for CBORPattern {

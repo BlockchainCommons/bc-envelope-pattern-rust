@@ -144,7 +144,7 @@ impl Pattern {
     }
 
     /// Creates a new `Pattern` that matches a specific CBOR value.
-    pub fn cbor(cbor: CBOR) -> Self {
+    pub fn cbor(cbor: impl CBOREncodable) -> Self {
         Pattern::Leaf(LeafPattern::Cbor(CBORPattern::exact(cbor)))
     }
 }
