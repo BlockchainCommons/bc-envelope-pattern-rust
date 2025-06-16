@@ -22,16 +22,37 @@ impl CBORPattern {
     pub fn any() -> Self { CBORPattern::Any }
 
     /// Creates a new `CborPattern` that matches a specific CBOR value.
-    pub fn exact(cbor: impl CBOREncodable) -> Self { CBORPattern::Exact(cbor.to_cbor()) }
+    pub fn exact(cbor: impl CBOREncodable) -> Self {
+        CBORPattern::Exact(cbor.to_cbor())
+    }
 }
 
 impl Matcher for CBORPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         let subject = envelope.subject();
+
+        // Special case for KnownValue
+        if let Some(known_value) = subject.as_known_value() {
+            return match self {
+                CBORPattern::Any => vec![vec![envelope.clone()]],
+                CBORPattern::Exact(expected_cbor) => {
+                    // Create CBOR from the KnownValue for comparison
+                    let known_value_cbor = known_value.to_cbor();
+                    if &known_value_cbor == expected_cbor {
+                        vec![vec![envelope.clone()]]
+                    } else {
+                        vec![]
+                    }
+                }
+            };
+        }
+
+        // Standard case for CBOR leaf
         let subject_cbor = match subject.as_leaf() {
             Some(cbor) => cbor,
             None => return vec![],
         };
+
         match self {
             CBORPattern::Any => vec![vec![envelope.clone()]],
             CBORPattern::Exact(expected_cbor) => {
@@ -57,8 +78,9 @@ impl Compilable for CBORPattern {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bc_envelope::Envelope;
+
+    use super::*;
 
     #[test]
     fn test_cbor_pattern_any() {
