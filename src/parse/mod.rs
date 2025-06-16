@@ -1,3 +1,5 @@
+mod error;
 mod token;
 
-pub use token::{Error, Result, Token};
+pub use error::{Error, Result};
+pub use token::Token;
