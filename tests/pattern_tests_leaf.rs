@@ -43,7 +43,7 @@ fn test_bool_pattern() {
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_bool(), Pattern::subject()])
+        Pattern::sequence(vec![Pattern::any_bool(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -94,7 +94,7 @@ fn test_number_pattern() {
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_number(), Pattern::subject()])
+        Pattern::sequence(vec![Pattern::any_number(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -140,7 +140,7 @@ fn test_text_pattern() {
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_text(), Pattern::subject()])
+        Pattern::sequence(vec![Pattern::any_text(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -206,7 +206,7 @@ fn test_date_pattern() {
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_date(), Pattern::subject()])
+        Pattern::sequence(vec![Pattern::any_date(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -278,9 +278,11 @@ fn test_known_value_pattern() {
     // Matching a known value and the subject in a sequence returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
-    let paths =
-        Pattern::sequence(vec![Pattern::any_known_value(), Pattern::subject()])
-            .paths(&envelope);
+    let paths = Pattern::sequence(vec![
+        Pattern::any_known_value(),
+        Pattern::any_subject(),
+    ])
+    .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         813f39cd 'date' [ "meaning": "timestamp" ]
@@ -338,7 +340,7 @@ fn test_known_value_regex_pattern() {
     let regex = Regex::new(r".*te$").unwrap();
     let paths = Pattern::sequence(vec![
         Pattern::known_value_regex(regex),
-        Pattern::subject(),
+        Pattern::any_subject(),
     ])
     .paths(&envelope);
     #[rustfmt::skip]
@@ -403,9 +405,11 @@ fn test_byte_string_pattern() {
     // Matching a byte string and the subject in a sequence returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
-    let paths =
-        Pattern::sequence(vec![Pattern::any_byte_string(), Pattern::subject()])
-            .paths(&envelope);
+    let paths = Pattern::sequence(vec![
+        Pattern::any_byte_string(),
+        Pattern::any_subject(),
+    ])
+    .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         19c2bef3 Bytes(5) [ "type": "greeting" ]
@@ -502,7 +506,7 @@ fn test_array_pattern() {
 
     // Test sequence patterns
     let paths =
-        Pattern::sequence(vec![Pattern::any_array(), Pattern::subject()])
+        Pattern::sequence(vec![Pattern::any_array(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -562,8 +566,9 @@ fn test_map_pattern() {
     assert!(!Pattern::map_with_count(1).matches(&empty_envelope));
 
     // Test sequence patterns
-    let paths = Pattern::sequence(vec![Pattern::any_map(), Pattern::subject()])
-        .paths(&envelope);
+    let paths =
+        Pattern::sequence(vec![Pattern::any_map(), Pattern::any_subject()])
+            .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         1d96ee45 {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
@@ -600,8 +605,9 @@ fn test_null_pattern() {
     // Matching a null and the subject in a sequence returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
-    let paths = Pattern::sequence(vec![Pattern::null(), Pattern::subject()])
-        .paths(&envelope);
+    let paths =
+        Pattern::sequence(vec![Pattern::null(), Pattern::any_subject()])
+            .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a72948d7 null [ "type": "null_value" ]
@@ -654,8 +660,9 @@ fn test_tag_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
 
     // Test sequence patterns
-    let paths = Pattern::sequence(vec![Pattern::any_tag(), Pattern::subject()])
-        .paths(&envelope);
+    let paths =
+        Pattern::sequence(vec![Pattern::any_tag(), Pattern::any_subject()])
+            .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         b9457c8d 100("tagged_content") [ "format": "tagged" ]
@@ -712,7 +719,7 @@ fn test_tag_pattern_named() {
     // Test in sequence pattern
     let paths = Pattern::sequence(vec![
         Pattern::tagged_with_name("date"),
-        Pattern::subject(),
+        Pattern::any_subject(),
     ])
     .paths(&envelope);
     assert_actual_expected!(format_paths(&paths), expected);
@@ -769,7 +776,7 @@ fn test_tag_pattern_regex() {
     let regex = regex::Regex::new(r".*te$").unwrap();
     let paths = Pattern::sequence(vec![
         Pattern::tagged_with_regex(regex),
-        Pattern::subject(),
+        Pattern::any_subject(),
     ])
     .paths(&envelope);
     assert_eq!(paths.len(), 1);

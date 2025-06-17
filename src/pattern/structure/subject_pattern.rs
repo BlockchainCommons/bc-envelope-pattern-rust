@@ -1,32 +1,61 @@
 use bc_envelope::Envelope;
 
-use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
+use crate::pattern::{
+    Compilable, Matcher, Path, Pattern, structure::StructurePattern, vm::Instr,
+};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum SubjectPattern {
     Any,
+    Pattern(Box<Pattern>),
 }
 
 impl SubjectPattern {
     pub fn any() -> Self { SubjectPattern::Any }
-}
 
-impl Compilable for SubjectPattern {
-    fn compile(&self, code: &mut Vec<Instr>, _lits: &mut Vec<Pattern>) {
-        match self {
-            SubjectPattern::Any => {
-                code.push(Instr::NavigateSubject);
-            }
-        }
+    pub fn pattern(pattern: Pattern) -> Self {
+        SubjectPattern::Pattern(Box::new(pattern))
     }
 }
 
 impl Matcher for SubjectPattern {
     fn paths(&self, env: &Envelope) -> Vec<Path> {
-        if env.is_node() {
-            vec![vec![env.subject().clone()]]
-        } else {
-            vec![vec![]]
+        let subject = env.subject();
+        match self {
+            SubjectPattern::Any => {
+                vec![vec![subject.clone()]]
+            }
+            SubjectPattern::Pattern(pattern) => {
+                if pattern.matches(&subject) {
+                    vec![vec![subject.clone()]]
+                } else {
+                    vec![]
+                }
+            }
+        }
+    }
+}
+
+impl Compilable for SubjectPattern {
+    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+        match self {
+            SubjectPattern::Any => {
+                code.push(Instr::NavigateSubject);
+            }
+            SubjectPattern::Pattern(pattern) => {
+                todo!();
+            }
+        }
+    }
+}
+
+impl std::fmt::Display for SubjectPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SubjectPattern::Any => write!(f, "SUBJECT"),
+            SubjectPattern::Pattern(pattern) => {
+                write!(f, "SUBJECT({})", pattern)
+            }
         }
     }
 }

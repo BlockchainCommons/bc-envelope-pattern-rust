@@ -63,11 +63,11 @@ impl std::fmt::Display for StructurePattern {
             StructurePattern::Assertions(pattern) => write!(f, "{}", pattern),
             StructurePattern::Digest(pattern) => write!(f, "{}", pattern),
             StructurePattern::Node(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Object(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Obscured(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Predicate(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Subject(pattern) => write!(f, "{}", pattern),
             _ => todo!(),
-            // StructurePattern::Object(pattern) => write!(f, "{}", pattern),
-            // StructurePattern::Obscured(pattern) => write!(f, "{}", pattern),
-            // StructurePattern::Predicate(pattern) => write!(f, "{}", pattern),
-            // StructurePattern::Subject(pattern) => write!(f, "{}", pattern),
             // StructurePattern::Wrapped(pattern) => write!(f, "{}", pattern),
         }
     }

@@ -1,5 +1,7 @@
 mod common;
 
+use core::num;
+
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Matcher, Pattern};
 use indoc::indoc;
@@ -10,23 +12,35 @@ use crate::common::pattern_utils::*;
 fn test_subject_pattern() {
     let envelope = Envelope::new("Alice");
 
-    let pat = Pattern::subject();
-    let matching_paths = pat.paths(&envelope);
+    let any_subject_pat = Pattern::any_subject();
+    let matching_paths = any_subject_pat.paths(&envelope);
 
     #[rustfmt::skip]
-    let expected = indoc! {r#"
+    let expected_1 = indoc! {r#"
         13941b48 "Alice"
     "#}.trim();
-    assert_actual_expected!(format_paths(&matching_paths), expected);
+    assert_actual_expected!(format_paths(&matching_paths), expected_1);
 
     let envelope_with_assertions = envelope.add_assertion("knows", "Bob");
-    let matching_paths = pat.paths(&envelope_with_assertions);
+    let matching_paths = any_subject_pat.paths(&envelope_with_assertions);
     #[rustfmt::skip]
-    let expected = indoc! {r#"
+    let expected_2 = indoc! {r#"
         8955db5e "Alice" [ "knows": "Bob" ]
             13941b48 "Alice"
     "#}.trim();
-    assert_actual_expected!(format_paths(&matching_paths), expected);
+    assert_actual_expected!(format_paths(&matching_paths), expected_2);
+
+    let text_subject_pat = Pattern::subject(Pattern::any_text());
+    let matching_paths = text_subject_pat.paths(&envelope);
+    assert_actual_expected!(format_paths(&matching_paths), expected_1);
+    let matching_paths = text_subject_pat.paths(&envelope_with_assertions);
+    assert_actual_expected!(format_paths(&matching_paths), expected_2);
+
+    let number_subject_pat = Pattern::subject(Pattern::any_number());
+    let matching_paths = number_subject_pat.paths(&envelope);
+    assert!(matching_paths.is_empty());
+    let matching_paths = number_subject_pat.paths(&envelope_with_assertions);
+    assert!(matching_paths.is_empty());
 }
 
 #[test]
@@ -42,23 +56,26 @@ fn test_wrapped_pattern() {
     let expected = indoc! {r#"
         58b1ac6a { 42 }
             7f83f7bd 42
-    "#}.trim();
+    "#}
+    .trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     // The matched paths include the assertion.
-    let wrapped_envelope_with_assertion = wrapped_envelope.add_assertion("an", "assertion");
+    let wrapped_envelope_with_assertion =
+        wrapped_envelope.add_assertion("an", "assertion");
     let paths = Pattern::wrapped().paths(&wrapped_envelope_with_assertion);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
         169aba00 { 42 } [ "an": "assertion" ]
             7f83f7bd 42
-    "#}.trim();
+    "#}
+    .trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     let wrapped_twice = wrapped_envelope_with_assertion.wrap_envelope();
-    // Matching a wrapped envelope with assertions returns a path where the first
-    // element is the original wrapped envelope including assertions, and the
-    // second element is the still-wrapped subject.
+    // Matching a wrapped envelope with assertions returns a path where the
+    // first element is the original wrapped envelope including assertions,
+    // and the second element is the still-wrapped subject.
     let paths = Pattern::wrapped().paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -67,10 +84,8 @@ fn test_wrapped_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    let wrapped_twice_pattern = Pattern::sequence(vec![
-        Pattern::wrapped(),
-        Pattern::wrapped(),
-    ]);
+    let wrapped_twice_pattern =
+        Pattern::sequence(vec![Pattern::wrapped(), Pattern::wrapped()]);
     let paths = wrapped_twice_pattern.paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -148,7 +163,10 @@ fn test_digest_pattern() {
 
     // Test hex prefix matching
     assert!(Pattern::digest_prefix(prefix).matches(&envelope));
-    assert!(!Pattern::digest_prefix(vec![0xff, 0xff, 0xff, 0xff]).matches(&envelope));
+    assert!(
+        !Pattern::digest_prefix(vec![0xff, 0xff, 0xff, 0xff])
+            .matches(&envelope)
+    );
 
     // Test with envelope that has assertions
     let envelope_with_assertions =
@@ -326,8 +344,7 @@ fn test_node_pattern() {
     let leaf_envelope = Envelope::new("Just a leaf");
     assert!(!Pattern::any_node().matches(&leaf_envelope));
     assert!(
-        !Pattern::node_with_assertions_range(1..=3)
-            .matches(&leaf_envelope)
+        !Pattern::node_with_assertions_range(1..=3).matches(&leaf_envelope)
     );
     assert!(!Pattern::node_with_assertions_count(1).matches(&leaf_envelope));
 

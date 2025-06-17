@@ -47,3 +47,12 @@ impl Compilable for ObjectPattern {
         code.push(Instr::MatchStructure(idx));
     }
 }
+
+impl std::fmt::Display for ObjectPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ObjectPattern::Any => write!(f, "OBJECT"),
+            ObjectPattern::Pattern(pattern) => write!(f, "OBJECT({})", pattern),
+        }
+    }
+}

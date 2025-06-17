@@ -51,7 +51,7 @@ fn test_node_pattern_with_sequence() {
     // Test sequence matching node with 2 assertions then extracting subject
     let paths = Pattern::sequence(vec![
         Pattern::node_with_assertions_count(2),
-        Pattern::subject(),
+        Pattern::any_subject(),
     ])
     .paths(&envelope);
 

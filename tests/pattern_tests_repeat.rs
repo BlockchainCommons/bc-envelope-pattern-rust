@@ -475,7 +475,7 @@ fn repeat_some_order() {
     let pat = |mode| {
         Pattern::sequence(vec![
             Pattern::repeat(Pattern::wrapped(), 1.., mode),
-            Pattern::subject(),
+            Pattern::any_subject(),
         ])
     };
 
@@ -513,7 +513,7 @@ fn repeat_range_order() {
     let pat = |mode| {
         Pattern::sequence(vec![
             Pattern::repeat(Pattern::wrapped(), 2..=3, mode),
-            Pattern::subject(),
+            Pattern::any_subject(),
         ])
     };
 

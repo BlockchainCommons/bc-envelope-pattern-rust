@@ -48,3 +48,12 @@ impl Compilable for PredicatePattern {
         code.push(Instr::MatchStructure(idx));
     }
 }
+
+impl std::fmt::Display for PredicatePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PredicatePattern::Any => write!(f, "PRED"),
+            PredicatePattern::Pattern(pattern) => write!(f, "PRED({})", pattern),
+        }
+    }
+}

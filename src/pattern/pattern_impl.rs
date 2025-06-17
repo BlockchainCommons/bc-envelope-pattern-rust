@@ -79,9 +79,15 @@ use super::{
     },
     vm,
 };
-use crate::{pattern::{
-    leaf::CBORPattern, meta::{AnyPattern, NonePattern}, vm::Instr, Compilable
-}, Repeat};
+use crate::{
+    Repeat,
+    pattern::{
+        Compilable,
+        leaf::CBORPattern,
+        meta::{AnyPattern, NonePattern},
+        vm::Instr,
+    },
+};
 
 /// The main pattern type used for matching envelopes.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -406,10 +412,18 @@ impl Pattern {
 }
 
 impl Pattern {
-    pub fn subject() -> Self {
+    pub fn any_subject() -> Self {
         Pattern::Structure(StructurePattern::Subject(SubjectPattern::any()))
     }
 
+    pub fn subject(pattern: Pattern) -> Self {
+        Pattern::Structure(StructurePattern::Subject(SubjectPattern::pattern(
+            pattern,
+        )))
+    }
+}
+
+impl Pattern {
     pub fn any_predicate() -> Self {
         Pattern::Structure(StructurePattern::Predicate(PredicatePattern::any()))
     }
@@ -454,18 +468,14 @@ impl Pattern {
         Pattern::Structure(StructurePattern::Node(NodePattern::any()))
     }
 
-    pub fn node_with_assertions_range(
-        range: impl RangeBounds<usize>,
-    ) -> Self {
-        Pattern::Structure(StructurePattern::Node(
-            NodePattern::count(range),
-        ))
+    pub fn node_with_assertions_range(range: impl RangeBounds<usize>) -> Self {
+        Pattern::Structure(StructurePattern::Node(NodePattern::count(range)))
     }
 
     pub fn node_with_assertions_count(count: usize) -> Self {
-        Pattern::Structure(StructurePattern::Node(
-            NodePattern::count(count..=count),
-        ))
+        Pattern::Structure(StructurePattern::Node(NodePattern::count(
+            count..=count,
+        )))
     }
 
     pub fn obscured() -> Self {
@@ -578,7 +588,11 @@ impl Pattern {
     /// | `min..`       | `{min,}`     |
     /// | `..=max`      | `{0,max}`    |
     /// | `n..=n`       | `{n}`        |
-    pub fn repeat(pattern: Pattern, range: impl RangeBounds<usize>, mode: Greediness) -> Self {
+    pub fn repeat(
+        pattern: Pattern,
+        range: impl RangeBounds<usize>,
+        mode: Greediness,
+    ) -> Self {
         let repeat = Repeat::new(range);
 
         Pattern::Meta(MetaPattern::Repeat(RepeatPattern {

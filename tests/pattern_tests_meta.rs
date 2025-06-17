@@ -45,7 +45,7 @@ fn test_and_pattern() {
     // A sequence pattern that includes the number range pattern and then
     // extracts the subject.
     let number_range_with_subject_pattern =
-        Pattern::sequence(vec![number_range_pattern, Pattern::subject()]);
+        Pattern::sequence(vec![number_range_pattern, Pattern::any_subject()]);
     let paths = number_range_with_subject_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -84,7 +84,7 @@ fn test_or_pattern() {
 
     let foo_or_greater_than_40_with_subject_pattern = Pattern::sequence(vec![
         foo_or_greater_than_40_pattern,
-        Pattern::subject(),
+        Pattern::any_subject(),
     ]);
     let paths = foo_or_greater_than_40_with_subject_pattern.paths(&envelope);
     #[rustfmt::skip]
