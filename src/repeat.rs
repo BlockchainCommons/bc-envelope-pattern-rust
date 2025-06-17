@@ -55,6 +55,24 @@ impl Repeat {
     }
 }
 
+impl RangeBounds<usize> for Repeat
+{
+    fn start_bound(&self) -> Bound<&usize> {
+        if self.min == 0 {
+            Bound::Unbounded
+        } else {
+            Bound::Included(&self.min)
+        }
+    }
+
+    fn end_bound(&self) -> Bound<&usize> {
+        match self.max {
+            Some(ref max) => Bound::Included(max),
+            None => Bound::Unbounded,
+        }
+    }
+}
+
 impl std::fmt::Display for Repeat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.range_notation())
@@ -63,14 +81,24 @@ impl std::fmt::Display for Repeat {
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RepeatRange {
-    pub repeat: Repeat,
-    pub mode: Greediness,
+    repeat: Repeat,
+    mode: Greediness,
 }
 
 impl RepeatRange {
     pub fn new(range: impl RangeBounds<usize>, mode: Greediness) -> Self {
         let repeat = Repeat::new(range);
         Self { repeat, mode }
+    }
+
+    pub fn min(&self) -> usize { self.repeat.min() }
+
+    pub fn max(&self) -> Option<usize> { self.repeat.max() }
+
+    pub fn mode(&self) -> Greediness { self.mode }
+
+    pub fn contains(&self, count: usize) -> bool {
+        self.repeat.contains(count)
     }
 
     pub fn is_unbounded(&self) -> bool { self.repeat.is_unbounded() }

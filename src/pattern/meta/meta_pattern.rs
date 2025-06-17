@@ -79,8 +79,8 @@ impl std::fmt::Display for MetaPattern {
             MetaPattern::Search(pattern) => write!(f, "{}", pattern),
             MetaPattern::Sequence(pattern) => write!(f, "{}", pattern),
             MetaPattern::Repeat(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Group(pattern) => write!(f, "{}", pattern),
             _ => todo!(),
-            // MetaPattern::Group(pattern) => write!(f, "{}", pattern),
         }
     }
 }

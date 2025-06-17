@@ -3,16 +3,27 @@
 use bc_envelope::Envelope;
 
 use crate::{
-    Matcher, Path,
-    pattern::{Compilable, Greediness, Pattern, vm::Instr},
+    Matcher, Path, RepeatRange,
+    pattern::{Compilable, Pattern, vm::Instr},
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RepeatPattern {
-    pub sub: Box<Pattern>,
-    pub min: usize,
-    pub max: Option<usize>, // None == unbounded
-    pub mode: Greediness,
+    sub: Box<Pattern>,
+    range: RepeatRange,
+}
+
+impl RepeatPattern {
+    /// Creates a new `RepeatPattern` with the specified sub-pattern and range.
+    pub fn new(sub: Pattern, range: RepeatRange) -> Self {
+        RepeatPattern { sub: Box::new(sub), range }
+    }
+
+    /// Returns the sub-pattern of this repeat pattern.
+    pub fn sub(&self) -> &Pattern { &self.sub }
+
+    /// Returns the range of this repeat pattern.
+    pub fn range(&self) -> &RepeatRange { &self.range }
 }
 
 impl Matcher for RepeatPattern {
@@ -28,21 +39,15 @@ impl Compilable for RepeatPattern {
         lits.push((*self.sub).clone());
         code.push(Instr::Repeat {
             pat_idx: idx,
-            min: self.min,
-            max: self.max,
-            mode: self.mode,
+            min: self.range.min(),
+            max: self.range.max(),
+            mode: self.range.mode(),
         });
     }
 }
 
 impl std::fmt::Display for RepeatPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{{{},{}}}{}",
-            self.min,
-            self.max.map_or("".to_string(), |m| m.to_string()),
-            self.sub
-        )
+        write!(f, "{}{}", self.sub, self.range)
     }
 }

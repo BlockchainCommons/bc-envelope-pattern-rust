@@ -96,17 +96,21 @@ fn repeat_test() {
     let s = "hello";
     let env = fold(s);
 
-    let paths = Pattern::sequence(vec![Pattern::any_assertion()]).paths(&env);
+    let pattern = Pattern::sequence(vec![Pattern::any_assertion()]);
+    assert_eq!(format!("{}", pattern), "ASSERTION");
+    let paths = pattern.paths(&env);
     assert_eq!(unfold(paths[0].last().unwrap()), s);
 
     let assertion_object_pattern = Pattern::sequence(vec![
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
+    assert_eq!(format!("{}", assertion_object_pattern), "ASSERTION>OBJECT");
 
-    let paths =
-        Pattern::repeat(assertion_object_pattern, 3..=3, Greediness::Greedy)
-            .paths(&env);
+    let pattern =
+        Pattern::repeat(assertion_object_pattern, 3..=3, Greediness::Greedy);
+    assert_eq!(format!("{}", pattern), "ASSERTION>OBJECT{3}");
+    let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
     println!("{}", format_paths(&paths));
 
@@ -127,35 +131,50 @@ fn test_repeat_2() {
         Pattern::assertion_with_object(Pattern::text("A")),
         Pattern::any_object(),
     ]);
+    assert_eq!(format!("{}", seq_a), r#"ASSERTION-OBJ(TEXT("A"))>OBJECT"#);
 
     let seq_any = Pattern::sequence(vec![
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
+    assert_eq!(format!("{}", seq_any), r#"ASSERTION>OBJECT"#);
 
     let seq_b = Pattern::sequence(vec![
         Pattern::assertion_with_object(Pattern::text("B")),
         Pattern::any_object(),
     ]);
+    assert_eq!(format!("{}", seq_b), r#"ASSERTION-OBJ(TEXT("B"))>OBJECT"#);
 
-    let pat = |mode| Pattern::sequence(vec![
-        seq_a.clone(),
-        Pattern::repeat(seq_any.clone(), .., mode),
-        seq_b.clone(),
-    ]);
+    let pat = |mode| {
+        Pattern::sequence(vec![
+            seq_a.clone(),
+            Pattern::repeat(seq_any.clone(), .., mode),
+            seq_b.clone(),
+        ])
+    };
 
-    let paths = pat(Greediness::Greedy).paths(&env);
+    let pattern = pat(Greediness::Greedy);
+    println!("{}", pattern);
+    let paths = pattern.paths(&env);
     println!("\nGreedy:\n{}", format_paths(&paths));
 
-    let paths = pat(Greediness::Lazy).paths(&env);
+    let pattern = pat(Greediness::Lazy);
+    println!("{}", pattern);
+    let paths = pattern.paths(&env);
     println!("\nLazy:\n{}", format_paths(&paths));
 
-    let paths = pat(Greediness::Possessive).paths(&env);
+    let pattern = pat(Greediness::Possessive);
+    println!("{}", pattern);
+    let paths = pattern.paths(&env);
     println!("\nPossessive:\n{}", format_paths(&paths));
 }
 
 fn transpose(path: impl AsRef<Path>) -> String {
-    path.as_ref().iter().filter_map(|e| e.subject().as_text()).collect::<Vec<_>>().join("")
+    path.as_ref()
+        .iter()
+        .filter_map(|e| e.subject().as_text())
+        .collect::<Vec<_>>()
+        .join("")
 }
 
 fn wrap_n(mut env: Envelope, n: usize) -> Envelope {

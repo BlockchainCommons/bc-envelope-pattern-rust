@@ -20,20 +20,6 @@ impl WrappedPattern {
     pub fn any() -> Self { WrappedPattern::Any }
 }
 
-impl Compilable for WrappedPattern {
-    /// Emit predicate + descent so the VM makes progress.
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
-        // println!("Compiling WrappedPattern: {:?}", self);
-        // 1) atomic predicate “is wrapped”
-        let idx = lits.len();
-        lits.push(Pattern::Structure(StructurePattern::Wrapped(self.clone())));
-        code.push(Instr::MatchStructure(idx));
-
-        // 2) then move into inner envelope
-        code.push(Instr::PushAxis(Axis::Wrapped));
-    }
-}
-
 impl Matcher for WrappedPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         // println!("Matching WrappedPattern: {:?}", self);
@@ -47,6 +33,20 @@ impl Matcher for WrappedPattern {
         } else {
             vec![]
         }
+    }
+}
+
+impl Compilable for WrappedPattern {
+    /// Emit predicate + descent so the VM makes progress.
+    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+        // println!("Compiling WrappedPattern: {:?}", self);
+        // 1) atomic predicate “is wrapped”
+        let idx = lits.len();
+        lits.push(Pattern::Structure(StructurePattern::Wrapped(self.clone())));
+        code.push(Instr::MatchStructure(idx));
+
+        // 2) then move into inner envelope
+        code.push(Instr::PushAxis(Axis::Wrapped));
     }
 }
 
