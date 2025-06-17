@@ -44,6 +44,14 @@ impl Compilable for NullPattern {
     }
 }
 
+impl std::fmt::Display for NullPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NullPattern::Any => write!(f, "NULL"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
@@ -62,5 +70,10 @@ mod tests {
         let text_envelope = Envelope::new("test");
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
+    }
+
+    #[test]
+    fn test_null_pattern_display() {
+        assert_eq!(NullPattern::any().to_string(), "NULL");
     }
 }

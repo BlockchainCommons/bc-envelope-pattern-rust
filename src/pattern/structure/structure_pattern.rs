@@ -56,3 +56,19 @@ impl Compilable for StructurePattern {
         }
     }
 }
+
+impl std::fmt::Display for StructurePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            StructurePattern::Assertions(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Digest(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Node(pattern) => write!(f, "{}", pattern),
+            _ => todo!(),
+            // StructurePattern::Object(pattern) => write!(f, "{}", pattern),
+            // StructurePattern::Obscured(pattern) => write!(f, "{}", pattern),
+            // StructurePattern::Predicate(pattern) => write!(f, "{}", pattern),
+            // StructurePattern::Subject(pattern) => write!(f, "{}", pattern),
+            // StructurePattern::Wrapped(pattern) => write!(f, "{}", pattern),
+        }
+    }
+}

@@ -108,6 +108,18 @@ impl Compilable for ByteStringPattern {
     }
 }
 
+impl std::fmt::Display for ByteStringPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ByteStringPattern::Any => write!(f, "BSTR"),
+            ByteStringPattern::Exact(value) => write!(f, "BSTR(h'{}')", hex::encode(value)),
+            ByteStringPattern::BinaryRegex(regex) => {
+                write!(f, "BSTR(/{}/)", regex.as_str())
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
@@ -170,5 +182,19 @@ mod tests {
         let pattern = ByteStringPattern::binary_regex(regex);
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
+    }
+
+    #[test]
+    fn test_byte_string_pattern_display() {
+        assert_eq!(ByteStringPattern::any().to_string(), "BSTR");
+        assert_eq!(
+            ByteStringPattern::exact(vec![1, 2, 3]).to_string(),
+            r#"BSTR(h'010203')"#
+        );
+        let regex = regex::bytes::Regex::new(r"^\d+$").unwrap();
+        assert_eq!(
+            ByteStringPattern::binary_regex(regex).to_string(),
+            r"BSTR(/^\d+$/)"
+        );
     }
 }

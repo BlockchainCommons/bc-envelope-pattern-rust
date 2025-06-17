@@ -460,7 +460,7 @@ fn test_array_pattern() {
     // Does not match non-array subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_array().matches(&envelope));
-    assert!(!Pattern::array_count(3).matches(&envelope));
+    assert!(!Pattern::array_with_count(3).matches(&envelope));
 
     // Test with a CBOR array
     let array = vec![1, 2, 3];
@@ -473,17 +473,17 @@ fn test_array_pattern() {
     assert!(Pattern::any_array().matches(&envelope));
 
     // Matches exact count
-    assert!(Pattern::array_count(3).matches(&envelope));
-    assert!(!Pattern::array_count(5).matches(&envelope));
+    assert!(Pattern::array_with_count(3).matches(&envelope));
+    assert!(!Pattern::array_with_count(5).matches(&envelope));
 
     // Matches count range
-    assert!(Pattern::array_count_range(2..=4).matches(&envelope));
-    assert!(!Pattern::array_count_range(5..=10).matches(&envelope));
+    assert!(Pattern::array_with_range(2..=4).matches(&envelope));
+    assert!(!Pattern::array_with_range(5..=10).matches(&envelope));
 
     // Test with assertions
     let envelope = envelope.add_assertion("type", "list");
     assert!(Pattern::any_array().matches(&envelope));
-    assert!(Pattern::array_count(3).matches(&envelope));
+    assert!(Pattern::array_with_count(3).matches(&envelope));
 
     // The matched paths include the assertion
     let paths = Pattern::any_array().paths(&envelope);
@@ -497,8 +497,8 @@ fn test_array_pattern() {
     let empty_array = Vec::<i32>::new().to_cbor();
     let empty_envelope = Envelope::new(empty_array);
     assert!(Pattern::any_array().matches(&empty_envelope));
-    assert!(Pattern::array_count(0).matches(&empty_envelope));
-    assert!(!Pattern::array_count(1).matches(&empty_envelope));
+    assert!(Pattern::array_with_count(0).matches(&empty_envelope));
+    assert!(!Pattern::array_with_count(1).matches(&empty_envelope));
 
     // Test sequence patterns
     let paths =
@@ -519,7 +519,7 @@ fn test_map_pattern() {
     // Does not match non-map subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_map().matches(&envelope));
-    assert!(!Pattern::map_count(2).matches(&envelope));
+    assert!(!Pattern::map_with_count(2).matches(&envelope));
 
     // Test with a CBOR map
     let mut map = Map::new();
@@ -534,17 +534,17 @@ fn test_map_pattern() {
     assert!(Pattern::any_map().matches(&envelope));
 
     // Matches exact count
-    assert!(Pattern::map_count(2).matches(&envelope));
-    assert!(!Pattern::map_count(3).matches(&envelope));
+    assert!(Pattern::map_with_count(2).matches(&envelope));
+    assert!(!Pattern::map_with_count(3).matches(&envelope));
 
     // Matches count range
-    assert!(Pattern::map_count_range(1..=3).matches(&envelope));
-    assert!(!Pattern::map_count_range(5..=10).matches(&envelope));
+    assert!(Pattern::map_with_range(1..=3).matches(&envelope));
+    assert!(!Pattern::map_with_range(5..=10).matches(&envelope));
 
     // Test with assertions
     let envelope = envelope.add_assertion("type", "dictionary");
     assert!(Pattern::any_map().matches(&envelope));
-    assert!(Pattern::map_count(2).matches(&envelope));
+    assert!(Pattern::map_with_count(2).matches(&envelope));
 
     // The matched paths include the assertion
     let paths = Pattern::any_map().paths(&envelope);
@@ -558,8 +558,8 @@ fn test_map_pattern() {
     let empty_map = Map::new();
     let empty_envelope = Envelope::new(empty_map);
     assert!(Pattern::any_map().matches(&empty_envelope));
-    assert!(Pattern::map_count(0).matches(&empty_envelope));
-    assert!(!Pattern::map_count(1).matches(&empty_envelope));
+    assert!(Pattern::map_with_count(0).matches(&empty_envelope));
+    assert!(!Pattern::map_with_count(1).matches(&empty_envelope));
 
     // Test sequence patterns
     let paths = Pattern::sequence(vec![Pattern::any_map(), Pattern::subject()])

@@ -53,3 +53,24 @@ impl Compilable for BoolPattern {
         );
     }
 }
+
+impl std::fmt::Display for BoolPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BoolPattern::Any => write!(f, "BOOL"),
+            BoolPattern::Exact(value) => write!(f, "BOOL({})", value),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_bool_pattern_display() {
+        assert_eq!(BoolPattern::any().to_string(), "BOOL");
+        assert_eq!(BoolPattern::exact(true).to_string(), "BOOL(true)");
+        assert_eq!(BoolPattern::exact(false).to_string(), "BOOL(false)");
+    }
+}

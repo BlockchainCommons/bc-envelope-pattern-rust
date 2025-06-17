@@ -9,3 +9,13 @@ pub enum Greediness {
     /// Grabs as many repetitions as possible and never backtracks; if the rest of the pattern cannot match, the whole match fails.
     Possessive,
 }
+
+impl Greediness {
+    pub fn modifier(&self) -> &'static str {
+        match self {
+            Greediness::Greedy => "",
+            Greediness::Lazy => "?",
+            Greediness::Possessive => "+",
+        }
+    }
+}

@@ -82,41 +82,41 @@ fn test_range() {
     let test_cases = vec![
         RangeTestCase {
             input: "{1, 5}",
-            expected: RepeatRange::new(1..=5, Greediness::default()).unwrap(),
+            expected: RepeatRange::new(1..=5, Greediness::default()),
         },
         RangeTestCase {
             input: "{ 3 , }",
-            expected: RepeatRange::new(3.., Greediness::default()).unwrap(),
+            expected: RepeatRange::new(3.., Greediness::default()),
         },
         RangeTestCase {
             input: "{ 5 }",
-            expected: RepeatRange::new(5..=5, Greediness::default()).unwrap(),
+            expected: RepeatRange::new(5..=5, Greediness::default()),
         },
 
         RangeTestCase {
             input: "{1, 5 }?",
-            expected: RepeatRange::new(1..=5, Greediness::Lazy).unwrap(),
+            expected: RepeatRange::new(1..=5, Greediness::Lazy),
         },
         RangeTestCase {
             input: "{ 3 , }?",
-            expected: RepeatRange::new(3.., Greediness::Lazy).unwrap(),
+            expected: RepeatRange::new(3.., Greediness::Lazy),
         },
         RangeTestCase {
             input: "{5}?",
-            expected: RepeatRange::new(5..=5, Greediness::Lazy).unwrap(),
+            expected: RepeatRange::new(5..=5, Greediness::Lazy),
         },
 
         RangeTestCase {
             input: "{ 1,5}+",
-            expected: RepeatRange::new(1..=5, Greediness::Possessive).unwrap(),
+            expected: RepeatRange::new(1..=5, Greediness::Possessive),
         },
         RangeTestCase {
             input: "{ 3 , }+",
-            expected: RepeatRange::new(3.., Greediness::Possessive).unwrap(),
+            expected: RepeatRange::new(3.., Greediness::Possessive),
         },
         RangeTestCase {
             input: "{5}+",
-            expected: RepeatRange::new(5..=5, Greediness::Possessive).unwrap(),
+            expected: RepeatRange::new(5..=5, Greediness::Possessive),
         },
     ];
 
@@ -135,56 +135,3 @@ fn test_range() {
         panic!("Failed to parse ranges: {:?}", failed_cases);
     }
 }
-
-// fn test_complex_tokens_2() {
-//     // Test string literal
-//     let mut lexer = Token::lexer(r#""hello world""#);
-//     if let Some(Ok(Token::StringLiteral(s))) = lexer.next() {
-//         assert_eq!(s, "hello world");
-//     } else {
-//         panic!("Failed to parse string literal");
-//     }
-
-//     // Test hex string
-//     let mut lexer = Token::lexer("h'0123456789abcdef'");
-//     if let Some(Ok(Token::HexString(Ok(bytes)))) = lexer.next() {
-//         assert_eq!(bytes, vec![0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]);
-//     } else {
-//         panic!("Failed to parse hex string");
-//     }
-
-//     // Test number
-//     let mut lexer = Token::lexer("123.45");
-//     if let Some(Ok(Token::NumberLiteral(Ok(num)))) = lexer.next() {
-//         assert_eq!(num, 123.45);
-//     } else {
-//         panic!("Failed to parse number");
-//     }
-
-//     // Test ISO-8601 date
-//     let mut lexer = Token::lexer("2023-01-23T14:35:42Z");
-//     if let Some(Ok(Token::DateISO8601(date))) = lexer.next() {
-//         assert_eq!(date, "2023-01-23T14:35:42Z");
-//     } else {
-//         panic!("Failed to parse ISO-8601 date");
-//     }
-// }
-
-// #[test]
-// fn test_pattern_tokenization() {
-//     // Test a complete pattern string
-//     let pattern = "SUBJECT > ASSERTION-PRED(TEXT(/name/)) > ASSERTION-OBJ(NUMBER(>=18))";
-//     let tokens: Vec<_> = Token::lexer(pattern)
-//         .collect::<Result<Vec<_>, _>>()
-//         .expect("Failed to tokenize pattern");
-
-//     assert!(tokens.len() > 10, "Should have tokenized the entire pattern");
-
-//     // Test a pattern with repetition
-//     let pattern = "NODE > (ASSERTION-PRED(TEXT(/^is/)) > ASSERTION-OBJ(ANY))*";
-//     let tokens: Vec<_> = Token::lexer(pattern)
-//         .collect::<Result<Vec<_>, _>>()
-//         .expect("Failed to tokenize pattern");
-
-//     assert!(tokens.len() > 8, "Should have tokenized the entire pattern");
-// }

@@ -155,6 +155,17 @@ impl Compilable for TaggedPattern {
     }
 }
 
+impl std::fmt::Display for TaggedPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TaggedPattern::Any => write!(f, "TAG"),
+            TaggedPattern::Tag(tag) => write!(f, "TAG({})", tag),
+            TaggedPattern::Named(name) => write!(f, "TAG({})", name),
+            TaggedPattern::Regex(regex) => write!(f, "TAG(/{}/)", regex),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
@@ -198,8 +209,7 @@ mod tests {
     #[test]
     fn test_tag_pattern_named() {
         // Ensure tags are registered for testing
-        dcbor::register_tags();
-        bc_components::register_tags();
+        bc_envelope::register_tags();
 
         // Create a tagged envelope using a registered tag (e.g., date tag = 1)
         let tagged_cbor = CBOR::to_tagged_value(1, "2023-12-25");
@@ -226,8 +236,7 @@ mod tests {
     #[test]
     fn test_tag_pattern_regex() {
         // Ensure tags are registered for testing
-        dcbor::register_tags();
-        bc_components::register_tags();
+        bc_envelope::register_tags();
 
         // Create a tagged envelope using a registered tag (e.g., date tag = 1)
         let tagged_cbor = CBOR::to_tagged_value(1, "2023-12-25");
@@ -268,5 +277,20 @@ mod tests {
         let pattern = TaggedPattern::with_tag_regex(regex);
         let paths = pattern.paths(&unregistered_envelope);
         assert!(paths.is_empty()); // Should be empty because tag 999 has no name in registry
+    }
+
+    #[test]
+    fn test_tag_pattern_display() {
+        bc_envelope::register_tags();
+
+        let pattern = TaggedPattern::any();
+        assert_eq!(pattern.to_string(), "TAG");
+        let pattern = TaggedPattern::with_tag_value(100);
+        assert_eq!(pattern.to_string(), "TAG(100)");
+        let pattern = TaggedPattern::with_tag_name("date");
+        assert_eq!(pattern.to_string(), "TAG(date)");
+        let regex = regex::Regex::new(r"^da.*").unwrap();
+        let pattern = TaggedPattern::with_tag_regex(regex);
+        assert_eq!(pattern.to_string(), "TAG(/^da.*/)");
     }
 }

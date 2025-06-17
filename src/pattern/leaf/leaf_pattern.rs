@@ -43,7 +43,7 @@ impl Matcher for LeafPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         match self {
             LeafPattern::Any => {
-                if envelope.is_leaf() {
+                if envelope.is_leaf() || envelope.is_known_value() {
                     vec![vec![envelope.clone()]]
                 } else {
                     vec![]
@@ -107,6 +107,25 @@ impl Compilable for LeafPattern {
             LeafPattern::KnownValue(pattern) => {
                 pattern.compile(code, literals);
             }
+        }
+    }
+}
+
+impl std::fmt::Display for LeafPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LeafPattern::Any => write!(f, "LEAF"),
+            LeafPattern::Cbor(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Number(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Text(pattern) => write!(f, "{}", pattern),
+            LeafPattern::ByteString(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Tag(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Array(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Map(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Bool(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Null(pattern) => write!(f, "{}", pattern),
+            LeafPattern::Date(pattern) => write!(f, "{}", pattern),
+            LeafPattern::KnownValue(pattern) => write!(f, "{}", pattern),
         }
     }
 }

@@ -68,3 +68,17 @@ impl Compilable for AssertionsPattern {
         code.push(Instr::MatchStructure(idx));
     }
 }
+
+impl std::fmt::Display for AssertionsPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AssertionsPattern::Any => write!(f, "ASSERTION"),
+            AssertionsPattern::WithPredicate(pattern) => {
+                write!(f, "ASSERTION-PRED({})", pattern)
+            }
+            AssertionsPattern::WithObject(pattern) => {
+                write!(f, "ASSERTION-OBJ({})", pattern)
+            }
+        }
+    }
+}

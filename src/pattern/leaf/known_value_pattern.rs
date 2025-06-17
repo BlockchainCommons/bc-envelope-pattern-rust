@@ -145,6 +145,17 @@ impl Compilable for KnownValuePattern {
     }
 }
 
+impl std::fmt::Display for KnownValuePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            KnownValuePattern::Any => write!(f, "KNOWN"),
+            KnownValuePattern::KnownValue(value) => write!(f, "KNOWN({})", value.name()),
+            KnownValuePattern::Named(name) => write!(f, "KNOWN({})", name),
+            KnownValuePattern::Regex(regex) => write!(f, "KNOWN(/{}/)", regex.as_str()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
@@ -241,5 +252,20 @@ mod tests {
         let pattern = KnownValuePattern::regex(regex);
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
+    }
+
+    #[test]
+    fn test_known_value_pattern_display() {
+        bc_envelope::register_tags();
+
+        let pattern = KnownValuePattern::any();
+        assert_eq!(pattern.to_string(), "KNOWN");
+        let pattern = KnownValuePattern::known_value(known_values::DATE);
+        assert_eq!(pattern.to_string(), "KNOWN(date)");
+        let pattern = KnownValuePattern::named("date");
+        assert_eq!(pattern.to_string(), "KNOWN(date)");
+        let regex = regex::Regex::new(r"^da.*").unwrap();
+        let pattern = KnownValuePattern::regex(regex);
+        assert_eq!(pattern.to_string(), "KNOWN(/^da.*/)");
     }
 }

@@ -1,9 +1,9 @@
-use std::ops::RangeInclusive;
+use std::ops::RangeBounds;
 
 use bc_envelope::Envelope;
 
 use crate::{
-    Pattern,
+    Pattern, Repeat,
     pattern::{
         Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
@@ -16,22 +16,18 @@ pub enum ArrayPattern {
     /// Matches any array.
     Any,
     /// Matches arrays with a specific count of elements.
-    Count(RangeInclusive<usize>),
+    Count(Repeat),
 }
 
 impl ArrayPattern {
     /// Creates a new `ArrayPattern` that matches any array.
     pub fn any() -> Self { ArrayPattern::Any }
 
-    /// Creates a new `ArrayPattern` that matches arrays with a specific count
-    /// of elements.
-    pub fn range_count(range: RangeInclusive<usize>) -> Self {
-        ArrayPattern::Count(range)
+    /// Creates a new `ArrayPattern` that matches arrays with a count
+    /// of elements in the specified range.
+    pub fn count(range: impl RangeBounds<usize>) -> Self {
+        ArrayPattern::Count(Repeat::new(range))
     }
-
-    /// Creates a new `ArrayPattern` that matches arrays with exactly the
-    /// specified count of elements.
-    pub fn count(count: usize) -> Self { ArrayPattern::Count(count..=count) }
 }
 
 impl Matcher for ArrayPattern {
@@ -40,7 +36,7 @@ impl Matcher for ArrayPattern {
             match self {
                 ArrayPattern::Any => vec![vec![envelope.clone()]],
                 ArrayPattern::Count(range) => {
-                    if range.contains(&array.len()) {
+                    if range.contains(array.len()) {
                         vec![vec![envelope.clone()]]
                     } else {
                         vec![]
@@ -60,6 +56,26 @@ impl Compilable for ArrayPattern {
             code,
             literals,
         );
+    }
+}
+
+impl std::fmt::Display for ArrayPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ArrayPattern::Any => write!(f, "ARRAY"),
+            ArrayPattern::Count(range) => {
+                if range.is_single() {
+                    write!(f, "ARRAY({{{}}})", range.min())
+                } else {
+                    write!(
+                        f,
+                        "ARRAY({{{}}},{{{}}})",
+                        range.min(),
+                        range.max().unwrap()
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -93,17 +109,17 @@ mod tests {
         let envelope = Envelope::new(cbor_array);
 
         // Test exact count
-        let pattern = ArrayPattern::count(3);
+        let pattern = ArrayPattern::count(3..=3);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test count range
-        let pattern = ArrayPattern::range_count(2..=4);
+        let pattern = ArrayPattern::count(2..=4);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test count mismatch
-        let pattern = ArrayPattern::count(5);
+        let pattern = ArrayPattern::count(5..=5);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }

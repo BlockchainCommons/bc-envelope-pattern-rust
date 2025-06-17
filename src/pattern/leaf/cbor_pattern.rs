@@ -77,6 +77,15 @@ impl Compilable for CBORPattern {
     }
 }
 
+impl std::fmt::Display for CBORPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CBORPattern::Any => write!(f, "CBOR"),
+            CBORPattern::Exact(cbor) => write!(f, "CBOR({})", cbor.diagnostic_flat()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;

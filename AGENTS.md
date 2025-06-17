@@ -35,13 +35,18 @@ White space is ignored between tokens, so you can use it to make patterns more r
 
 All leaf patterns match Envelope leaves, which are CBOR values.
 
+- Leaf
+    -  `LEAF`
+        - Matches any leaf value.
 - Array
     - `ARRAY`
         - Matches any array.
-    - `ARRAY ( n )`
+    - `ARRAY ( { n } )`
         - Matches an array with exactly `n` elements.
     - `ARRAY ( { n , m } )`
         - Matches an array with between `n` and `m` elements, inclusive.
+    - `ARRAY ( { n , } )`
+        - Matches an array with at least `n` elements.
 - Boolean
     - `BOOL`
         - Matches any boolean value.
@@ -146,8 +151,8 @@ Structure patterns match parts of Gordian Envelope structures.
 - Node
     - `NODE`
         - Matches any Gordian Envelope node, which is an envelope with at least one assertion.
-    - `NODE ( assertions-count )`
-        - Matches a Gordian Envelope node with the specified number of assertions (must be greater than 0).
+    - `NODE ( { m, n } )`
+        - Matches a Gordian Envelope node with between `m` and `n` assertions, inclusive.
 - Objects
     - `OBJ`
         - Matches any object.

@@ -203,6 +203,29 @@ impl Compilable for DatePattern {
     }
 }
 
+impl std::fmt::Display for DatePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DatePattern::Any => write!(f, "DATE"),
+            DatePattern::Date(date) => write!(f, "DATE({})", date),
+            DatePattern::Range(range) => write!(
+                f,
+                "DATE({}...{})",
+                range.start(),
+                range.end()
+            ),
+            DatePattern::Earliest(date) => write!(f, "DATE({}...)", date),
+            DatePattern::Latest(date) => write!(f, "DATE(...{})", date),
+            DatePattern::Iso8601(iso_string) => {
+                write!(f, "DATE({})", iso_string)
+            }
+            DatePattern::Regex(regex) => {
+                write!(f, "DATE(/{}/)", regex.as_str())
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
@@ -338,5 +361,29 @@ mod tests {
         let pattern = DatePattern::any();
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
+    }
+
+    #[test]
+    fn test_date_pattern_display() {
+        let pattern = DatePattern::any();
+        assert_eq!(pattern.to_string(), "DATE");
+
+        let pattern = DatePattern::date(Date::from_ymd(2023, 12, 25));
+        assert_eq!(pattern.to_string(), "DATE(2023-12-25)");
+
+        let pattern = DatePattern::range(Date::from_ymd(2023, 12, 20)..=Date::from_ymd(2023, 12, 30));
+        assert_eq!(pattern.to_string(), "DATE(2023-12-20...2023-12-30)");
+
+        let pattern = DatePattern::earliest(Date::from_ymd(2023, 12, 25));
+        assert_eq!(pattern.to_string(), "DATE(2023-12-25...)");
+
+        let pattern = DatePattern::latest(Date::from_ymd(2023, 12, 25));
+        assert_eq!(pattern.to_string(), "DATE(...2023-12-25)");
+
+        let pattern = DatePattern::iso8601("2023-12-25");
+        assert_eq!(pattern.to_string(), "DATE(2023-12-25)");
+
+        let pattern = DatePattern::regex(regex::Regex::new(r"^2023-.*").unwrap());
+        assert_eq!(pattern.to_string(), "DATE(/^2023-.*/)");
     }
 }

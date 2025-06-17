@@ -1,13 +1,11 @@
-use std::ops::RangeInclusive;
+use std::ops::RangeBounds;
 
 use bc_envelope::Envelope;
 
 use crate::{
-    Pattern,
     pattern::{
-        Compilable, Matcher, Path, compile_as_atomic,
-        structure::StructurePattern, vm::Instr,
-    },
+        compile_as_atomic, structure::StructurePattern, vm::Instr, Compilable, Matcher, Path
+    }, Pattern, Repeat
 };
 
 /// Pattern for matching node envelopes.
@@ -16,7 +14,7 @@ pub enum NodePattern {
     /// Matches any node.
     Any,
     /// Matches a node with the specified count of assertions.
-    AssertionsCount(RangeInclusive<usize>),
+    AssertionsCount(Repeat),
 }
 
 impl NodePattern {
@@ -25,14 +23,8 @@ impl NodePattern {
 
     /// Creates a new `NodePattern` that matches a node with the specified count
     /// of assertions.
-    pub fn assertions_count_range(range: RangeInclusive<usize>) -> Self {
-        NodePattern::AssertionsCount(range)
-    }
-
-    /// Creates a new `NodePattern` that matches a node with exactly the
-    /// specified number of assertions.
-    pub fn assertions_count(count: usize) -> Self {
-        NodePattern::AssertionsCount(count..=count)
+    pub fn count(range: impl RangeBounds<usize>) -> Self {
+        NodePattern::AssertionsCount(Repeat::new(range))
     }
 }
 
@@ -45,7 +37,7 @@ impl Matcher for NodePattern {
         let is_hit = match self {
             NodePattern::Any => true,
             NodePattern::AssertionsCount(range) => {
-                range.contains(&envelope.assertions().len())
+                range.contains(envelope.assertions().len())
             }
         };
 
@@ -64,5 +56,28 @@ impl Compilable for NodePattern {
             code,
             literals,
         );
+    }
+}
+
+impl std::fmt::Display for NodePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NodePattern::Any => write!(f, "NODE"),
+            NodePattern::AssertionsCount(range) => write!(f, "NODE({})", range),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_node_pattern_display() {
+        let any_pattern = NodePattern::any();
+        assert_eq!(any_pattern.to_string(), "NODE");
+
+        let count_pattern = NodePattern::count(1..=3);
+        assert_eq!(count_pattern.to_string(), "NODE({1,3})");
     }
 }

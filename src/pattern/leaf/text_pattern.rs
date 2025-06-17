@@ -95,3 +95,32 @@ impl Compilable for TextPattern {
         );
     }
 }
+
+impl std::fmt::Display for TextPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TextPattern::Any => write!(f, "TEXT"),
+            TextPattern::Exact(value) => write!(f, r#"TEXT("{}")"#, value),
+            TextPattern::Regex(regex) => write!(f, r#"TEXT(/{}/)"#, regex),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_text_pattern_display() {
+        assert_eq!(TextPattern::any().to_string(), "TEXT");
+        assert_eq!(
+            TextPattern::exact("Hello").to_string(),
+            r#"TEXT("Hello")"#
+        );
+        assert_eq!(
+            TextPattern::regex(regex::Regex::new(r"^\d+$").unwrap())
+                .to_string(),
+            r#"TEXT(/^\d+$/)"#
+        );
+    }
+}

@@ -140,17 +140,15 @@ fn test_assertion_predicate_pattern() {
 fn test_digest_pattern() {
     let envelope = Envelope::new("Hello, World!");
     let digest = envelope.digest().into_owned();
-    let hex_digest = hex::encode(digest.as_bytes());
-    let prefix = &hex_digest[0..8];
+    let prefix = digest.data()[..4].to_vec(); // First 4 bytes
 
     // Test exact digest matching
     assert!(Pattern::digest(digest.clone()).matches(&envelope));
     assert!(!Pattern::digest(Digest::from_data([0; 32])).matches(&envelope));
 
     // Test hex prefix matching
-    assert!(Pattern::digest_hex_prefix(prefix).matches(&envelope));
-    assert!(Pattern::digest_hex_prefix(&hex_digest).matches(&envelope));
-    assert!(!Pattern::digest_hex_prefix("ffffffff").matches(&envelope));
+    assert!(Pattern::digest_prefix(prefix).matches(&envelope));
+    assert!(!Pattern::digest_prefix(vec![0xff, 0xff, 0xff, 0xff]).matches(&envelope));
 
     // Test with envelope that has assertions
     let envelope_with_assertions =
@@ -328,7 +326,7 @@ fn test_node_pattern() {
     let leaf_envelope = Envelope::new("Just a leaf");
     assert!(!Pattern::any_node().matches(&leaf_envelope));
     assert!(
-        !Pattern::node_with_assertions_count_range(1..=3)
+        !Pattern::node_with_assertions_range(1..=3)
             .matches(&leaf_envelope)
     );
     assert!(!Pattern::node_with_assertions_count(1).matches(&leaf_envelope));
@@ -338,7 +336,7 @@ fn test_node_pattern() {
         Envelope::new("Alice").add_assertion("knows", "Bob");
     assert!(Pattern::any_node().matches(&single_assertion_envelope));
     assert!(
-        Pattern::node_with_assertions_count_range(1..=3)
+        Pattern::node_with_assertions_range(1..=3)
             .matches(&single_assertion_envelope)
     );
     assert!(
@@ -356,7 +354,7 @@ fn test_node_pattern() {
         .add_assertion("city", "New York");
     assert!(Pattern::any_node().matches(&multi_assertion_envelope));
     assert!(
-        Pattern::node_with_assertions_count_range(1..=5)
+        Pattern::node_with_assertions_range(1..=5)
             .matches(&multi_assertion_envelope)
     );
     assert!(
@@ -368,7 +366,7 @@ fn test_node_pattern() {
             .matches(&multi_assertion_envelope)
     );
     assert!(
-        !Pattern::node_with_assertions_count_range(4..=5)
+        !Pattern::node_with_assertions_range(4..=5)
             .matches(&multi_assertion_envelope)
     );
 

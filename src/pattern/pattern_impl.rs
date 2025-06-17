@@ -54,7 +54,7 @@
 use std::{
     cell::RefCell,
     collections::HashMap,
-    ops::{Bound, RangeBounds, RangeInclusive},
+    ops::{RangeBounds, RangeInclusive},
 };
 
 use bc_envelope::Envelope;
@@ -79,12 +79,9 @@ use super::{
     },
     vm,
 };
-use crate::pattern::{
-    Compilable,
-    leaf::CBORPattern,
-    meta::{AnyPattern, NonePattern},
-    vm::Instr,
-};
+use crate::{pattern::{
+    leaf::CBORPattern, meta::{AnyPattern, NonePattern}, vm::Instr, Compilable
+}, Repeat};
 
 /// The main pattern type used for matching envelopes.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -134,6 +131,11 @@ impl Matcher for Pattern {
 // region: Leaf Patterns
 //
 //
+
+impl Pattern {
+    /// Creates a new `Pattern` that matches any leaf.
+    pub fn any_leaf() -> Self { Pattern::Leaf(LeafPattern::Any) }
+}
 
 impl Pattern {
     /// Creates a new `Pattern` that matches any CBOR value.
@@ -318,12 +320,12 @@ impl Pattern {
         Pattern::Leaf(LeafPattern::Array(ArrayPattern::any()))
     }
 
-    pub fn array_count(count: usize) -> Self {
-        Pattern::Leaf(LeafPattern::Array(ArrayPattern::count(count)))
+    pub fn array_with_range(range: impl RangeBounds<usize>) -> Self {
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::count(range)))
     }
 
-    pub fn array_count_range(range: RangeInclusive<usize>) -> Self {
-        Pattern::Leaf(LeafPattern::Array(ArrayPattern::range_count(range)))
+    pub fn array_with_count(count: usize) -> Self {
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::count(count..=count)))
     }
 }
 
@@ -332,12 +334,12 @@ impl Pattern {
         Pattern::Leaf(LeafPattern::Map(MapPattern::any()))
     }
 
-    pub fn map_count(count: usize) -> Self {
-        Pattern::Leaf(LeafPattern::Map(MapPattern::count(count)))
+    pub fn map_with_range(range: impl RangeBounds<usize>) -> Self {
+        Pattern::Leaf(LeafPattern::Map(MapPattern::count(range)))
     }
 
-    pub fn map_count_range(range: RangeInclusive<usize>) -> Self {
-        Pattern::Leaf(LeafPattern::Map(MapPattern::range_count(range)))
+    pub fn map_with_count(count: usize) -> Self {
+        Pattern::Leaf(LeafPattern::Map(MapPattern::count(count..=count)))
     }
 }
 
@@ -436,33 +438,33 @@ impl Pattern {
         )))
     }
 
-    pub fn digest_hex_prefix<T: Into<String>>(prefix: T) -> Self {
-        Pattern::Structure(StructurePattern::Digest(DigestPattern::hex_prefix(
+    pub fn digest_prefix(prefix: impl AsRef<[u8]>) -> Self {
+        Pattern::Structure(StructurePattern::Digest(DigestPattern::prefix(
             prefix,
         )))
     }
 
     pub fn digest_binary_regex(regex: regex::bytes::Regex) -> Self {
-        Pattern::Structure(StructurePattern::Digest(DigestPattern::binary_regex(
-            regex,
-        )))
+        Pattern::Structure(StructurePattern::Digest(
+            DigestPattern::binary_regex(regex),
+        ))
     }
 
     pub fn any_node() -> Self {
         Pattern::Structure(StructurePattern::Node(NodePattern::any()))
     }
 
-    pub fn node_with_assertions_count_range(
-        range: RangeInclusive<usize>,
+    pub fn node_with_assertions_range(
+        range: impl RangeBounds<usize>,
     ) -> Self {
         Pattern::Structure(StructurePattern::Node(
-            NodePattern::assertions_count_range(range),
+            NodePattern::count(range),
         ))
     }
 
     pub fn node_with_assertions_count(count: usize) -> Self {
         Pattern::Structure(StructurePattern::Node(
-            NodePattern::assertions_count(count),
+            NodePattern::count(count..=count),
         ))
     }
 
@@ -576,26 +578,13 @@ impl Pattern {
     /// | `min..`       | `{min,}`     |
     /// | `..=max`      | `{0,max}`    |
     /// | `n..=n`       | `{n}`        |
-    pub fn repeat<R>(pattern: Pattern, range: R, mode: Greediness) -> Self
-    where
-        R: RangeBounds<usize>,
-    {
-        let min = match range.start_bound() {
-            Bound::Included(&n) => n,
-            Bound::Excluded(&n) => n + 1,
-            Bound::Unbounded => 0,
-        };
-
-        let max = match range.end_bound() {
-            Bound::Included(&n) => Some(n),
-            Bound::Excluded(&n) => Some(n - 1),
-            Bound::Unbounded => None,
-        };
+    pub fn repeat(pattern: Pattern, range: impl RangeBounds<usize>, mode: Greediness) -> Self {
+        let repeat = Repeat::new(range);
 
         Pattern::Meta(MetaPattern::Repeat(RepeatPattern {
             sub: Box::new(pattern),
-            min,
-            max,
+            min: repeat.min(),
+            max: repeat.max(),
             mode,
         }))
     }
@@ -614,3 +603,13 @@ impl Pattern {
 //
 //
 // endregion
+
+impl std::fmt::Display for Pattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Pattern::Leaf(leaf) => write!(f, "{}", leaf),
+            Pattern::Structure(structure) => write!(f, "{}", structure),
+            Pattern::Meta(meta) => write!(f, "{}", meta),
+        }
+    }
+}

@@ -29,11 +29,10 @@ fn test_mixed_patterns_with_search() {
     // Search for specific digest prefix
     let alice_subject = envelope.subject();
     let alice_digest = alice_subject.digest();
-    let alice_hex = hex::encode(alice_digest.as_bytes());
-    let alice_prefix = &alice_hex[0..8];
+    let alice_prefix = alice_digest.data()[..4].to_vec();
 
     let digest_paths =
-        Pattern::search(Pattern::digest_hex_prefix(alice_prefix))
+        Pattern::search(Pattern::digest_prefix(alice_prefix))
             .paths(&envelope);
     assert_eq!(digest_paths.len(), 1);
 
