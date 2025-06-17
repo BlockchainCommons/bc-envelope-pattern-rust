@@ -43,7 +43,16 @@ impl Compilable for SubjectPattern {
                 code.push(Instr::NavigateSubject);
             }
             SubjectPattern::Pattern(pattern) => {
-                todo!();
+                // Navigate to the subject first so the resulting path
+                // includes the starting envelope and its subject.
+                code.push(Instr::NavigateSubject);
+                // Save the path and run the inner pattern relative to the
+                // subject. This mirrors the behaviour of SequencePattern so
+                // that any paths produced by `pattern` are appended to the
+                // subject path rather than replacing it.
+                code.push(Instr::ExtendSequence);
+                pattern.compile(code, literals);
+                code.push(Instr::CombineSequence);
             }
         }
     }
