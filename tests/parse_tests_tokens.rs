@@ -1,4 +1,4 @@
-use bc_envelope_pattern::{Token, ParseError};
+use bc_envelope_pattern::Token;
 use logos::Logos;
 
 #[test]
@@ -38,14 +38,25 @@ fn test_complex_tokens() {
     } else {
         panic!("Failed to parse group name");
     }
-//     // Test regex
-//     let mut lexer = Token::lexer("/[a-z]+/");
-//     if let Some(Ok(Token::Regex(Ok(regex)))) = lexer.next() {
-//         assert_eq!(regex, "[a-z]+");
-//     } else {
-//         panic!("Failed to parse regex");
-//     }
 
+    // Test regex
+    let mut lexer = Token::lexer("/[a-z]+/");
+    if let Some(Ok(Token::Regex(Ok(regex)))) = lexer.next() {
+        assert_eq!(regex, "[a-z]+");
+    } else {
+        panic!("Failed to parse regex");
+    }
+
+    let mut lx = Token::lexer(r"/abc\/def/  / /  //  /a\//");
+    assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok("abc\\/def".to_string())))));
+    assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok(" ".to_string())))));
+    assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok("".to_string())))));
+    assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok("a\\/".to_string())))));
+    assert_eq!(lx.next(), None);
+}
+
+// #[test]
+// fn test_complex_tokens_2() {
 //     // Test range
 //     let mut lexer = Token::lexer("{1, 5}");
 //     if let Some(Ok(Token::Range(Ok(range)))) = lexer.next() {
@@ -85,7 +96,7 @@ fn test_complex_tokens() {
 //     } else {
 //         panic!("Failed to parse ISO-8601 date");
 //     }
-}
+// }
 
 // #[test]
 // fn test_pattern_tokenization() {

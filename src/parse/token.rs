@@ -1,6 +1,5 @@
 use bc_ur::prelude::*;
-use logos::{Logos, Span};
-use regex::Regex;
+use logos::{Lexer, Logos, Span};
 
 use super::error::{Error, Result};
 
@@ -181,15 +180,8 @@ pub enum Token {
     )]
     GroupName(String),
 
-    // // Regular expressions
-    // #[regex(r#"/[^/]*/"#, |lex| {
-    //     let regex_str = &lex.slice()[1..lex.slice().len() - 1];
-    //     match Regex::new(regex_str) {
-    //         Ok(_) => Ok(regex_str.to_string()),
-    //         Err(_) => Err(Error::InvalidRegex(lex.span()))
-    //     }
-    // })]
-    // Regex(Result<String>),
+    #[token("/", parse_regex)]
+    Regex(Result<String>),
 
     // // Range pattern {n,m} - using a different approach
     // #[regex(r"\{[0-9]+,[0-9]+\}", |lex| {
@@ -298,4 +290,29 @@ pub enum Token {
     //     lex.slice().to_string()
     // )]
     // Identifier(String),
+}
+
+/// Callback used by the `Regex` variant above.
+fn parse_regex(lex: &mut Lexer<Token>) -> Result<String> {
+    let src = lex.remainder();               // everything after the first '/'
+    let mut escape = false;
+
+    for (i, ch) in src.char_indices() {
+        match (ch, escape) {
+            ('\\', false) => escape = true,  // start of an escape
+            ('/', false)  => {
+                // Found the closing delimiter ------------------
+                lex.bump(i + 1);             // +1 to also eat the '/'
+                let content = src[..i].to_owned();
+                match regex::Regex::new(&content) {
+                    Ok(_) => return Ok(content),
+                    Err(_) => return Err(Error::InvalidRegex(lex.span())),
+                }
+            }
+            _ => escape = false,             // any other char ends an escape
+        }
+    }
+
+    // Unterminated literal – treat as lexing error
+    Err(Error::UnterminatedRegex(lex.span()))
 }
