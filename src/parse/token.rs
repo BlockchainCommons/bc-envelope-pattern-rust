@@ -1,6 +1,4 @@
-use bc_ur::prelude::*;
-use logos::{Lexer, Logos, Span};
-
+use logos::{Lexer, Logos};
 use super::error::{Error, Result};
 
 /// Tokens for the Gordian Envelope pattern syntax.
