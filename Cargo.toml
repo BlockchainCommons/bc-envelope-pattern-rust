@@ -21,7 +21,7 @@ categories = [
 ] # https://crates.io/category_slugs
 
 [dependencies]
-bc-envelope = "^0.30.0"
+bc-envelope = "^0.31.0"
 known-values = "^0.6.0"
 dcbor = { version = "^0.21.0", features = ["anyhow", "multithreaded"] }
 bc-components = "^0.23.0"
