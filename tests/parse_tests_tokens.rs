@@ -1,4 +1,4 @@
-use bc_envelope_pattern::Token;
+use bc_envelope_pattern::{Greediness, RepeatRange, Token};
 use logos::Logos;
 
 #[test]
@@ -55,16 +55,88 @@ fn test_complex_tokens() {
     assert_eq!(lx.next(), None);
 }
 
-// #[test]
-// fn test_complex_tokens_2() {
-//     // Test range
-//     let mut lexer = Token::lexer("{1, 5}");
-//     if let Some(Ok(Token::Range(Ok(range)))) = lexer.next() {
-//         assert_eq!(range, (1, 5));
-//     } else {
-//         panic!("Failed to parse range");
-//     }
+#[test]
+fn test_unsigned_integer() {
+    let mut lexer = Token::lexer("42");
+    if let Some(Ok(Token::UnsignedInteger(Ok(42)))) = lexer.next() {
+        // Successfully parsed integer
+    } else {
+        panic!("Failed to parse integer literal");
+    }
 
+    // Test unsigned integer
+    let mut lexer = Token::lexer("0");
+    if let Some(Ok(Token::UnsignedInteger(Ok(0)))) = lexer.next() {
+        // Successfully parsed zero
+    } else {
+        panic!("Failed to parse zero literal");
+    }
+}
+
+#[test]
+fn test_range() {
+    struct RangeTestCase {
+        input: &'static str,
+        expected: RepeatRange,
+    }
+    let test_cases = vec![
+        RangeTestCase {
+            input: "{1, 5}",
+            expected: RepeatRange::new(1..=5, Greediness::default()).unwrap(),
+        },
+        RangeTestCase {
+            input: "{ 3 , }",
+            expected: RepeatRange::new(3.., Greediness::default()).unwrap(),
+        },
+        RangeTestCase {
+            input: "{ 5 }",
+            expected: RepeatRange::new(5..=5, Greediness::default()).unwrap(),
+        },
+
+        RangeTestCase {
+            input: "{1, 5 }?",
+            expected: RepeatRange::new(1..=5, Greediness::Lazy).unwrap(),
+        },
+        RangeTestCase {
+            input: "{ 3 , }?",
+            expected: RepeatRange::new(3.., Greediness::Lazy).unwrap(),
+        },
+        RangeTestCase {
+            input: "{5}?",
+            expected: RepeatRange::new(5..=5, Greediness::Lazy).unwrap(),
+        },
+
+        RangeTestCase {
+            input: "{ 1,5}+",
+            expected: RepeatRange::new(1..=5, Greediness::Possessive).unwrap(),
+        },
+        RangeTestCase {
+            input: "{ 3 , }+",
+            expected: RepeatRange::new(3.., Greediness::Possessive).unwrap(),
+        },
+        RangeTestCase {
+            input: "{5}+",
+            expected: RepeatRange::new(5..=5, Greediness::Possessive).unwrap(),
+        },
+    ];
+
+    let mut failed_cases = vec![];
+
+    for test_case in test_cases {
+        let mut lexer = Token::lexer(test_case.input);
+        if let Some(Ok(Token::Range(Ok(range)))) = lexer.next() {
+            assert_eq!(range, test_case.expected);
+        } else {
+            failed_cases.push(test_case.input);
+        }
+    }
+
+    if !failed_cases.is_empty() {
+        panic!("Failed to parse ranges: {:?}", failed_cases);
+    }
+}
+
+// fn test_complex_tokens_2() {
 //     // Test string literal
 //     let mut lexer = Token::lexer(r#""hello world""#);
 //     if let Some(Ok(Token::StringLiteral(s))) = lexer.next() {

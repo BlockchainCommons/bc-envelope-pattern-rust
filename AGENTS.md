@@ -207,17 +207,17 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, a
         - `pattern *` (0 or more)
         - `pattern ?` (0 or 1)
         - `pattern +` (1 or more)
-        - `pattern {n,m}` (`n` to `m` repeats, inclusive)
+        - `pattern { n , m }` (`n` to `m` repeats, inclusive)
     - Lazy — starts with as few repetitions as possible, adding more only if the rest of the pattern cannot match.
         - `pattern *?` (0 or more)
         - `pattern ??` (0 or 1)
         - `pattern +?` (1 or more)
-        - `pattern {n,m}?` (`n` to `m` repeats, inclusive)
+        - `pattern { n , m }?` (`n` to `m` repeats, inclusive)
     - Possessive — grabs as many repetitions as possible and never backtracks; if the rest of the pattern cannot match, the whole match fails.
         - `pattern *+` (0 or more)
         - `pattern ?+` (0 or 1)
         - `pattern ++` (1 or more)
-        - `pattern {n,m}+` (`n` to `m` repeats, inclusive)
+        - `pattern { n , m }+` (`n` to `m` repeats, inclusive)
 - Search
     - `SEARCH ( pattern )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.

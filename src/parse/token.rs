@@ -1,11 +1,15 @@
+use std::ops::{Bound, RangeBounds};
+
 use logos::{Lexer, Logos};
+
 use super::error::{Error, Result};
+use crate::Greediness;
 
 /// Tokens for the Gordian Envelope pattern syntax.
 #[derive(Debug, Clone, Logos, PartialEq)]
 #[rustfmt::skip]
 #[logos(error = Error)]
-#[logos(skip r"(?:[ \t\r\n\f]|//[^\n]*)+")]
+#[logos(skip r"[ \t\r\n\f]+")]
 pub enum Token {
     // Meta Pattern Operators
     #[token("&")]
@@ -148,12 +152,6 @@ pub enum Token {
     #[token(")")]
     ParenClose,
 
-    #[token("{")]
-    BraceOpen,
-
-    #[token("}")]
-    BraceClose,
-
     #[token(",")]
     Comma,
 
@@ -172,7 +170,11 @@ pub enum Token {
     #[token("<")]
     LessThan,
 
-    // Capture Group Name
+    #[regex(r"[1-9]\d*|0", |lex|
+        lex.slice().parse::<usize>().map_err(|_| Error::InvalidNumberFormat(lex.span()))
+    )]
+    UnsignedInteger(Result<usize>),
+
     #[regex(r"@[a-zA-Z_][a-zA-Z0-9_]*", |lex|
         lex.slice()[1..].to_string()
     )]
@@ -180,6 +182,9 @@ pub enum Token {
 
     #[token("/", parse_regex)]
     Regex(Result<String>),
+
+    #[token("{", parse_range)]
+    Range(Result<RepeatRange>),
 
     // // Range pattern {n,m} - using a different approach
     // #[regex(r"\{[0-9]+,[0-9]+\}", |lex| {
@@ -292,25 +297,68 @@ pub enum Token {
 
 /// Callback used by the `Regex` variant above.
 fn parse_regex(lex: &mut Lexer<Token>) -> Result<String> {
-    let src = lex.remainder();               // everything after the first '/'
+    let src = lex.remainder(); // everything after the first '/'
     let mut escape = false;
 
     for (i, ch) in src.char_indices() {
         match (ch, escape) {
-            ('\\', false) => escape = true,  // start of an escape
-            ('/', false)  => {
+            ('\\', false) => escape = true, // start of an escape
+            ('/', false) => {
                 // Found the closing delimiter ------------------
-                lex.bump(i + 1);             // +1 to also eat the '/'
+                lex.bump(i + 1); // +1 to also eat the '/'
                 let content = src[..i].to_owned();
                 match regex::Regex::new(&content) {
                     Ok(_) => return Ok(content),
                     Err(_) => return Err(Error::InvalidRegex(lex.span())),
                 }
             }
-            _ => escape = false,             // any other char ends an escape
+            _ => escape = false, // any other char ends an escape
         }
     }
 
     // Unterminated literal – treat as lexing error
     Err(Error::UnterminatedRegex(lex.span()))
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct RepeatRange {
+    pub min: usize,
+    pub max: Option<usize>, // None == unbounded
+    pub mode: Greediness,
+}
+
+impl RepeatRange {
+    pub fn new<R>(range: R, mode: Greediness) -> Result<Self>
+    where
+        R: RangeBounds<usize>,
+    {
+        let min = match range.start_bound() {
+            Bound::Included(&start) => start,
+            Bound::Excluded(&start) => start + 1,
+            Bound::Unbounded => 0,
+        };
+        let max = match range.end_bound() {
+            Bound::Included(&end) => Some(end),
+            Bound::Excluded(&end) => Some(end - 1),
+            Bound::Unbounded => None,
+        };
+        Ok(Self { min, max, mode })
+    }
+
+    pub fn is_unbounded(&self) -> bool { self.max.is_none() }
+}
+
+fn parse_range(lex: &mut Lexer<Token>) -> Result<RepeatRange> {
+    let _src = lex.remainder(); // everything after the first '{'
+
+    // Needs to handle: (note allowable whitespace)
+    // - { n , m }
+    // - { n , }
+    // - { n }
+
+    // Optionally followed by one of:
+    // - ? (lazy)
+    // - + (possessive)
+
+    todo!();
 }
