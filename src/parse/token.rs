@@ -349,16 +349,101 @@ impl RepeatRange {
 }
 
 fn parse_range(lex: &mut Lexer<Token>) -> Result<RepeatRange> {
-    let _src = lex.remainder(); // everything after the first '{'
+    let src = lex.remainder(); // everything after the first '{'
 
-    // Needs to handle: (note allowable whitespace)
-    // - { n , m }
-    // - { n , }
-    // - { n }
+    // Helper to skip whitespace inside the range specification
+    fn skip_ws(s: &str, pos: &mut usize) {
+        while let Some(ch) = s[*pos..].chars().next() {
+            if matches!(ch, ' ' | '\t' | '\n' | '\r' | '\u{0c}') {
+                *pos += ch.len_utf8();
+            } else {
+                break;
+            }
+        }
+    }
 
-    // Optionally followed by one of:
-    // - ? (lazy)
-    // - + (possessive)
+    let mut pos = 0;
 
-    todo!();
+    // parse minimum value --------------------------------------------------
+    skip_ws(src, &mut pos);
+    let start = pos;
+    while let Some(ch) = src[pos..].chars().next() {
+        if ch.is_ascii_digit() {
+            pos += ch.len_utf8();
+        } else {
+            break;
+        }
+    }
+    if start == pos {
+        return Err(Error::InvalidRange(lex.span()));
+    }
+    let min: usize = src[start..pos]
+        .parse()
+        .map_err(|_| Error::InvalidRange(lex.span()))?;
+
+    skip_ws(src, &mut pos);
+
+    // parse optional comma and maximum value -------------------------------
+    let max: Option<usize>;
+
+    match src[pos..].chars().next() {
+        Some(',') => {
+            pos += 1;
+            skip_ws(src, &mut pos);
+
+            // If the next non-space char is '}', the range is open ended
+            match src[pos..].chars().next() {
+                Some('}') => {
+                    pos += 1;
+                    max = None;
+                }
+                Some(ch) if ch.is_ascii_digit() => {
+                    let start = pos;
+                    while let Some(ch) = src[pos..].chars().next() {
+                        if ch.is_ascii_digit() {
+                            pos += ch.len_utf8();
+                        } else {
+                            break;
+                        }
+                    }
+                    if start == pos {
+                        return Err(Error::InvalidRange(lex.span()));
+                    }
+                    let m: usize = src[start..pos]
+                        .parse()
+                        .map_err(|_| Error::InvalidRange(lex.span()))?;
+                    skip_ws(src, &mut pos);
+                    if !matches!(src[pos..].chars().next(), Some('}')) {
+                        return Err(Error::InvalidRange(lex.span()));
+                    }
+                    pos += 1;
+                    max = Some(m);
+                }
+                _ => return Err(Error::InvalidRange(lex.span())),
+            }
+        }
+        Some('}') => {
+            pos += 1;
+            max = Some(min);
+        }
+        _ => return Err(Error::InvalidRange(lex.span())),
+    }
+
+    // determine greediness -------------------------------------------------
+    let mode = match src[pos..].chars().next() {
+        Some('?') => {
+            pos += 1;
+            Greediness::Lazy
+        }
+        Some('+') => {
+            pos += 1;
+            Greediness::Possessive
+        }
+        _ => Greediness::Greedy,
+    };
+
+    // consume parsed characters (everything after '{')
+    lex.bump(pos);
+
+    Ok(RepeatRange { min, max, mode })
 }
