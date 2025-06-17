@@ -49,3 +49,11 @@ impl Matcher for WrappedPattern {
         }
     }
 }
+
+impl std::fmt::Display for WrappedPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WrappedPattern::Any => write!(f, "WRAPPED"),
+        }
+    }
+}

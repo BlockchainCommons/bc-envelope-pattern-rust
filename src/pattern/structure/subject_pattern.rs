@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use crate::pattern::{
-    Compilable, Matcher, Path, Pattern, structure::StructurePattern, vm::Instr,
+    Compilable, Matcher, Path, Pattern, vm::Instr,
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]

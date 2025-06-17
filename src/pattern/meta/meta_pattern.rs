@@ -71,15 +71,15 @@ impl Compilable for MetaPattern {
 impl std::fmt::Display for MetaPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            MetaPattern::Any(pattern) => write!(f, "{}", pattern),
+            MetaPattern::None(pattern) => write!(f, "{}", pattern),
+            MetaPattern::And(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Or(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Not(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Search(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Sequence(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Repeat(pattern) => write!(f, "{}", pattern),
             _ => todo!(),
-            // MetaPattern::Any(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::None(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::And(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::Or(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::Not(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::Search(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::Sequence(pattern) => write!(f, "{}", pattern),
-            // MetaPattern::Repeat(pattern) => write!(f, "{}", pattern),
             // MetaPattern::Group(pattern) => write!(f, "{}", pattern),
         }
     }

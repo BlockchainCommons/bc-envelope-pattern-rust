@@ -34,3 +34,9 @@ impl Compilable for NonePattern {
         );
     }
 }
+
+impl std::fmt::Display for NonePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "NONE")
+    }
+}

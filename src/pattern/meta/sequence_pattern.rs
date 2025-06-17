@@ -24,6 +24,14 @@ impl SequencePattern {
         };
         SequencePattern { first: Box::new(first_pat), rest }
     }
+
+    pub fn patterns(&self) -> Vec<Pattern> {
+        let mut result = vec![*self.first.clone()];
+        if let Some(rest) = &self.rest {
+            result.extend(rest.patterns());
+        }
+        result
+    }
 }
 
 impl Matcher for SequencePattern {
@@ -64,5 +72,32 @@ impl Compilable for SequencePattern {
             // Combine the paths correctly
             code.push(Instr::CombineSequence);
         }
+    }
+}
+
+impl std::fmt::Display for SequencePattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.patterns()
+                .iter()
+                .map(|p| p.to_string())
+                .collect::<Vec<_>>()
+                .join(">")
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sequence_pattern_display() {
+        let pattern1 = Pattern::wrapped();
+        let pattern2 = Pattern::wrapped();
+        let sequence_pattern = SequencePattern::new(vec![pattern1, pattern2]);
+        assert_eq!(sequence_pattern.to_string(), "WRAPPED>WRAPPED");
     }
 }

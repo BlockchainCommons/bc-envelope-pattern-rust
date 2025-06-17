@@ -67,3 +67,20 @@ impl Compilable for SearchPattern {
         code.push(Instr::Search { pat_idx: idx });
     }
 }
+
+impl std::fmt::Display for SearchPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "SEARCH({})", self.pattern())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_search_pattern_display() {
+        let pattern = SearchPattern::new(Pattern::text("test"));
+        assert_eq!(pattern.to_string(), r#"SEARCH(TEXT("test"))"#);
+    }
+}

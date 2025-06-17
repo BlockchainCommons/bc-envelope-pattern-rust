@@ -36,3 +36,30 @@ impl Compilable for AndPattern {
         }
     }
 }
+
+impl std::fmt::Display for AndPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.patterns
+                .iter()
+                .map(|p| p.to_string())
+                .collect::<Vec<_>>()
+                .join("&")
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_and_pattern_display() {
+        let pattern1 = Pattern::number_greater_than(5);
+        let pattern2 = Pattern::number_less_than(10);
+        let and_pattern = AndPattern::new(vec![pattern1, pattern2]);
+        assert_eq!(and_pattern.to_string(), "NUMBER(>5)&NUMBER(<10)");
+    }
+}

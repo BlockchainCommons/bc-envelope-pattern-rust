@@ -1,7 +1,5 @@
 mod common;
 
-use core::num;
-
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Matcher, Pattern};
 use indoc::indoc;

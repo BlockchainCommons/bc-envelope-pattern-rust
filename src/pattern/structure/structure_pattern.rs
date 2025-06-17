@@ -67,8 +67,7 @@ impl std::fmt::Display for StructurePattern {
             StructurePattern::Obscured(pattern) => write!(f, "{}", pattern),
             StructurePattern::Predicate(pattern) => write!(f, "{}", pattern),
             StructurePattern::Subject(pattern) => write!(f, "{}", pattern),
-            _ => todo!(),
-            // StructurePattern::Wrapped(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Wrapped(pattern) => write!(f, "{}", pattern),
         }
     }
 }

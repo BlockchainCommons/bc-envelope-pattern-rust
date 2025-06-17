@@ -38,6 +38,12 @@ impl Compilable for NotPattern {
     }
 }
 
+impl std::fmt::Display for NotPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "!{}", self.pattern)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -95,5 +101,14 @@ mod tests {
 
         let paths = not_pattern.paths(&envelope);
         assert_eq!(paths.len(), 0);
+    }
+
+    #[test]
+    fn test_not_pattern_display() {
+        let pattern = NotPattern::new(Pattern::text("test"));
+        assert_eq!(pattern.to_string(), r#"!TEXT("test")"#);
+
+        let pattern = NotPattern::new(Pattern::any());
+        assert_eq!(pattern.to_string(), "!ANY");
     }
 }

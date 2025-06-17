@@ -34,3 +34,15 @@ impl Compilable for RepeatPattern {
         });
     }
 }
+
+impl std::fmt::Display for RepeatPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{{{},{}}}{}",
+            self.min,
+            self.max.map_or("".to_string(), |m| m.to_string()),
+            self.sub
+        )
+    }
+}

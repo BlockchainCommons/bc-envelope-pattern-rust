@@ -72,3 +72,30 @@ impl Compilable for OrPattern {
         }
     }
 }
+
+impl std::fmt::Display for OrPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.patterns
+                .iter()
+                .map(|p| p.to_string())
+                .collect::<Vec<_>>()
+                .join("|")
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_or_pattern_display() {
+        let pattern1 = Pattern::text("Alice");
+        let pattern2 = Pattern::text("Bob");
+        let or_pattern = OrPattern::new(vec![pattern1, pattern2]);
+        assert_eq!(or_pattern.to_string(), r#"TEXT("Alice")|TEXT("Bob")"#);
+    }
+}
