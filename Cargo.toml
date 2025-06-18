@@ -38,6 +38,7 @@ hex-literal = "^0.4.1"
 indoc = "^2.0.0"
 bc-rand = "^0.4.0"
 anyhow = "^1.0.0"
+bc-tags = "0.3.0"
 
 [features]
 default = ["signature", "encrypt", "compress", "known_value", "types"]

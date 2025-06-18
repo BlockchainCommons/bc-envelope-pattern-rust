@@ -85,6 +85,7 @@ fn parse_primary(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
         Token::Tag => leaf::parse_tag(lexer),
         Token::Known => leaf::parse_known_value(lexer),
         Token::Leaf => Ok(Pattern::any_leaf()),
+        Token::Cbor => leaf::parse_cbor(lexer),
         Token::Map => leaf::parse_map(lexer),
         Token::None => Ok(Pattern::none()),
         Token::Null => leaf::parse_null(lexer),
