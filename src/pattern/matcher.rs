@@ -11,7 +11,7 @@ pub trait Matcher: std::fmt::Debug + std::fmt::Display + Clone {
     fn paths_with_captures(
         &self,
         _envelope: &Envelope,
-    ) -> (Vec<Path>, HashMap<String, Path>) {
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         unimplemented!(
             "Matcher::paths_with_captures not implemented for {:?}",
             self

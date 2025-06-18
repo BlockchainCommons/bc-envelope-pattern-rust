@@ -731,5 +731,19 @@ fn test_capture_pattern() {
     let (capture_paths, captures) = capture.paths_with_captures(&envelope);
     assert!(capture_paths.iter().any(|p| *p == inner_paths[0]));
     assert!(captures.contains_key("num"));
-    assert_eq!(captures.get("num").unwrap(), &inner_paths[0]);
+    assert!(captures.get("num").unwrap().contains(&inner_paths[0]));
+}
+
+#[test]
+fn test_capture_multiple_matches() {
+    let envelope = Envelope::new(42);
+
+    let pattern = Pattern::or(vec![
+        Pattern::capture("num", Pattern::number(42)),
+        Pattern::capture("num", Pattern::number_greater_than(40)),
+    ]);
+
+    let (_paths, captures) = pattern.paths_with_captures(&envelope);
+    let nums = captures.get("num").unwrap();
+    assert_eq!(nums.len(), 2);
 }
