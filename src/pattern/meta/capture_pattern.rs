@@ -38,10 +38,12 @@ impl Matcher for CapturePattern {
     fn paths_with_captures(
         &self,
         envelope: &Envelope,
-    ) -> (Vec<Path>, std::collections::HashMap<String, Path>) {
+    ) -> (Vec<Path>, std::collections::HashMap<String, Vec<Path>>) {
         let (paths, mut caps) = self.pattern.paths_with_captures(envelope);
-        if let Some(p) = paths.first() {
-            caps.insert(self.name.clone(), p.clone());
+        if !paths.is_empty() {
+            caps.entry(self.name.clone())
+                .or_default()
+                .extend(paths.clone());
         }
         (paths, caps)
     }
