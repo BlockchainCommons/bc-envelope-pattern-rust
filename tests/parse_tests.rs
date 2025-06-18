@@ -569,3 +569,16 @@ fn parse_repeat_patterns() {
     );
     assert_eq!(p.to_string(), "(NUMBER){2,4}+");
 }
+
+#[test]
+fn parse_capture_patterns() {
+    let src = "@name(NUMBER(1))";
+    let p = parse_pattern(src).unwrap();
+    assert_eq!(p, Pattern::capture("name", Pattern::number(1)));
+    assert_eq!(p.to_string(), src);
+
+    let spaced = "@name ( NUMBER ( 1 ) )";
+    let p_spaced = parse_pattern(spaced).unwrap();
+    assert_eq!(p_spaced, Pattern::capture("name", Pattern::number(1)));
+    assert_eq!(p_spaced.to_string(), src);
+}
