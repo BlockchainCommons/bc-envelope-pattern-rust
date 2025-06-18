@@ -8,6 +8,20 @@ The main task now is to implement the parser for the text-based syntax for patte
 
 Write unit tests for these patterns to ensure they are parsed correctly. Refer to the syntax guide below and `tests/` for examples of expected behavior.
 
+## Commands
+
+- Running `clippy`:
+
+```bash
+cargo +nightly clippy --all-features --no-deps -- -D warnings
+```
+
+- Running `fmt`:
+
+```bash
+cargo +nightly fmt -- --check
+```
+
 ## Intro to Gordian Envelopes
 
 - The basic structure of Gordian Envelopes is defined in the [Envelope I-D](https://datatracker.ietf.org/doc/draft-mcnally-envelope/).
@@ -159,7 +173,7 @@ Structure patterns match parts of Gordian Envelope structures.
         - Matches an assertion having a predicate that matches the specified pattern.
     - `ASSERTOBJ ( pattern )`
         - Matches an assertion having an object that matches the specified pattern.
-- [ ] Digest
+- [x] Digest
     - `DIGEST ( hex )`
         - Matches a digest whose value starts with the specified hex prefix. Up to 32 bytes can be specified, which is the length of the full SHA-256 digest.
     - `DIGEST ( ur:digest/value )`
@@ -215,7 +229,7 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, a
 - [x] None
     - `NONE`
         - Never matches.
-- [ ] Not
+- [x] Not
     - `! pattern`
         - Matches if the specified pattern does not match.
 - [x] Or
