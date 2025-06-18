@@ -12,12 +12,14 @@ pub struct GroupPattern {
 }
 
 impl GroupPattern {
-    /// Creates a new `GroupPattern` with the specified sub-pattern and quantifier.
+    /// Creates a new `GroupPattern` with the specified sub-pattern and
+    /// quantifier.
     pub fn repeat(pattern: Pattern, quantifier: Quantifier) -> Self {
         GroupPattern { pattern: Box::new(pattern), quantifier }
     }
 
-    /// Creates a new `GroupPattern` with a quantifier that matches exactly once.
+    /// Creates a new `GroupPattern` with a quantifier that matches exactly
+    /// once.
     pub fn new(pattern: Pattern) -> Self {
         GroupPattern {
             pattern: Box::new(pattern),

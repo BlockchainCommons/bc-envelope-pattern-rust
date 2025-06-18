@@ -1,6 +1,6 @@
 use logos::Logos;
 
-use super::{meta, Token};
+use super::{Token, meta};
 use crate::{Error, Pattern, Result};
 
 /// Parse a pattern expression.

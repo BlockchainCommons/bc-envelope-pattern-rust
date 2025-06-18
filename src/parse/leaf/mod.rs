@@ -1,6 +1,6 @@
 // Parsers for leaf-level pattern syntax
 
-use super::{utils, Token};
+use super::{Token, utils};
 use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_bool(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
@@ -18,12 +18,19 @@ pub(crate) fn parse_bool(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             let value = match value_token {
                 Token::BoolTrue => true,
                 Token::BoolFalse => false,
-                t => return Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                t => {
+                    return Err(Error::UnexpectedToken(
+                        Box::new(t),
+                        lexer.span(),
+                    ));
+                }
             };
 
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(Pattern::bool(value)),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -45,10 +52,17 @@ pub(crate) fn parse_text(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                         let regex = regex::Regex::new(&res?)
                             .map_err(|_| Error::InvalidRegex(lexer.span()))?;
                         match lexer.next() {
-                            Some(Ok(Token::ParenClose)) => Ok(Pattern::text_regex(regex)),
-                            Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                            Some(Ok(Token::ParenClose)) => {
+                                Ok(Pattern::text_regex(regex))
+                            }
+                            Some(Ok(t)) => Err(Error::UnexpectedToken(
+                                Box::new(t),
+                                lexer.span(),
+                            )),
                             Some(Err(e)) => Err(e),
-                            None => Err(Error::ExpectedCloseParen(lexer.span())),
+                            None => {
+                                Err(Error::ExpectedCloseParen(lexer.span()))
+                            }
                         }
                     } else {
                         Err(Error::UnexpectedEndOfInput)
@@ -60,7 +74,10 @@ pub(crate) fn parse_text(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                     lexer.bump(consumed);
                     match lexer.next() {
                         Some(Ok(Token::ParenClose)) => Ok(Pattern::text(value)),
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
@@ -86,12 +103,17 @@ pub(crate) fn parse_array(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                     };
                     match lexer.next() {
                         Some(Ok(Token::ParenClose)) => Ok(pat),
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
                 }
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::UnexpectedEndOfInput),
             }
@@ -100,7 +122,9 @@ pub(crate) fn parse_array(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     }
 }
 
-pub(crate) fn parse_byte_string(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_byte_string(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {
         Some(Ok(Token::ParenOpen)) => {
@@ -116,7 +140,9 @@ pub(crate) fn parse_byte_string(lexer: &mut logos::Lexer<Token>) -> Result<Patte
             lexer.bump(consumed);
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -137,7 +163,9 @@ pub(crate) fn parse_number(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
 
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -156,7 +184,9 @@ pub(crate) fn parse_date(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             lexer.bump(consumed);
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -174,8 +204,13 @@ pub(crate) fn parse_map(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                 Some(Ok(Token::UnsignedInteger(res))) => {
                     let count = res?;
                     match lexer.next() {
-                        Some(Ok(Token::ParenClose)) => Ok(Pattern::map_with_count(count)),
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(Token::ParenClose)) => {
+                            Ok(Pattern::map_with_count(count))
+                        }
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
@@ -189,12 +224,17 @@ pub(crate) fn parse_map(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                     };
                     match lexer.next() {
                         Some(Ok(Token::ParenClose)) => Ok(pat),
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
                 }
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::UnexpectedEndOfInput),
             }

@@ -82,7 +82,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
     - `CBOR ( ur:type/value )`
         - Matches a CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
-- [ ] Date
+- [x] Date
     - `DATE`
         - Matches any date value.
     - `DATE ( iso-8601 )`
@@ -104,14 +104,14 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches the known value with the specified name. Again we use single quotes here for familiarity.
     - `KNOWN ( /regex/ )`
         - Matches a known value with a name that matches the specified regex. We do not use the single quotes here.
-- [ ] Map
+- [x] Map
     - `MAP`
         - Matches any map.
     - `MAP ( n )`
         - Matches a map with exactly `n` entries.
     - `MAP ( { n , m } )`
         - Matches a map with between `n` and `m` entries, inclusive.
-- [ ] Null
+- [x] Null
     - `NULL`
         - Matches the null value.
 - [x] Number

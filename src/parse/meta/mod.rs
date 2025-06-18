@@ -1,6 +1,6 @@
 // Parsers for meta-pattern operators
 
-use super::{leaf, Token};
+use super::{Token, leaf};
 use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
@@ -25,7 +25,9 @@ pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     }
 }
 
-pub(crate) fn parse_sequence(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_sequence(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     let mut patterns = vec![parse_and(lexer)?];
 
     loop {
@@ -76,16 +78,16 @@ fn parse_primary(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
 
     match token {
         Token::Any => Ok(Pattern::any()),
-        Token::None => Ok(Pattern::none()),
-        Token::Bool => leaf::parse_bool(lexer),
-        Token::Text => leaf::parse_text(lexer),
-        Token::Number => leaf::parse_number(lexer),
-        Token::Leaf => Ok(Pattern::any_leaf()),
         Token::Array => leaf::parse_array(lexer),
+        Token::Bool => leaf::parse_bool(lexer),
         Token::ByteString => leaf::parse_byte_string(lexer),
         Token::Date => leaf::parse_date(lexer),
+        Token::Leaf => Ok(Pattern::any_leaf()),
         Token::Map => leaf::parse_map(lexer),
+        Token::None => Ok(Pattern::none()),
         Token::Null => leaf::parse_null(lexer),
+        Token::Number => leaf::parse_number(lexer),
+        Token::Text => leaf::parse_text(lexer),
         t => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
     }
 }

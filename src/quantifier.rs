@@ -31,9 +31,7 @@ impl Quantifier {
 }
 
 impl Default for Quantifier {
-    fn default() -> Self {
-        Quantifier::new(1..=1, Reluctance::Greedy)
-    }
+    fn default() -> Self { Quantifier::new(1..=1, Reluctance::Greedy) }
 }
 
 impl std::fmt::Display for Quantifier {

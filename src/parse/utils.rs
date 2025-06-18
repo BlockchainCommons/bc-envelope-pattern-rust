@@ -56,7 +56,8 @@ pub(crate) fn parse_hex_string(src: &str) -> Result<(Vec<u8>, usize)> {
         let b = src.as_bytes()[pos];
         if b == b'\'' {
             let inner = &src[start..pos];
-            let bytes = hex::decode(inner).map_err(|_| Error::InvalidHexString(pos..pos))?;
+            let bytes = hex::decode(inner)
+                .map_err(|_| Error::InvalidHexString(pos..pos))?;
             pos += 1;
             skip_ws(src, &mut pos);
             return Ok((bytes, pos));
@@ -69,7 +70,9 @@ pub(crate) fn parse_hex_string(src: &str) -> Result<(Vec<u8>, usize)> {
     Err(Error::InvalidHexString(pos..pos))
 }
 
-pub(crate) fn parse_binary_regex(src: &str) -> Result<(regex::bytes::Regex, usize)> {
+pub(crate) fn parse_binary_regex(
+    src: &str,
+) -> Result<(regex::bytes::Regex, usize)> {
     let mut pos = 0;
     skip_ws(src, &mut pos);
     if pos >= src.len() || src.as_bytes()[pos] != b'/' {
@@ -91,8 +94,8 @@ pub(crate) fn parse_binary_regex(src: &str) -> Result<(regex::bytes::Regex, usiz
         }
         if b == b'/' {
             let inner = &src[start..pos - 1];
-            let regex =
-                regex::bytes::Regex::new(inner).map_err(|_| Error::InvalidRegex(pos..pos))?;
+            let regex = regex::bytes::Regex::new(inner)
+                .map_err(|_| Error::InvalidRegex(pos..pos))?;
             skip_ws(src, &mut pos);
             return Ok((regex, pos));
         }
@@ -193,7 +196,8 @@ pub(crate) fn parse_text_regex(src: &str) -> Result<(regex::Regex, usize)> {
         }
         if b == b'/' {
             let inner = &src[start..pos - 1];
-            let regex = regex::Regex::new(inner).map_err(|_| Error::InvalidRegex(pos..pos))?;
+            let regex = regex::Regex::new(inner)
+                .map_err(|_| Error::InvalidRegex(pos..pos))?;
             skip_ws(src, &mut pos);
             return Ok((regex, pos));
         }
@@ -218,7 +222,8 @@ fn parse_iso8601(src: &str, pos: &mut usize) -> Result<dcbor::Date> {
         return Err(Error::InvalidDateFormat(0..0));
     }
     let iso = &src[start..*pos];
-    let date = dcbor::Date::from_string(iso).map_err(|_| Error::InvalidDateFormat(0..0))?;
+    let date = dcbor::Date::from_string(iso)
+        .map_err(|_| Error::InvalidDateFormat(0..0))?;
     skip_ws(src, pos);
     Ok(date)
 }

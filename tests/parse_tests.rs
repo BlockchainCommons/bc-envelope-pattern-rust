@@ -1,4 +1,4 @@
-use bc_envelope_pattern::{parse_pattern, Pattern};
+use bc_envelope_pattern::{Pattern, parse_pattern};
 
 #[test]
 fn parse_any() {
