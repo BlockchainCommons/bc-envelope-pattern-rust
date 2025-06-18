@@ -257,3 +257,42 @@ pub(crate) fn parse_date_inner(src: &str) -> Result<(Pattern, usize)> {
 
     Ok((Pattern::date(first), pos))
 }
+
+pub(crate) fn parse_bare_word(src: &str) -> Result<(String, usize)> {
+    let mut pos = 0;
+    skip_ws(src, &mut pos);
+    let start = pos;
+    while pos < src.len() {
+        let ch = src[pos..].chars().next().unwrap();
+        if matches!(ch, ' ' | '\t' | '\n' | '\r' | '\u{0c}' | ')') {
+            break;
+        }
+        pos += ch.len_utf8();
+    }
+    if start == pos {
+        return Err(Error::UnexpectedEndOfInput);
+    }
+    let word = src[start..pos].to_string();
+    skip_ws(src, &mut pos);
+    Ok((word, pos))
+}
+
+pub(crate) fn parse_single_quoted(src: &str) -> Result<(String, usize)> {
+    let mut pos = 0;
+    skip_ws(src, &mut pos);
+    if pos >= src.len() || src.as_bytes()[pos] != b'\'' {
+        return Err(Error::UnexpectedEndOfInput);
+    }
+    pos += 1;
+    let start = pos;
+    while pos < src.len() {
+        if src.as_bytes()[pos] == b'\'' {
+            let value = src[start..pos].to_string();
+            pos += 1;
+            skip_ws(src, &mut pos);
+            return Ok((value, pos));
+        }
+        pos += 1;
+    }
+    Err(Error::UnexpectedEndOfInput)
+}
