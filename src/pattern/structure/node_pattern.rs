@@ -25,8 +25,8 @@ impl NodePattern {
 
     /// Creates a new `NodePattern` that matches a node with the specified count
     /// of assertions.
-    pub fn interval(range: impl RangeBounds<usize>) -> Self {
-        NodePattern::AssertionsInterval(Interval::new(range))
+    pub fn interval(interval: impl RangeBounds<usize>) -> Self {
+        NodePattern::AssertionsInterval(Interval::new(interval))
     }
 }
 

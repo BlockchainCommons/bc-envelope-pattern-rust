@@ -30,6 +30,12 @@ impl Quantifier {
     pub fn is_unbounded(&self) -> bool { self.interval.is_unbounded() }
 }
 
+impl Default for Quantifier {
+    fn default() -> Self {
+        Quantifier::new(1..=1, Reluctance::Greedy)
+    }
+}
+
 impl std::fmt::Display for Quantifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

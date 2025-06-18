@@ -242,7 +242,7 @@ fn optional_wrapped_pattern() {
     ]);
     assert_eq!(
         format!("{}", optional_wrapped_pattern),
-        r#"WRAPPED?>NUMBER"#
+        r#"(WRAPPED)?>NUMBER"#
     );
 
     let inner = Envelope::new(42);

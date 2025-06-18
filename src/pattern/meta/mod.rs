@@ -18,6 +18,6 @@ pub(crate) use meta_pattern::MetaPattern;
 pub(crate) use none_pattern::NonePattern;
 pub(crate) use not_pattern::NotPattern;
 pub(crate) use or_pattern::OrPattern;
-pub(crate) use repeat_pattern::RepeatPattern;
+pub(crate) use repeat_pattern::GroupPattern;
 pub(crate) use search_pattern::SearchPattern;
 pub(crate) use sequence_pattern::SequencePattern;

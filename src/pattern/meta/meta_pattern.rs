@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use super::{
-    AndPattern, CapturePattern, NotPattern, OrPattern, RepeatPattern,
+    AndPattern, CapturePattern, GroupPattern, NotPattern, OrPattern,
     SearchPattern, SequencePattern,
 };
 use crate::{
@@ -31,9 +31,9 @@ pub enum MetaPattern {
     /// Matches a sequence of patterns.
     Sequence(SequencePattern),
     /// Matches with repetition.
-    Repeat(RepeatPattern),
-    /// Groups (captures) a pattern match.
-    Group(CapturePattern),
+    Group(GroupPattern),
+    /// Captures a pattern match.
+    Capture(CapturePattern),
 }
 
 impl Matcher for MetaPattern {
@@ -46,8 +46,8 @@ impl Matcher for MetaPattern {
             MetaPattern::Not(pattern) => pattern.paths(envelope),
             MetaPattern::Search(pattern) => pattern.paths(envelope),
             MetaPattern::Sequence(pattern) => pattern.paths(envelope),
-            MetaPattern::Repeat(pattern) => pattern.paths(envelope),
             MetaPattern::Group(pattern) => pattern.paths(envelope),
+            MetaPattern::Capture(pattern) => pattern.paths(envelope),
         }
     }
 
@@ -60,8 +60,8 @@ impl Matcher for MetaPattern {
             MetaPattern::Not(pattern) => pattern.compile(code, lits),
             MetaPattern::Search(pattern) => pattern.compile(code, lits),
             MetaPattern::Sequence(pattern) => pattern.compile(code, lits),
-            MetaPattern::Repeat(pattern) => pattern.compile(code, lits),
             MetaPattern::Group(pattern) => pattern.compile(code, lits),
+            MetaPattern::Capture(pattern) => pattern.compile(code, lits),
         }
     }
 
@@ -74,8 +74,8 @@ impl Matcher for MetaPattern {
             MetaPattern::Not(pattern) => pattern.is_complex(),
             MetaPattern::Search(pattern) => pattern.is_complex(),
             MetaPattern::Sequence(pattern) => pattern.is_complex(),
-            MetaPattern::Repeat(pattern) => pattern.is_complex(),
             MetaPattern::Group(pattern) => pattern.is_complex(),
+            MetaPattern::Capture(pattern) => pattern.is_complex(),
         }
     }
 }
@@ -90,8 +90,8 @@ impl std::fmt::Display for MetaPattern {
             MetaPattern::Not(pattern) => write!(f, "{}", pattern),
             MetaPattern::Search(pattern) => write!(f, "{}", pattern),
             MetaPattern::Sequence(pattern) => write!(f, "{}", pattern),
-            MetaPattern::Repeat(pattern) => write!(f, "{}", pattern),
             MetaPattern::Group(pattern) => write!(f, "{}", pattern),
+            MetaPattern::Capture(pattern) => write!(f, "{}", pattern),
         }
     }
 }

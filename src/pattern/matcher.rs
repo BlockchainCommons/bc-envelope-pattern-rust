@@ -5,14 +5,16 @@ use crate::pattern::{Pattern, vm::Instr};
 pub type Path = Vec<Envelope>;
 
 pub trait Matcher: std::fmt::Debug + std::fmt::Display + Clone {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path>;
+    fn paths(&self, _envelope: &Envelope) -> Vec<Path> {
+        unimplemented!("Matcher::paths not implemented for {:?}", self)
+    }
 
     fn matches(&self, envelope: &Envelope) -> bool {
         !self.paths(envelope).is_empty()
     }
 
     fn compile(&self, _code: &mut Vec<Instr>, _literals: &mut Vec<Pattern>) {
-        unimplemented!("Matcher::compile must be implemented for {:?}", self);
+        unimplemented!("Matcher::compile not implemented for {:?}", self);
     }
 
     /// Should return true if the Display of the matcher is *complex*,

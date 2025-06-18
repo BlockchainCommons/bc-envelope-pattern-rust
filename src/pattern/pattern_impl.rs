@@ -69,8 +69,8 @@ use super::{
         TaggedPattern, TextPattern,
     },
     meta::{
-        AndPattern, CapturePattern, MetaPattern, NotPattern, OrPattern,
-        RepeatPattern, SearchPattern, SequencePattern,
+        AndPattern, CapturePattern, GroupPattern, MetaPattern, NotPattern,
+        OrPattern, SearchPattern, SequencePattern,
     },
     structure::{
         AssertionsPattern, DigestPattern, NodePattern, ObjectPattern,
@@ -329,8 +329,8 @@ impl Pattern {
         Pattern::Leaf(LeafPattern::Array(ArrayPattern::any()))
     }
 
-    pub fn array_with_range(range: impl RangeBounds<usize>) -> Self {
-        Pattern::Leaf(LeafPattern::Array(ArrayPattern::interval(range)))
+    pub fn array_with_range(interval: impl RangeBounds<usize>) -> Self {
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::interval(interval)))
     }
 
     pub fn array_with_count(count: usize) -> Self {
@@ -343,8 +343,8 @@ impl Pattern {
         Pattern::Leaf(LeafPattern::Map(MapPattern::any()))
     }
 
-    pub fn map_with_range(range: impl RangeBounds<usize>) -> Self {
-        Pattern::Leaf(LeafPattern::Map(MapPattern::interval(range)))
+    pub fn map_with_range(interval: impl RangeBounds<usize>) -> Self {
+        Pattern::Leaf(LeafPattern::Map(MapPattern::interval(interval)))
     }
 
     pub fn map_with_count(count: usize) -> Self {
@@ -596,17 +596,21 @@ impl Pattern {
         interval: impl RangeBounds<usize>,
         reluctance: Reluctance,
     ) -> Self {
-        Pattern::Meta(MetaPattern::Repeat(RepeatPattern::new(
+        Pattern::Meta(MetaPattern::Group(GroupPattern::repeat(
             pattern,
             Quantifier::new(interval, reluctance),
         )))
+    }
+
+    pub fn group(pattern: Pattern) -> Self {
+        Pattern::Meta(MetaPattern::Group(GroupPattern::new(pattern)))
     }
 }
 
 impl Pattern {
     /// Creates a new `Pattern` that will capture a pattern match with a name.
-    pub fn capture(name: &str, pattern: Pattern) -> Self {
-        Pattern::Meta(MetaPattern::Group(CapturePattern::new(name, pattern)))
+    pub fn capture(name: impl AsRef<str>, pattern: Pattern) -> Self {
+        Pattern::Meta(MetaPattern::Capture(CapturePattern::new(name, pattern)))
     }
 }
 

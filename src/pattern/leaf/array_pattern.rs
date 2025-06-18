@@ -22,8 +22,8 @@ impl ArrayPattern {
 
     /// Creates a new `ArrayPattern` that matches arrays with a count
     /// of elements in the specified range.
-    pub fn interval(range: impl RangeBounds<usize>) -> Self {
-        ArrayPattern::Interval(Interval::new(range))
+    pub fn interval(interval: impl RangeBounds<usize>) -> Self {
+        ArrayPattern::Interval(Interval::new(interval))
     }
 }
 
