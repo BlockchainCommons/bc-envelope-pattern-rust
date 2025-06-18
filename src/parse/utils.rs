@@ -1,7 +1,8 @@
 // Utility parsing helpers shared across pattern parsers
 
-use crate::{Error, Pattern, Result};
 use dcbor_parse::parse_dcbor_item_partial;
+
+use crate::{Error, Pattern, Result};
 
 pub(crate) fn skip_ws(src: &str, pos: &mut usize) {
     while let Some(ch) = src[*pos..].chars().next() {

@@ -1,6 +1,6 @@
 // Parsers for meta-pattern operators
 
-use super::{leaf, structure, Token};
+use super::{Token, leaf, structure};
 use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
@@ -25,7 +25,9 @@ pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     }
 }
 
-pub(crate) fn parse_sequence(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_sequence(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     let mut patterns = vec![parse_not(lexer)?];
 
     loop {

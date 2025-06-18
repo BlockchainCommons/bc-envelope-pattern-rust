@@ -1,9 +1,10 @@
 // Parsers for structure-level pattern syntax
 
-use super::{meta, Token};
-use crate::{Error, Pattern, Result};
 use bc_components::Digest;
 use bc_envelope::prelude::URDecodable;
+
+use super::{Token, meta};
+use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_node(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
@@ -20,12 +21,17 @@ pub(crate) fn parse_node(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                     };
                     match lexer.next() {
                         Some(Ok(Token::ParenClose)) => Ok(pat),
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
                 }
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::UnexpectedEndOfInput),
             }
@@ -34,11 +40,15 @@ pub(crate) fn parse_node(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     }
 }
 
-pub(crate) fn parse_wrapped(_lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_wrapped(
+    _lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     Ok(Pattern::wrapped())
 }
 
-pub(crate) fn parse_subject(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_subject(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {
         Some(Ok(Token::ParenOpen)) => {
@@ -46,7 +56,9 @@ pub(crate) fn parse_subject(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> 
             let pattern = meta::parse_or(lexer)?;
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(Pattern::subject(pattern)),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -55,11 +67,15 @@ pub(crate) fn parse_subject(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> 
     }
 }
 
-pub(crate) fn parse_assertion(_lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_assertion(
+    _lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     Ok(Pattern::any_assertion())
 }
 
-pub(crate) fn parse_assertion_pred(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_assertion_pred(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     match lexer.next() {
         Some(Ok(Token::ParenOpen)) => {
             let pattern = meta::parse_or(lexer)?;
@@ -67,7 +83,9 @@ pub(crate) fn parse_assertion_pred(lexer: &mut logos::Lexer<Token>) -> Result<Pa
                 Some(Ok(Token::ParenClose)) => {
                     Ok(Pattern::assertion_with_predicate(pattern))
                 }
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -78,7 +96,9 @@ pub(crate) fn parse_assertion_pred(lexer: &mut logos::Lexer<Token>) -> Result<Pa
     }
 }
 
-pub(crate) fn parse_assertion_obj(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_assertion_obj(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     match lexer.next() {
         Some(Ok(Token::ParenOpen)) => {
             let pattern = meta::parse_or(lexer)?;
@@ -86,7 +106,9 @@ pub(crate) fn parse_assertion_obj(lexer: &mut logos::Lexer<Token>) -> Result<Pat
                 Some(Ok(Token::ParenClose)) => {
                     Ok(Pattern::assertion_with_object(pattern))
                 }
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -105,7 +127,9 @@ pub(crate) fn parse_object(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             let pat = meta::parse_or(lexer)?;
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(Pattern::object(pat)),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -122,7 +146,9 @@ pub(crate) fn parse_digest(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             lexer.bump(consumed);
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -165,7 +191,8 @@ fn parse_digest_inner(src: &str) -> Result<(Pattern, usize)> {
         if hex_str.len() % 2 != 0 {
             return Err(Error::InvalidHexString(pos..pos));
         }
-        let bytes = hex::decode(hex_str).map_err(|_| Error::InvalidHexString(pos..pos))?;
+        let bytes = hex::decode(hex_str)
+            .map_err(|_| Error::InvalidHexString(pos..pos))?;
         if bytes.len() > Digest::DIGEST_SIZE {
             return Err(Error::InvalidHexString(pos..pos));
         }
@@ -174,7 +201,9 @@ fn parse_digest_inner(src: &str) -> Result<(Pattern, usize)> {
     }
 }
 
-pub(crate) fn parse_predicate(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_predicate(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {
         Some(Ok(Token::ParenOpen)) => {
@@ -182,7 +211,9 @@ pub(crate) fn parse_predicate(lexer: &mut logos::Lexer<Token>) -> Result<Pattern
             let pat = meta::parse_or(lexer)?;
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(Pattern::predicate(pat)),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -191,18 +222,26 @@ pub(crate) fn parse_predicate(lexer: &mut logos::Lexer<Token>) -> Result<Pattern
     }
 }
 
-pub(crate) fn parse_obscured(_lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_obscured(
+    _lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     Ok(Pattern::obscured())
 }
 
-pub(crate) fn parse_elided(_lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_elided(
+    _lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     Ok(Pattern::elided())
 }
 
-pub(crate) fn parse_encrypted(_lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_encrypted(
+    _lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     Ok(Pattern::encrypted())
 }
 
-pub(crate) fn parse_compressed(_lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_compressed(
+    _lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     Ok(Pattern::compressed())
 }

@@ -1,8 +1,8 @@
+use bc_components::Digest;
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{parse_pattern, Pattern};
+use bc_envelope_pattern::{Pattern, parse_pattern};
 use dcbor::Date;
 use known_values::KnownValue;
-use bc_components::Digest;
 
 #[test]
 fn parse_any() {
@@ -505,7 +505,10 @@ fn parse_not_patterns() {
 
     let expr = "!ANY & NONE";
     let p = parse_pattern(expr).unwrap();
-    let expected = Pattern::not_matching(Pattern::and(vec![Pattern::any(), Pattern::none()]));
+    let expected = Pattern::not_matching(Pattern::and(vec![
+        Pattern::any(),
+        Pattern::none(),
+    ]));
     assert_eq!(p, expected);
     assert_eq!(p.to_string(), "!ANY&NONE");
 }
@@ -518,7 +521,10 @@ fn parse_digest_patterns() {
 
     let spaced = "DIGEST ( a1b2c3 )";
     let p_spaced = parse_pattern(spaced).unwrap();
-    assert_eq!(p_spaced, Pattern::digest_prefix(hex::decode("a1b2c3").unwrap()));
+    assert_eq!(
+        p_spaced,
+        Pattern::digest_prefix(hex::decode("a1b2c3").unwrap())
+    );
     assert_eq!(p_spaced.to_string(), "DIGEST(a1b2c3)");
 }
 

@@ -1,8 +1,9 @@
 // Parsers for leaf-level pattern syntax
 
+use known_values::KnownValue;
+
 use super::{Token, utils};
 use crate::{Error, Pattern, Result};
-use known_values::KnownValue;
 
 pub(crate) fn parse_bool(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
@@ -162,7 +163,9 @@ pub(crate) fn parse_cbor(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             lexer.bump(consumed);
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -273,7 +276,9 @@ pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             lexer.bump(consumed);
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
@@ -300,7 +305,9 @@ fn parse_tag_inner(src: &str) -> Result<(Pattern, usize)> {
     }
 }
 
-pub(crate) fn parse_known_value(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+pub(crate) fn parse_known_value(
+    lexer: &mut logos::Lexer<Token>,
+) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {
         Some(Ok(Token::ParenOpen)) => {
@@ -310,7 +317,9 @@ pub(crate) fn parse_known_value(lexer: &mut logos::Lexer<Token>) -> Result<Patte
             lexer.bump(consumed);
             match lexer.next() {
                 Some(Ok(Token::ParenClose)) => Ok(pattern),
-                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Ok(t)) => {
+                    Err(Error::UnexpectedToken(Box::new(t), lexer.span()))
+                }
                 Some(Err(e)) => Err(e),
                 None => Err(Error::ExpectedCloseParen(lexer.span())),
             }
