@@ -75,7 +75,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a byte string with the specified hex value. Note that the `h'...'` syntax is used to denote hex strings in CBOR diagnostic notation, so we use it here for familiarity.
     - `BSTR ( /regex/ )`
         - Matches a byte string that matches the specified binary regex.
-- [ ] CBOR
+- [x] CBOR
     - `CBOR`
         - Matches any CBOR value.
     - `CBOR ( diagnostic-notation )`

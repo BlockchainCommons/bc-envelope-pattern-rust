@@ -387,5 +387,37 @@ fn parse_cbor_patterns_2() {
     let expr = format!(r#"CBOR({})"#, ur);
     let p = parse_pattern(&expr).unwrap();
     assert_eq!(p, Pattern::cbor(date.clone()));
-    assert_eq!(p.to_string(), format!(r#"CBOR({})"#, date.to_cbor().diagnostic_flat()));
+    assert_eq!(
+        p.to_string(),
+        format!("CBOR({})", date.to_cbor().diagnostic_flat())
+    );
+}
+
+#[test]
+fn parse_node_patterns() {
+    let p = parse_pattern("NODE").unwrap();
+    assert_eq!(p, Pattern::any_node());
+    assert_eq!(p.to_string(), "NODE");
+
+    let p = parse_pattern("NODE({1,3})").unwrap();
+    assert_eq!(p, Pattern::node_with_assertions_range(1..=3));
+    assert_eq!(p.to_string(), "NODE({1,3})");
+}
+
+#[test]
+fn parse_wrapped_pattern() {
+    let p = parse_pattern("WRAPPED").unwrap();
+    assert_eq!(p, Pattern::wrapped());
+    assert_eq!(p.to_string(), "WRAPPED");
+}
+
+#[test]
+fn parse_subject_patterns() {
+    let p = parse_pattern("SUBJECT").unwrap();
+    assert_eq!(p, Pattern::any_subject());
+    assert_eq!(p.to_string(), "SUBJECT");
+
+    let p = parse_pattern("SUBJECT(TEXT(\"hi\"))").unwrap();
+    assert_eq!(p, Pattern::subject(Pattern::text("hi")));
+    assert_eq!(p.to_string(), "SUBJECT(TEXT(\"hi\"))");
 }
