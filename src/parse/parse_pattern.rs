@@ -1,7 +1,7 @@
 use logos::Logos;
 
-use super::{Result, Token};
-use crate::Pattern;
+use super::Token;
+use crate::{Pattern, Result};
 
 pub fn parse_pattern(_input: impl AsRef<str>) -> Result<Pattern> {
     let mut _lexer = Token::lexer(_input.as_ref());

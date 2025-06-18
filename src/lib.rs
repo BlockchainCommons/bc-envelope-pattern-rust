@@ -1,13 +1,13 @@
+mod error;
+mod interval;
 mod parse;
 mod pattern;
-mod interval;
-mod reluctance;
 mod quantifier;
+mod reluctance;
 
-pub use parse::{
-    Error as ParseError, Result as ParseResult, parse_pattern,
-};
-pub use pattern::{Matcher, Path, Pattern};
+pub use error::{Error, Result};
 pub use interval::Interval;
-pub use reluctance::Reluctance;
+pub use parse::parse_pattern;
+pub use pattern::{Matcher, Path, Pattern};
 pub use quantifier::Quantifier;
+pub use reluctance::Reluctance;

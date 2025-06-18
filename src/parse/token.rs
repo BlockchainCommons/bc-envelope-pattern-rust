@@ -1,7 +1,6 @@
 use logos::{Lexer, Logos};
 
-use super::error::{Error, Result};
-use crate::{Quantifier, Reluctance};
+use crate::{Error, Quantifier, Reluctance, Result};
 
 /// Tokens for the Gordian Envelope pattern syntax.
 #[derive(Debug, Clone, Logos, PartialEq)]
