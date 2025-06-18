@@ -24,14 +24,10 @@ impl CapturePattern {
     }
 
     /// Returns the name of the capture.
-    pub fn name(&self) -> &str {
-        &self.name
-    }
+    pub fn name(&self) -> &str { &self.name }
 
     /// Returns the inner pattern.
-    pub fn pattern(&self) -> &Pattern {
-        &self.pattern
-    }
+    pub fn pattern(&self) -> &Pattern { &self.pattern }
 }
 
 impl Matcher for CapturePattern {

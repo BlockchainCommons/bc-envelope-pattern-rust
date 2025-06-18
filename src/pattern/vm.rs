@@ -5,9 +5,8 @@
 use bc_components::DigestProvider;
 use bc_envelope::{EdgeType, Envelope};
 
-use crate::{Quantifier, Reluctance};
-
 use super::{Matcher, Path, Pattern};
+use crate::{Quantifier, Reluctance};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

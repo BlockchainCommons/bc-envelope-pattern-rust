@@ -1,8 +1,7 @@
 use bc_envelope::Envelope;
 
 use crate::pattern::{
-    Matcher, Path, Pattern, compile_as_atomic, meta::MetaPattern,
-    vm::Instr,
+    Matcher, Path, Pattern, compile_as_atomic, meta::MetaPattern, vm::Instr,
 };
 
 /// A pattern that matches if any contained pattern matches.

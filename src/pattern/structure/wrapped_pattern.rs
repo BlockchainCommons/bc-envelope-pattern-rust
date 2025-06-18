@@ -14,15 +14,11 @@ pub struct WrappedPattern;
 
 impl WrappedPattern {
     /// Creates a new `WrappedPattern` that matches any wrapped envelope.
-    pub fn new() -> WrappedPattern {
-        WrappedPattern
-    }
+    pub fn new() -> WrappedPattern { WrappedPattern }
 }
 
 impl Default for WrappedPattern {
-    fn default() -> Self {
-        WrappedPattern::new()
-    }
+    fn default() -> Self { WrappedPattern::new() }
 }
 
 impl Matcher for WrappedPattern {

@@ -4,8 +4,8 @@ use bc_envelope::prelude::*;
 use crate::{
     Pattern,
     pattern::{
-        Matcher, Path, compile_as_atomic,
-        structure::StructurePattern, vm::Instr,
+        Matcher, Path, compile_as_atomic, structure::StructurePattern,
+        vm::Instr,
     },
 };
 
@@ -78,9 +78,7 @@ impl Matcher for DigestPattern {
         let digest = envelope.digest();
         let is_hit = match self {
             DigestPattern::Digest(pattern_digest) => *pattern_digest == *digest,
-            DigestPattern::Prefix(prefix) => {
-                digest.data().starts_with(prefix)
-            }
+            DigestPattern::Prefix(prefix) => digest.data().starts_with(prefix),
             DigestPattern::BinaryRegex(regex) => regex.is_match(digest.data()),
         };
 
@@ -104,8 +102,12 @@ impl std::fmt::Display for DigestPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             DigestPattern::Digest(digest) => write!(f, "DIGEST({})", digest),
-            DigestPattern::Prefix(prefix) => write!(f, "DIGEST({})", hex::encode(prefix)),
-            DigestPattern::BinaryRegex(regex) => write!(f, "DIGEST(/{}/)", regex),
+            DigestPattern::Prefix(prefix) => {
+                write!(f, "DIGEST({})", hex::encode(prefix))
+            }
+            DigestPattern::BinaryRegex(regex) => {
+                write!(f, "DIGEST(/{}/)", regex)
+            }
         }
     }
 }
@@ -122,7 +124,10 @@ mod tests {
         assert_eq!(format!("{}", pattern), format!("DIGEST({})", digest));
         let prefix = vec![0x74, 0x65, 0x73]; // "tes"
         let pattern = DigestPattern::prefix(prefix.clone());
-        assert_eq!(format!("{}", pattern), format!("DIGEST({})", hex::encode(&prefix)));
+        assert_eq!(
+            format!("{}", pattern),
+            format!("DIGEST({})", hex::encode(&prefix))
+        );
         let regex = regex::bytes::Regex::new(r"^te.*").unwrap();
         let pattern = DigestPattern::binary_regex(regex.clone());
         assert_eq!(format!("{}", pattern), format!("DIGEST(/{}/)", regex));

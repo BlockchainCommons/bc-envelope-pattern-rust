@@ -2,7 +2,6 @@ use std::ops::RangeBounds;
 
 use crate::{Interval, Reluctance};
 
-
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Quantifier {
     interval: Interval,

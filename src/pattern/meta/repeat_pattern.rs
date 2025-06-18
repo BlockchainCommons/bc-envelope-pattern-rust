@@ -35,10 +35,7 @@ impl Matcher for RepeatPattern {
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         let idx = lits.len();
         lits.push((*self.pattern).clone());
-        code.push(Instr::Repeat {
-            pat_idx: idx,
-            quantifier: self.quantifier,
-        });
+        code.push(Instr::Repeat { pat_idx: idx, quantifier: self.quantifier });
     }
 }
 

@@ -11,15 +11,11 @@ pub struct NullPattern;
 
 impl NullPattern {
     /// Creates a new `NullPattern` that matches any null value.
-    pub fn new() ->  Self {
-        NullPattern
-    }
+    pub fn new() -> Self { NullPattern }
 }
 
 impl Default for NullPattern {
-    fn default() -> Self {
-        NullPattern::new()
-    }
+    fn default() -> Self { NullPattern::new() }
 }
 
 impl Matcher for NullPattern {

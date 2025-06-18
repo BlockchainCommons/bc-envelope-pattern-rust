@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Reluctance, Matcher, Pattern};
+use bc_envelope_pattern::{Matcher, Pattern, Reluctance};
 use indoc::indoc;
 
 use crate::common::pattern_utils::*;

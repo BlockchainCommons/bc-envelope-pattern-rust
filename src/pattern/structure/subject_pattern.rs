@@ -1,8 +1,6 @@
 use bc_envelope::Envelope;
 
-use crate::pattern::{
-    Matcher, Path, Pattern, vm::Instr,
-};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum SubjectPattern {

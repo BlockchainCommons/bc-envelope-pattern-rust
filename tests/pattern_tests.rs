@@ -32,8 +32,7 @@ fn test_mixed_patterns_with_search() {
     let alice_prefix = alice_digest.data()[..4].to_vec();
 
     let digest_paths =
-        Pattern::search(Pattern::digest_prefix(alice_prefix))
-            .paths(&envelope);
+        Pattern::search(Pattern::digest_prefix(alice_prefix)).paths(&envelope);
     assert_eq!(digest_paths.len(), 1);
 
     // The found element should be Alice

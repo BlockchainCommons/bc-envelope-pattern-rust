@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Reluctance, Matcher, Path, Pattern};
+use bc_envelope_pattern::{Matcher, Path, Pattern, Reluctance};
 use indoc::indoc;
 
 use crate::common::pattern_utils::format_paths;
@@ -150,19 +150,28 @@ fn test_repeat_2() {
     };
 
     let pattern = pat(Reluctance::Greedy);
-    assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*>ASSERTOBJ(TEXT("B"))>OBJECT"#);
+    assert_eq!(
+        format!("{}", pattern),
+        r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*>ASSERTOBJ(TEXT("B"))>OBJECT"#
+    );
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
     assert_eq!(transpose(&paths[0]), "AabBbabB");
 
     let pattern = pat(Reluctance::Lazy);
-    assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*?>ASSERTOBJ(TEXT("B"))>OBJECT"#);
+    assert_eq!(
+        format!("{}", pattern),
+        r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*?>ASSERTOBJ(TEXT("B"))>OBJECT"#
+    );
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
     assert_eq!(transpose(&paths[0]), "AabB");
 
     let pattern = pat(Reluctance::Possessive);
-    assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*+>ASSERTOBJ(TEXT("B"))>OBJECT"#);
+    assert_eq!(
+        format!("{}", pattern),
+        r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*+>ASSERTOBJ(TEXT("B"))>OBJECT"#
+    );
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 0);
 }

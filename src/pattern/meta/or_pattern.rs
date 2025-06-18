@@ -73,7 +73,8 @@ impl Matcher for OrPattern {
     fn is_complex(&self) -> bool {
         // The pattern is complex if it contains more than one pattern, or if
         // the one pattern is complex itself.
-        self.patterns().len() > 1 || self.patterns().iter().any(|p| p.is_complex())
+        self.patterns().len() > 1
+            || self.patterns().iter().any(|p| p.is_complex())
     }
 }
 

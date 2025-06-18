@@ -3,8 +3,8 @@ use bc_envelope::Envelope;
 use crate::{
     Pattern,
     pattern::{
-        Matcher, Path, compile_as_atomic,
-        structure::StructurePattern, vm::Instr,
+        Matcher, Path, compile_as_atomic, structure::StructurePattern,
+        vm::Instr,
     },
 };
 

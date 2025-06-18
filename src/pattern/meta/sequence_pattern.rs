@@ -1,8 +1,6 @@
 use bc_envelope::Envelope;
 
-use crate::{
-    pattern::{Matcher, Path, Pattern, vm::Instr},
-};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct SequencePattern {
@@ -73,7 +71,8 @@ impl Matcher for SequencePattern {
     }
 
     fn is_complex(&self) -> bool {
-        // A sequence is complex if `first` is complex, or it has more than one pattern
+        // A sequence is complex if `first` is complex, or it has more than one
+        // pattern
         self.first.is_complex() || self.rest.is_some()
     }
 }
