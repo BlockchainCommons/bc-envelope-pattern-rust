@@ -357,3 +357,38 @@ fn parse_cbor_patterns() {
         assert_eq!(p.to_string(), src);
     }
 }
+
+#[test]
+fn parse_cbor_patterns_2() {
+    use bc_envelope::prelude::*;
+    bc_envelope::register_tags();
+
+    let p = parse_pattern("CBOR").unwrap();
+    assert_eq!(p, Pattern::any_cbor());
+    assert_eq!(p.to_string(), "CBOR");
+
+    let p = parse_pattern("CBOR(true)").unwrap();
+    assert_eq!(p, Pattern::cbor(true));
+    assert_eq!(p.to_string(), "CBOR(true)");
+
+    let p = parse_pattern("CBOR([1, 2, 3])").unwrap();
+    assert_eq!(p, Pattern::cbor(vec![1, 2, 3]));
+    assert_eq!(p.to_string(), "CBOR([1, 2, 3])");
+
+    let p = parse_pattern("CBOR({\"a\": 1})").unwrap();
+    let mut map = Map::new();
+    map.insert("a", 1);
+    assert_eq!(p, Pattern::cbor(map.clone()));
+    assert_eq!(p.to_string(), "CBOR({\"a\": 1})");
+
+    let p = parse_pattern("CBOR(1(\"hi\"))").unwrap();
+    assert_eq!(p, Pattern::cbor(CBOR::to_tagged_value(1, "hi")));
+    assert_eq!(p.to_string(), "CBOR(1(\"hi\"))");
+
+    let date = dcbor::Date::from_ymd(2025, 5, 15);
+    let ur = date.ur_string();
+    let expr = format!("CBOR({})", ur);
+    let p = parse_pattern(&expr).unwrap();
+    assert_eq!(p, Pattern::cbor(date.clone()));
+    assert_eq!(p.to_string(), format!("CBOR({})", date.to_cbor().diagnostic_flat()));
+}
