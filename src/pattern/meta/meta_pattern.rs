@@ -64,6 +64,20 @@ impl Matcher for MetaPattern {
             MetaPattern::Group(pattern) => pattern.compile(code, lits),
         }
     }
+
+    fn is_complex(&self) -> bool {
+        match self {
+            MetaPattern::Any(pattern) => pattern.is_complex(),
+            MetaPattern::None(pattern) => pattern.is_complex(),
+            MetaPattern::And(pattern) => pattern.is_complex(),
+            MetaPattern::Or(pattern) => pattern.is_complex(),
+            MetaPattern::Not(pattern) => pattern.is_complex(),
+            MetaPattern::Search(pattern) => pattern.is_complex(),
+            MetaPattern::Sequence(pattern) => pattern.is_complex(),
+            MetaPattern::Repeat(pattern) => pattern.is_complex(),
+            MetaPattern::Group(pattern) => pattern.is_complex(),
+        }
+    }
 }
 
 impl std::fmt::Display for MetaPattern {
@@ -78,7 +92,6 @@ impl std::fmt::Display for MetaPattern {
             MetaPattern::Sequence(pattern) => write!(f, "{}", pattern),
             MetaPattern::Repeat(pattern) => write!(f, "{}", pattern),
             MetaPattern::Group(pattern) => write!(f, "{}", pattern),
-            _ => todo!(),
         }
     }
 }

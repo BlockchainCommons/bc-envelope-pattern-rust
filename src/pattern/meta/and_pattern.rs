@@ -33,6 +33,12 @@ impl Matcher for AndPattern {
             pattern.compile(code, lits);
         }
     }
+
+    fn is_complex(&self) -> bool {
+        // The pattern is complex if it contains more than one pattern, or if the one
+        // pattern is complex itself.
+        self.patterns.len() > 1 || self.patterns.iter().any(|p| p.is_complex())
+    }
 }
 
 impl std::fmt::Display for AndPattern {

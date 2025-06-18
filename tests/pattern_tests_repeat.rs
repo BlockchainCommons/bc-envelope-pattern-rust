@@ -97,7 +97,7 @@ fn repeat_test() {
     let env = fold(s);
 
     let pattern = Pattern::sequence(vec![Pattern::any_assertion()]);
-    assert_eq!(format!("{}", pattern), "ASSERTION");
+    assert_eq!(format!("{}", pattern), "ASSERT");
     let paths = pattern.paths(&env);
     assert_eq!(unfold(paths[0].last().unwrap()), s);
 
@@ -105,21 +105,17 @@ fn repeat_test() {
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", assertion_object_pattern), "ASSERTION>OBJECT");
+    assert_eq!(format!("{}", assertion_object_pattern), "ASSERT>OBJECT");
 
     let pattern =
         Pattern::repeat(assertion_object_pattern, 3..=3, Greediness::Greedy);
-    assert_eq!(format!("{}", pattern), "ASSERTION>OBJECT{3}");
+    assert_eq!(format!("{}", pattern), "(ASSERT>OBJECT){3}");
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
-    println!("{}", format_paths(&paths));
 
     let path = &paths[0];
     assert_eq!(transpose(path), "hel");
     assert_eq!(unfold(path.last().unwrap()), "lo");
-    for element in path {
-        println!("{}", unfold(element));
-    }
 }
 
 #[test]
@@ -131,19 +127,19 @@ fn test_repeat_2() {
         Pattern::assertion_with_object(Pattern::text("A")),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", seq_a), r#"ASSERTION-OBJ(TEXT("A"))>OBJECT"#);
+    assert_eq!(format!("{}", seq_a), r#"ASSERTOBJ(TEXT("A"))>OBJECT"#);
 
     let seq_any = Pattern::sequence(vec![
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", seq_any), r#"ASSERTION>OBJECT"#);
+    assert_eq!(format!("{}", seq_any), r#"ASSERT>OBJECT"#);
 
     let seq_b = Pattern::sequence(vec![
         Pattern::assertion_with_object(Pattern::text("B")),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", seq_b), r#"ASSERTION-OBJ(TEXT("B"))>OBJECT"#);
+    assert_eq!(format!("{}", seq_b), r#"ASSERTOBJ(TEXT("B"))>OBJECT"#);
 
     let pat = |mode| {
         Pattern::sequence(vec![
@@ -154,19 +150,21 @@ fn test_repeat_2() {
     };
 
     let pattern = pat(Greediness::Greedy);
-    println!("{}", pattern);
+    assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*>ASSERTOBJ(TEXT("B"))>OBJECT"#);
     let paths = pattern.paths(&env);
-    println!("\nGreedy:\n{}", format_paths(&paths));
+    assert_eq!(paths.len(), 1);
+    assert_eq!(transpose(&paths[0]), "AabBbabB");
 
     let pattern = pat(Greediness::Lazy);
-    println!("{}", pattern);
+    assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*?>ASSERTOBJ(TEXT("B"))>OBJECT"#);
     let paths = pattern.paths(&env);
-    println!("\nLazy:\n{}", format_paths(&paths));
+    assert_eq!(paths.len(), 1);
+    assert_eq!(transpose(&paths[0]), "AabB");
 
     let pattern = pat(Greediness::Possessive);
-    println!("{}", pattern);
+    assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*+>ASSERTOBJ(TEXT("B"))>OBJECT"#);
     let paths = pattern.paths(&env);
-    println!("\nPossessive:\n{}", format_paths(&paths));
+    assert_eq!(paths.len(), 0);
 }
 
 fn transpose(path: impl AsRef<Path>) -> String {

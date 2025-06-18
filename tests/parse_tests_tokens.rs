@@ -13,7 +13,7 @@ fn test_basic_tokens() {
     assert_eq!(Token::lexer("?").next(), Some(Ok(Token::RepeatZeroOrOne)));
 
     // Test structure pattern keywords
-    assert_eq!(Token::lexer("ASSERTION").next(), Some(Ok(Token::Assertion)));
+    assert_eq!(Token::lexer("ASSERT").next(), Some(Ok(Token::Assertion)));
     assert_eq!(Token::lexer("NODE").next(), Some(Ok(Token::Node)));
     assert_eq!(Token::lexer("SUBJECT").next(), Some(Ok(Token::Subject)));
 
@@ -48,7 +48,10 @@ fn test_complex_tokens() {
     }
 
     let mut lx = Token::lexer(r"/abc\/def/  / /  //  /a\//");
-    assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok("abc\\/def".to_string())))));
+    assert_eq!(
+        lx.next(),
+        Some(Ok(Token::Regex(Ok("abc\\/def".to_string()))))
+    );
     assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok(" ".to_string())))));
     assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok("".to_string())))));
     assert_eq!(lx.next(), Some(Ok(Token::Regex(Ok("a\\/".to_string())))));
@@ -92,7 +95,6 @@ fn test_range() {
             input: "{ 5 }",
             expected: RepeatRange::new(5..=5, Greediness::default()),
         },
-
         RangeTestCase {
             input: "{1, 5 }?",
             expected: RepeatRange::new(1..=5, Greediness::Lazy),
@@ -105,7 +107,6 @@ fn test_range() {
             input: "{5}?",
             expected: RepeatRange::new(5..=5, Greediness::Lazy),
         },
-
         RangeTestCase {
             input: "{ 1,5}+",
             expected: RepeatRange::new(1..=5, Greediness::Possessive),

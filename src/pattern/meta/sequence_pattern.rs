@@ -71,6 +71,11 @@ impl Matcher for SequencePattern {
             code.push(Instr::CombineSequence);
         }
     }
+
+    fn is_complex(&self) -> bool {
+        // A sequence is complex if `first` is complex, or it has more than one pattern
+        self.first.is_complex() || self.rest.is_some()
+    }
 }
 
 impl std::fmt::Display for SequencePattern {

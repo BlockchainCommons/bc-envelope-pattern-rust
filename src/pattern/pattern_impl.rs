@@ -131,6 +131,14 @@ impl Matcher for Pattern {
 
         vm::run(&prog, env)
     }
+
+    fn is_complex(&self) -> bool {
+        match self {
+            Pattern::Leaf(leaf) => leaf.is_complex(),
+            Pattern::Structure(structure) => structure.is_complex(),
+            Pattern::Meta(meta) => meta.is_complex(),
+        }
+    }
 }
 
 // region: Leaf Patterns

@@ -323,7 +323,7 @@ fn test_search_pattern() {
         Pattern::search(Pattern::assertion_with_object(Pattern::any_number()));
     assert_eq!(
         format!("{}", number_object_search_pattern),
-        r#"SEARCH(ASSERTION-OBJ(NUMBER))"#
+        r#"SEARCH(ASSERTOBJ(NUMBER))"#
     );
     let number_object_search_paths =
         number_object_search_pattern.paths(&envelope);
@@ -658,7 +658,7 @@ fn test_not_pattern() {
     ]);
     assert_eq!(
         format!("{}", complex_pattern),
-        r#"!TEXT("wrong_subject")&ASSERTION-PRED(TEXT("key1"))"#
+        r#"!TEXT("wrong_subject")&ASSERTPRED(TEXT("key1"))"#
     );
 
     let matches = complex_pattern.matches(&envelope);

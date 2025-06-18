@@ -1,7 +1,7 @@
 use logos::{Lexer, Logos};
 
 use super::error::{Error, Result};
-use crate::{RepeatRange, Greediness};
+use crate::{Greediness, RepeatRange};
 
 /// Tokens for the Gordian Envelope pattern syntax.
 #[derive(Debug, Clone, Logos, PartialEq)]
@@ -50,13 +50,13 @@ pub enum Token {
     RepeatZeroOrOnePossessive,
 
     // Structure Pattern Keywords
-    #[token("ASSERTION")]
+    #[token("ASSERT")]
     Assertion,
 
-    #[token("ASSERTION-PRED")]
+    #[token("ASSERTPRED")]
     AssertionPred,
 
-    #[token("ASSERTION-OBJ")]
+    #[token("ASSERTOBJ")]
     AssertionObj,
 
     #[token("DIGEST")]

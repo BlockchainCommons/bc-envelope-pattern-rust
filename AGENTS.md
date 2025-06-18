@@ -139,11 +139,11 @@ All leaf patterns match Envelope leaves, which are CBOR values.
 Structure patterns match parts of Gordian Envelope structures.
 
 - Assertions
-    - `ASSERTION`
+    - `ASSERT`
         - Matches any assertion.
-    - `ASSERTION-PRED ( pattern )`
+    - `ASSERTPRED ( pattern )`
         - Matches an assertion having a predicate that matches the specified pattern.
-    - `ASSERTION-OBJ ( pattern )`
+    - `ASSERTOBJ ( pattern )`
         - Matches an assertion having an object that matches the specified pattern.
 - Digest
     - `DIGEST ( ur:digest/value )`

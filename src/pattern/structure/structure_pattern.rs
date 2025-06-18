@@ -53,6 +53,19 @@ impl Matcher for StructurePattern {
             StructurePattern::Predicate(s) => s.compile(code, lits),
         }
     }
+
+    fn is_complex(&self) -> bool {
+        match self {
+            StructurePattern::Assertions(pattern) => pattern.is_complex(),
+            StructurePattern::Digest(pattern) => pattern.is_complex(),
+            StructurePattern::Node(pattern) => pattern.is_complex(),
+            StructurePattern::Object(pattern) => pattern.is_complex(),
+            StructurePattern::Obscured(pattern) => pattern.is_complex(),
+            StructurePattern::Predicate(pattern) => pattern.is_complex(),
+            StructurePattern::Subject(pattern) => pattern.is_complex(),
+            StructurePattern::Wrapped(pattern) => pattern.is_complex(),
+        }
+    }
 }
 
 impl std::fmt::Display for StructurePattern {

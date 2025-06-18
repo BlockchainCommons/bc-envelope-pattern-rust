@@ -9,18 +9,18 @@ use crate::{
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RepeatPattern {
-    sub: Box<Pattern>,
+    pattern: Box<Pattern>,
     range: RepeatRange,
 }
 
 impl RepeatPattern {
     /// Creates a new `RepeatPattern` with the specified sub-pattern and range.
     pub fn new(sub: Pattern, range: RepeatRange) -> Self {
-        RepeatPattern { sub: Box::new(sub), range }
+        RepeatPattern { pattern: Box::new(sub), range }
     }
 
     /// Returns the sub-pattern of this repeat pattern.
-    pub fn sub(&self) -> &Pattern { &self.sub }
+    pub fn pattern(&self) -> &Pattern { &self.pattern }
 
     /// Returns the range of this repeat pattern.
     pub fn range(&self) -> &RepeatRange { &self.range }
@@ -34,7 +34,7 @@ impl Matcher for RepeatPattern {
     /// Emit a high-level `Repeat` instruction for the VM.
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         let idx = lits.len();
-        lits.push((*self.sub).clone());
+        lits.push((*self.pattern).clone());
         code.push(Instr::Repeat {
             pat_idx: idx,
             min: self.range.min(),
@@ -46,6 +46,12 @@ impl Matcher for RepeatPattern {
 
 impl std::fmt::Display for RepeatPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.sub, self.range)
+        let formatted_range = self.range.to_string();
+        if self.pattern.is_complex() && !formatted_range.is_empty() {
+            write!(f, "({}){}", self.pattern, formatted_range)
+        } else {
+            write!(f, "{}{}", self.pattern, formatted_range)
+        }
+
     }
 }

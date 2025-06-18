@@ -107,6 +107,23 @@ impl Matcher for LeafPattern {
             }
         }
     }
+
+    fn is_complex(&self) -> bool {
+        match self {
+            LeafPattern::Any => false,
+            LeafPattern::Cbor(pattern) => pattern.is_complex(),
+            LeafPattern::Number(pattern) => pattern.is_complex(),
+            LeafPattern::Text(pattern) => pattern.is_complex(),
+            LeafPattern::ByteString(pattern) => pattern.is_complex(),
+            LeafPattern::Tag(pattern) => pattern.is_complex(),
+            LeafPattern::Array(pattern) => pattern.is_complex(),
+            LeafPattern::Map(pattern) => pattern.is_complex(),
+            LeafPattern::Bool(pattern) => pattern.is_complex(),
+            LeafPattern::Null(pattern) => pattern.is_complex(),
+            LeafPattern::Date(pattern) => pattern.is_complex(),
+            LeafPattern::KnownValue(pattern) => pattern.is_complex(),
+        }
+    }
 }
 
 impl std::fmt::Display for LeafPattern {
