@@ -582,3 +582,22 @@ fn parse_capture_patterns() {
     assert_eq!(p_spaced, Pattern::capture("name", Pattern::number(1)));
     assert_eq!(p_spaced.to_string(), src);
 }
+
+#[test]
+fn parse_nested_capture_patterns() {
+    let src = "@outer(@inner(TEXT(\"hi\")))";
+    let p = parse_pattern(src).unwrap();
+    assert_eq!(
+        p,
+        Pattern::capture("outer", Pattern::capture("inner", Pattern::text("hi")))
+    );
+    assert_eq!(p.to_string(), src);
+}
+
+#[test]
+fn parse_capture_name_variants() {
+    let src = "@cap_1(NUMBER(42))";
+    let p = parse_pattern(src).unwrap();
+    assert_eq!(p, Pattern::capture("cap_1", Pattern::number(42)));
+    assert_eq!(p.to_string(), src);
+}
