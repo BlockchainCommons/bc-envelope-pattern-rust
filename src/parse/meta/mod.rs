@@ -101,6 +101,7 @@ fn parse_primary(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
         Token::Assertion => structure::parse_assertion(lexer),
         Token::AssertionPred => structure::parse_assertion_pred(lexer),
         Token::AssertionObj => structure::parse_assertion_obj(lexer),
+        Token::Digest => structure::parse_digest(lexer),
         Token::Obj => structure::parse_object(lexer),
         Token::Obscured => structure::parse_obscured(lexer),
         Token::Elided => structure::parse_elided(lexer),

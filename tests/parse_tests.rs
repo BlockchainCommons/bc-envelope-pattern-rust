@@ -2,6 +2,8 @@ use bc_envelope::prelude::*;
 use bc_envelope_pattern::{parse_pattern, Pattern};
 use dcbor::Date;
 use known_values::KnownValue;
+use hex;
+use bc_components::Digest;
 
 #[test]
 fn parse_any() {
@@ -507,4 +509,26 @@ fn parse_not_patterns() {
     let expected = Pattern::not_matching(Pattern::and(vec![Pattern::any(), Pattern::none()]));
     assert_eq!(p, expected);
     assert_eq!(p.to_string(), "!ANY&NONE");
+
+#[test]
+fn parse_digest_patterns() {
+    let p = parse_pattern("DIGEST(a1b2c3)").unwrap();
+    assert_eq!(p, Pattern::digest_prefix(hex::decode("a1b2c3").unwrap()));
+    assert_eq!(p.to_string(), "DIGEST(a1b2c3)");
+
+    let spaced = "DIGEST ( a1b2c3 )";
+    let p_spaced = parse_pattern(spaced).unwrap();
+    assert_eq!(p_spaced, Pattern::digest_prefix(hex::decode("a1b2c3").unwrap()));
+    assert_eq!(p_spaced.to_string(), "DIGEST(a1b2c3)");
+}
+
+#[test]
+fn parse_digest_ur_pattern() {
+    bc_envelope::register_tags();
+    let digest = Digest::from_image(b"hello world");
+    let ur = digest.ur_string();
+    let expr = format!("DIGEST({})", ur);
+    let p = parse_pattern(&expr).unwrap();
+    assert_eq!(p, Pattern::digest(digest.clone()));
+    assert_eq!(p.to_string(), format!("DIGEST({})", digest));
 }
