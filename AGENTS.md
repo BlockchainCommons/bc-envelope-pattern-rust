@@ -8,20 +8,6 @@ The main task now is to implement the parser for the text-based syntax for patte
 
 Write unit tests for these patterns to ensure they are parsed correctly. Refer to the syntax guide below and `tests/` for examples of expected behavior.
 
-## Commands
-
-- Running `clippy`:
-
-```bash
-cargo clippy --all-features --no-deps -- -D warnings
-```
-
-- Running `fmt`:
-
-```bash
-cargo +nightly fmt -- --check
-```
-
 ## Intro to Gordian Envelopes
 
 - The basic structure of Gordian Envelopes is defined in the [Envelope I-D](https://datatracker.ietf.org/doc/draft-mcnally-envelope/).
