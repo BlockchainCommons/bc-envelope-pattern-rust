@@ -164,7 +164,7 @@ Structure patterns match parts of Gordian Envelope structures.
         - Matches a digest whose value starts with the specified hex prefix. Up to 32 bytes can be specified, which is the length of the full SHA-256 digest.
     - `DIGEST ( ur:digest/value )`
         - Matches the specified `ur:digest` value, parsed using the `bc-ur` crate.
-- [ ] Node
+- [x] Node
     - `NODE`
         - Matches any Gordian Envelope node, which is an envelope with at least one assertion.
     - `NODE ( { m, n } )`
@@ -188,12 +188,12 @@ Structure patterns match parts of Gordian Envelope structures.
         - Matches any predicate.
     - `PRED ( pattern )`
         - Matches a predicate that matches the specified pattern.
-- [ ] Subjects
+- [x] Subjects
     - `SUBJECT`
         - Matches any subject. If the envelope is not a NODE, then this is the identity function.
     - `SUBJECT ( pattern )`
         - Matches a subject that matches the specified pattern.
-- [ ] Wrapped
+- [x] Wrapped
     - `WRAPPED`
         - Matches any wrapped Envelope.
 
