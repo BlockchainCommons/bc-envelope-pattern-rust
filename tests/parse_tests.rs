@@ -187,3 +187,45 @@ fn parse_number_patterns() {
     assert_eq!(p, Pattern::number_nan());
     assert_eq!(p.to_string(), "NUMBER(NaN)");
 }
+
+#[test]
+fn parse_leaf_pattern() {
+    let p = parse_pattern("LEAF").unwrap();
+    assert_eq!(p, Pattern::any_leaf());
+    assert_eq!(p.to_string(), "LEAF");
+}
+
+#[test]
+fn parse_array_patterns() {
+    let p = parse_pattern("ARRAY").unwrap();
+    assert_eq!(p, Pattern::any_array());
+    assert_eq!(p.to_string(), "ARRAY");
+
+    let p = parse_pattern("ARRAY({3})").unwrap();
+    assert_eq!(p, Pattern::array_with_count(3));
+    assert_eq!(p.to_string(), "ARRAY({3})");
+
+    let p = parse_pattern("ARRAY({2,4})").unwrap();
+    assert_eq!(p, Pattern::array_with_range(2..=4));
+    assert_eq!(p.to_string(), "ARRAY({2,4})");
+
+    let p = parse_pattern("ARRAY({2,})").unwrap();
+    assert_eq!(p, Pattern::array_with_range(2..));
+    assert_eq!(p.to_string(), "ARRAY({2,})");
+}
+
+#[test]
+fn parse_bstr_patterns() {
+    let p = parse_pattern("BSTR").unwrap();
+    assert_eq!(p, Pattern::any_byte_string());
+    assert_eq!(p.to_string(), "BSTR");
+
+    let p = parse_pattern("BSTR(h'0102')").unwrap();
+    assert_eq!(p, Pattern::byte_string(vec![1u8, 2]));
+    assert_eq!(p.to_string(), "BSTR(h'0102')");
+
+    let p = parse_pattern("BSTR(/abc/)").unwrap();
+    let regex = regex::bytes::Regex::new("abc").unwrap();
+    assert_eq!(p, Pattern::byte_string_binary_regex(regex));
+    assert_eq!(p.to_string(), "BSTR(/abc/)");
+}
