@@ -49,10 +49,10 @@ White space is ignored between tokens, so you can use it to make patterns more r
 
 All leaf patterns match Envelope leaves, which are CBOR values.
 
-- [ ] Leaf
+- [x] Leaf
     -  `LEAF`
         - Matches any leaf value.
-- [ ] Array
+- [x] Array
     - `ARRAY`
         - Matches any array.
     - `ARRAY ( { n } )`
@@ -68,7 +68,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches the boolean value `true`.
     - `BOOL ( false )`
         - Matches the boolean value `false`.
-- [ ] ByteString
+- [x] ByteString
     - `BSTR`
         - Matches any byte string.
     - `BSTR ( h'hex' )`
@@ -114,7 +114,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
 - [ ] Null
     - `NULL`
         - Matches the null value.
-- [ ] Number
+- [x] Number
     - `NUMBER`
         - Matches any number.
     - `NUMBER ( value )`
@@ -140,7 +140,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches the CBOR tagged value with the specified name. It is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
     - `TAG ( /regex/ )`
         - Matches a CBOR tagged value with a name that matches the specified regex.
-- [ ] Text
+- [x] Text
     - `TEXT`
         - Matches any text value.
     - `TEXT ( "string" )`
