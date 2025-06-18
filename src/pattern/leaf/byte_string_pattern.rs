@@ -2,10 +2,7 @@ use bc_envelope::Envelope;
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching byte string values.
@@ -14,22 +11,21 @@ pub enum ByteStringPattern {
     /// Matches any byte string.
     Any,
     /// Matches the specific byte string.
-    Exact(Vec<u8>),
+    Value(Vec<u8>),
     /// Matches the binary regular expression for a byte string.
-    BinaryRegex(regex::bytes::Regex),
+    Regex(regex::bytes::Regex),
 }
 
 impl PartialEq for ByteStringPattern {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (ByteStringPattern::Any, ByteStringPattern::Any) => true,
-            (ByteStringPattern::Exact(a), ByteStringPattern::Exact(b)) => {
+            (ByteStringPattern::Value(a), ByteStringPattern::Value(b)) => {
                 a == b
             }
-            (
-                ByteStringPattern::BinaryRegex(a),
-                ByteStringPattern::BinaryRegex(b),
-            ) => a.as_str() == b.as_str(),
+            (ByteStringPattern::Regex(a), ByteStringPattern::Regex(b)) => {
+                a.as_str() == b.as_str()
+            }
             _ => false,
         }
     }
@@ -43,11 +39,11 @@ impl std::hash::Hash for ByteStringPattern {
             ByteStringPattern::Any => {
                 0u8.hash(state);
             }
-            ByteStringPattern::Exact(s) => {
+            ByteStringPattern::Value(s) => {
                 1u8.hash(state);
                 s.hash(state);
             }
-            ByteStringPattern::BinaryRegex(regex) => {
+            ByteStringPattern::Regex(regex) => {
                 2u8.hash(state);
                 // Regex does not implement Hash, so we hash its pattern string.
                 regex.as_str().hash(state);
@@ -61,14 +57,14 @@ impl ByteStringPattern {
     pub fn any() -> Self { ByteStringPattern::Any }
 
     /// Creates a new `ByteStringPattern` that matches a specific byte string.
-    pub fn exact(value: impl AsRef<[u8]>) -> Self {
-        ByteStringPattern::Exact(value.as_ref().to_vec())
+    pub fn value(value: impl AsRef<[u8]>) -> Self {
+        ByteStringPattern::Value(value.as_ref().to_vec())
     }
 
     /// Creates a new `ByteStringPattern` that matches the binary regex for a
     /// byte string.
-    pub fn binary_regex(regex: regex::bytes::Regex) -> Self {
-        ByteStringPattern::BinaryRegex(regex)
+    pub fn regex(regex: regex::bytes::Regex) -> Self {
+        ByteStringPattern::Regex(regex)
     }
 }
 
@@ -77,14 +73,14 @@ impl Matcher for ByteStringPattern {
         if let Some(bytes) = envelope.subject().as_byte_string() {
             match self {
                 ByteStringPattern::Any => vec![vec![envelope.clone()]],
-                ByteStringPattern::Exact(value) => {
+                ByteStringPattern::Value(value) => {
                     if &bytes == value {
                         vec![vec![envelope.clone()]]
                     } else {
                         vec![]
                     }
                 }
-                ByteStringPattern::BinaryRegex(regex) => {
+                ByteStringPattern::Regex(regex) => {
                     if regex.is_match(&bytes) {
                         vec![vec![envelope.clone()]]
                     } else {
@@ -110,8 +106,10 @@ impl std::fmt::Display for ByteStringPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ByteStringPattern::Any => write!(f, "BSTR"),
-            ByteStringPattern::Exact(value) => write!(f, "BSTR(h'{}')", hex::encode(value)),
-            ByteStringPattern::BinaryRegex(regex) => {
+            ByteStringPattern::Value(value) => {
+                write!(f, "BSTR(h'{}')", hex::encode(value))
+            }
+            ByteStringPattern::Regex(regex) => {
                 write!(f, "BSTR(/{}/)", regex.as_str())
             }
         }
@@ -144,14 +142,14 @@ mod tests {
     fn test_byte_string_pattern_exact() {
         let bytes = vec![1, 2, 3, 4];
         let envelope = Envelope::new(CBOR::to_byte_string(bytes.clone()));
-        let pattern = ByteStringPattern::exact(bytes.clone());
+        let pattern = ByteStringPattern::value(bytes.clone());
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test with different byte string
         let different_bytes = vec![5, 6, 7, 8];
-        let pattern = ByteStringPattern::exact(different_bytes);
+        let pattern = ByteStringPattern::value(different_bytes);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }
@@ -163,21 +161,21 @@ mod tests {
 
         // Test matching regex
         let regex = regex::bytes::Regex::new(r"^He.*o$").unwrap();
-        let pattern = ByteStringPattern::binary_regex(regex);
+        let pattern = ByteStringPattern::regex(regex);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test non-matching regex
         let regex = regex::bytes::Regex::new(r"^World").unwrap();
-        let pattern = ByteStringPattern::binary_regex(regex);
+        let pattern = ByteStringPattern::regex(regex);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
 
         // Test with non-byte-string envelope
         let text_envelope = Envelope::new("test");
         let regex = regex::bytes::Regex::new(r".*").unwrap();
-        let pattern = ByteStringPattern::binary_regex(regex);
+        let pattern = ByteStringPattern::regex(regex);
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
     }
@@ -186,12 +184,12 @@ mod tests {
     fn test_byte_string_pattern_display() {
         assert_eq!(ByteStringPattern::any().to_string(), "BSTR");
         assert_eq!(
-            ByteStringPattern::exact(vec![1, 2, 3]).to_string(),
+            ByteStringPattern::value(vec![1, 2, 3]).to_string(),
             r#"BSTR(h'010203')"#
         );
         let regex = regex::bytes::Regex::new(r"^\d+$").unwrap();
         assert_eq!(
-            ByteStringPattern::binary_regex(regex).to_string(),
+            ByteStringPattern::regex(regex).to_string(),
             r"BSTR(/^\d+$/)"
         );
     }

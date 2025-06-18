@@ -3,10 +3,7 @@ use dcbor::prelude::*;
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching tag values.
@@ -15,7 +12,7 @@ pub enum TaggedPattern {
     /// Matches any tagged leaf.
     Any,
     /// Matches any leaf with the specific tag.
-    Tag(Tag),
+    Value(Tag),
     /// Matches a leaf with a tag having the given name in the global tags
     /// registry.
     Named(String),
@@ -27,7 +24,7 @@ impl PartialEq for TaggedPattern {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (TaggedPattern::Any, TaggedPattern::Any) => true,
-            (TaggedPattern::Tag(a), TaggedPattern::Tag(b)) => a == b,
+            (TaggedPattern::Value(a), TaggedPattern::Value(b)) => a == b,
             (TaggedPattern::Named(a), TaggedPattern::Named(b)) => a == b,
             (TaggedPattern::Regex(a), TaggedPattern::Regex(b)) => {
                 a.as_str() == b.as_str()
@@ -45,7 +42,7 @@ impl std::hash::Hash for TaggedPattern {
             TaggedPattern::Any => {
                 0u8.hash(state);
             }
-            TaggedPattern::Tag(tag) => {
+            TaggedPattern::Value(tag) => {
                 1u8.hash(state);
                 tag.hash(state);
             }
@@ -67,24 +64,19 @@ impl TaggedPattern {
     pub fn any() -> Self { TaggedPattern::Any }
 
     /// Creates a new `TaggedPattern` that matches a specific tag.
-    pub fn with_tag(tag: Tag) -> Self { TaggedPattern::Tag(tag) }
-
-    /// Creates a new `TaggedPattern` that matches a specific tag value.
-    pub fn with_tag_value(value: u64) -> Self {
-        TaggedPattern::Tag(Tag::with_value(value))
+    pub fn value(tag: impl Into<Tag>) -> Self {
+        TaggedPattern::Value(tag.into())
     }
 
     /// Creates a new `TaggedPattern` that matches a tag by its name in the
     /// global tags registry.
-    pub fn with_tag_name(name: impl Into<String>) -> Self {
+    pub fn named(name: impl Into<String>) -> Self {
         TaggedPattern::Named(name.into())
     }
 
     /// Creates a new `TaggedPattern` that matches tags whose names match the
     /// given regex pattern.
-    pub fn with_tag_regex(regex: regex::Regex) -> Self {
-        TaggedPattern::Regex(regex)
-    }
+    pub fn regex(regex: regex::Regex) -> Self { TaggedPattern::Regex(regex) }
 }
 
 impl Matcher for TaggedPattern {
@@ -94,7 +86,7 @@ impl Matcher for TaggedPattern {
             if let CBORCase::Tagged(tag, _) = cbor.as_case() {
                 match self {
                     TaggedPattern::Any => vec![vec![envelope.clone()]],
-                    TaggedPattern::Tag(expected_tag) => {
+                    TaggedPattern::Value(expected_tag) => {
                         if expected_tag.value() == tag.value() {
                             vec![vec![envelope.clone()]]
                         } else {
@@ -157,7 +149,7 @@ impl std::fmt::Display for TaggedPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TaggedPattern::Any => write!(f, "TAG"),
-            TaggedPattern::Tag(tag) => write!(f, "TAG({})", tag),
+            TaggedPattern::Value(tag) => write!(f, "TAG({})", tag),
             TaggedPattern::Named(name) => write!(f, "TAG({})", name),
             TaggedPattern::Regex(regex) => write!(f, "TAG(/{}/)", regex),
         }
@@ -194,12 +186,12 @@ mod tests {
         let envelope = Envelope::new(tagged_cbor);
 
         // Test matching tag
-        let pattern = TaggedPattern::with_tag_value(100);
+        let pattern = TaggedPattern::value(100);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test non-matching tag
-        let pattern = TaggedPattern::with_tag_value(200);
+        let pattern = TaggedPattern::value(200);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }
@@ -214,19 +206,19 @@ mod tests {
         let envelope = Envelope::new(tagged_cbor);
 
         // Test matching by name (dcbor registers tag 1 as "date")
-        let pattern = TaggedPattern::with_tag_name("date");
+        let pattern = TaggedPattern::named("date");
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test with non-matching name
-        let pattern = TaggedPattern::with_tag_name("unknown_tag");
+        let pattern = TaggedPattern::named("unknown_tag");
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
 
         // Test with non-tagged envelope
         let text_envelope = Envelope::new("test");
-        let pattern = TaggedPattern::with_tag_name("date");
+        let pattern = TaggedPattern::named("date");
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
     }
@@ -242,28 +234,28 @@ mod tests {
 
         // Test regex that matches "date"
         let regex = regex::Regex::new(r"^da.*").unwrap();
-        let pattern = TaggedPattern::with_tag_regex(regex);
+        let pattern = TaggedPattern::regex(regex);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test regex that matches names ending with "te"
         let regex = regex::Regex::new(r".*te$").unwrap();
-        let pattern = TaggedPattern::with_tag_regex(regex);
+        let pattern = TaggedPattern::regex(regex);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test regex that doesn't match
         let regex = regex::Regex::new(r"^unknown.*").unwrap();
-        let pattern = TaggedPattern::with_tag_regex(regex);
+        let pattern = TaggedPattern::regex(regex);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
 
         // Test with non-tagged envelope
         let text_envelope = Envelope::new("test");
         let regex = regex::Regex::new(r".*").unwrap();
-        let pattern = TaggedPattern::with_tag_regex(regex);
+        let pattern = TaggedPattern::regex(regex);
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
 
@@ -272,7 +264,7 @@ mod tests {
             CBOR::to_tagged_value(999, "unregistered_value");
         let unregistered_envelope = Envelope::new(unregistered_tagged_cbor);
         let regex = regex::Regex::new(r".*").unwrap(); // Match everything
-        let pattern = TaggedPattern::with_tag_regex(regex);
+        let pattern = TaggedPattern::regex(regex);
         let paths = pattern.paths(&unregistered_envelope);
         assert!(paths.is_empty()); // Should be empty because tag 999 has no name in registry
     }
@@ -283,12 +275,12 @@ mod tests {
 
         let pattern = TaggedPattern::any();
         assert_eq!(pattern.to_string(), "TAG");
-        let pattern = TaggedPattern::with_tag_value(100);
+        let pattern = TaggedPattern::value(100);
         assert_eq!(pattern.to_string(), "TAG(100)");
-        let pattern = TaggedPattern::with_tag_name("date");
+        let pattern = TaggedPattern::named("date");
         assert_eq!(pattern.to_string(), "TAG(date)");
         let regex = regex::Regex::new(r"^da.*").unwrap();
-        let pattern = TaggedPattern::with_tag_regex(regex);
+        let pattern = TaggedPattern::regex(regex);
         assert_eq!(pattern.to_string(), "TAG(/^da.*/)");
     }
 }

@@ -1,7 +1,7 @@
 use logos::{Lexer, Logos};
 
 use super::error::{Error, Result};
-use crate::{Greediness, RepeatRange};
+use crate::{Quantifier, Reluctance};
 
 /// Tokens for the Gordian Envelope pattern syntax.
 #[derive(Debug, Clone, Logos, PartialEq)]
@@ -182,7 +182,7 @@ pub enum Token {
     Regex(Result<String>),
 
     #[token("{", parse_range)]
-    Range(Result<RepeatRange>),
+    Range(Result<Quantifier>),
 }
 
 /// Callback used by the `Regex` variant above.
@@ -209,7 +209,7 @@ fn parse_regex(lex: &mut Lexer<Token>) -> Result<String> {
     // Unterminated literal – treat as lexing error
     Err(Error::UnterminatedRegex(lex.span()))
 }
-fn parse_range(lex: &mut Lexer<Token>) -> Result<RepeatRange> {
+fn parse_range(lex: &mut Lexer<Token>) -> Result<Quantifier> {
     let src = lex.remainder(); // everything after the first '{'
 
     // Helper to skip whitespace inside the range specification
@@ -294,13 +294,13 @@ fn parse_range(lex: &mut Lexer<Token>) -> Result<RepeatRange> {
     let mode = match src[pos..].chars().next() {
         Some('?') => {
             pos += 1;
-            Greediness::Lazy
+            Reluctance::Lazy
         }
         Some('+') => {
             pos += 1;
-            Greediness::Possessive
+            Reluctance::Possessive
         }
-        _ => Greediness::Greedy,
+        _ => Reluctance::Greedy,
     };
 
     // consume parsed characters (everything after '{')
@@ -310,8 +310,8 @@ fn parse_range(lex: &mut Lexer<Token>) -> Result<RepeatRange> {
         if min > max {
             return Err(Error::InvalidRange(lex.span()));
         }
-        Ok(RepeatRange::new(min..=max, mode))
+        Ok(Quantifier::new(min..=max, mode))
     } else {
-        Ok(RepeatRange::new(min.., mode))
+        Ok(Quantifier::new(min.., mode))
     }
 }

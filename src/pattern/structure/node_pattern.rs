@@ -3,9 +3,11 @@ use std::ops::RangeBounds;
 use bc_envelope::Envelope;
 
 use crate::{
+    Interval, Pattern,
     pattern::{
-        compile_as_atomic, structure::StructurePattern, vm::Instr, Matcher, Path
-    }, Pattern, Repeat
+        Matcher, Path, compile_as_atomic, structure::StructurePattern,
+        vm::Instr,
+    },
 };
 
 /// Pattern for matching node envelopes.
@@ -14,7 +16,7 @@ pub enum NodePattern {
     /// Matches any node.
     Any,
     /// Matches a node with the specified count of assertions.
-    AssertionsCount(Repeat),
+    AssertionsInterval(Interval),
 }
 
 impl NodePattern {
@@ -23,8 +25,8 @@ impl NodePattern {
 
     /// Creates a new `NodePattern` that matches a node with the specified count
     /// of assertions.
-    pub fn count(range: impl RangeBounds<usize>) -> Self {
-        NodePattern::AssertionsCount(Repeat::new(range))
+    pub fn interval(range: impl RangeBounds<usize>) -> Self {
+        NodePattern::AssertionsInterval(Interval::new(range))
     }
 }
 
@@ -36,7 +38,7 @@ impl Matcher for NodePattern {
 
         let is_hit = match self {
             NodePattern::Any => true,
-            NodePattern::AssertionsCount(range) => {
+            NodePattern::AssertionsInterval(range) => {
                 range.contains(envelope.assertions().len())
             }
         };
@@ -61,7 +63,9 @@ impl std::fmt::Display for NodePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             NodePattern::Any => write!(f, "NODE"),
-            NodePattern::AssertionsCount(range) => write!(f, "NODE({})", range),
+            NodePattern::AssertionsInterval(range) => {
+                write!(f, "NODE({})", range)
+            }
         }
     }
 }
@@ -75,7 +79,7 @@ mod tests {
         let any_pattern = NodePattern::any();
         assert_eq!(any_pattern.to_string(), "NODE");
 
-        let count_pattern = NodePattern::count(1..=3);
+        let count_pattern = NodePattern::interval(1..=3);
         assert_eq!(count_pattern.to_string(), "NODE({1,3})");
     }
 }

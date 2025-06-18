@@ -3,10 +3,7 @@ use dcbor::prelude::*;
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching specific CBOR values.
@@ -15,7 +12,7 @@ pub enum CBORPattern {
     /// Matches any CBOR value.
     Any,
     /// Matches the specific CBOR value.
-    Exact(CBOR),
+    Value(CBOR),
 }
 
 impl CBORPattern {
@@ -23,8 +20,8 @@ impl CBORPattern {
     pub fn any() -> Self { CBORPattern::Any }
 
     /// Creates a new `CborPattern` that matches a specific CBOR value.
-    pub fn exact(cbor: impl CBOREncodable) -> Self {
-        CBORPattern::Exact(cbor.to_cbor())
+    pub fn value(cbor: impl CBOREncodable) -> Self {
+        CBORPattern::Value(cbor.to_cbor())
     }
 }
 
@@ -36,7 +33,7 @@ impl Matcher for CBORPattern {
         if let Some(known_value) = subject.as_known_value() {
             return match self {
                 CBORPattern::Any => vec![vec![envelope.clone()]],
-                CBORPattern::Exact(expected_cbor) => {
+                CBORPattern::Value(expected_cbor) => {
                     // Create CBOR from the KnownValue for comparison
                     let known_value_cbor = known_value.to_cbor();
                     if &known_value_cbor == expected_cbor {
@@ -56,7 +53,7 @@ impl Matcher for CBORPattern {
 
         match self {
             CBORPattern::Any => vec![vec![envelope.clone()]],
-            CBORPattern::Exact(expected_cbor) => {
+            CBORPattern::Value(expected_cbor) => {
                 if subject_cbor == *expected_cbor {
                     vec![vec![envelope.clone()]]
                 } else {
@@ -79,7 +76,9 @@ impl std::fmt::Display for CBORPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CBORPattern::Any => write!(f, "CBOR"),
-            CBORPattern::Exact(cbor) => write!(f, "CBOR({})", cbor.diagnostic_flat()),
+            CBORPattern::Value(cbor) => {
+                write!(f, "CBOR({})", cbor.diagnostic_flat())
+            }
         }
     }
 }
@@ -104,7 +103,7 @@ mod tests {
         let value = "test_value";
         let envelope = Envelope::new(value);
         let cbor = envelope.subject().as_leaf().unwrap().clone();
-        let pattern = CBORPattern::exact(cbor);
+        let pattern = CBORPattern::value(cbor);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);

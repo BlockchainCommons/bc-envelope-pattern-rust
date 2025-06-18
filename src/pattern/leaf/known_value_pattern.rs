@@ -3,10 +3,7 @@ use known_values::{KNOWN_VALUES, KnownValue};
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching known values.
@@ -15,7 +12,7 @@ pub enum KnownValuePattern {
     /// Matches any known value.
     Any,
     /// Matches the specific known value.
-    KnownValue(KnownValue),
+    Value(KnownValue),
     /// Matches the name of a known value.
     Named(String),
     /// Matches the regex for a known value name.
@@ -26,10 +23,9 @@ impl PartialEq for KnownValuePattern {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (KnownValuePattern::Any, KnownValuePattern::Any) => true,
-            (
-                KnownValuePattern::KnownValue(a),
-                KnownValuePattern::KnownValue(b),
-            ) => a == b,
+            (KnownValuePattern::Value(a), KnownValuePattern::Value(b)) => {
+                a == b
+            }
             (KnownValuePattern::Named(a), KnownValuePattern::Named(b)) => {
                 a == b
             }
@@ -49,7 +45,7 @@ impl std::hash::Hash for KnownValuePattern {
             KnownValuePattern::Any => {
                 0u8.hash(state);
             }
-            KnownValuePattern::KnownValue(s) => {
+            KnownValuePattern::Value(s) => {
                 1u8.hash(state);
                 s.hash(state);
             }
@@ -71,9 +67,7 @@ impl KnownValuePattern {
     pub fn any() -> Self { KnownValuePattern::Any }
 
     /// Creates a new `KnownValuePattern` that matches a specific known value.
-    pub fn known_value(value: KnownValue) -> Self {
-        KnownValuePattern::KnownValue(value)
-    }
+    pub fn value(value: KnownValue) -> Self { KnownValuePattern::Value(value) }
 
     /// Creates a new `KnownValuePattern` that matches a known value by name.
     pub fn named(name: impl Into<String>) -> Self {
@@ -92,7 +86,7 @@ impl Matcher for KnownValuePattern {
         if let Ok(value) = envelope.extract_subject::<KnownValue>() {
             match self {
                 KnownValuePattern::Any => vec![vec![envelope.clone()]],
-                KnownValuePattern::KnownValue(expected) => {
+                KnownValuePattern::Value(expected) => {
                     if value == *expected {
                         vec![vec![envelope.clone()]]
                     } else {
@@ -147,9 +141,13 @@ impl std::fmt::Display for KnownValuePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             KnownValuePattern::Any => write!(f, "KNOWN"),
-            KnownValuePattern::KnownValue(value) => write!(f, "KNOWN({})", value.name()),
+            KnownValuePattern::Value(value) => {
+                write!(f, "KNOWN({})", value.name())
+            }
             KnownValuePattern::Named(name) => write!(f, "KNOWN({})", name),
-            KnownValuePattern::Regex(regex) => write!(f, "KNOWN(/{}/)", regex.as_str()),
+            KnownValuePattern::Regex(regex) => {
+                write!(f, "KNOWN(/{}/)", regex.as_str())
+            }
         }
     }
 }
@@ -157,6 +155,7 @@ impl std::fmt::Display for KnownValuePattern {
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
+
     use crate::{Matcher, pattern::leaf::KnownValuePattern};
 
     #[test]
@@ -180,14 +179,14 @@ mod tests {
     fn test_known_value_pattern_specific() {
         let value = known_values::DATE;
         let envelope = Envelope::new(value.clone());
-        let pattern = KnownValuePattern::known_value(value.clone());
+        let pattern = KnownValuePattern::value(value.clone());
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test with different known value
         let different_value = known_values::LANGUAGE;
-        let pattern = KnownValuePattern::known_value(different_value);
+        let pattern = KnownValuePattern::value(different_value);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }
@@ -258,7 +257,7 @@ mod tests {
 
         let pattern = KnownValuePattern::any();
         assert_eq!(pattern.to_string(), "KNOWN");
-        let pattern = KnownValuePattern::known_value(known_values::DATE);
+        let pattern = KnownValuePattern::value(known_values::DATE);
         assert_eq!(pattern.to_string(), "KNOWN(date)");
         let pattern = KnownValuePattern::named("date");
         assert_eq!(pattern.to_string(), "KNOWN(date)");

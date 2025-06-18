@@ -5,7 +5,9 @@
 use bc_components::DigestProvider;
 use bc_envelope::{EdgeType, Envelope};
 
-use super::{Greediness, Matcher, Path, Pattern};
+use crate::{Quantifier, Reluctance};
+
+use super::{Matcher, Path, Pattern};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,9 +92,7 @@ pub enum Instr {
     /// Repeat a sub pattern according to range and greediness
     Repeat {
         pat_idx: usize,
-        min: usize,
-        max: Option<usize>,
-        mode: Greediness,
+        quantifier: Quantifier,
     },
 }
 
@@ -150,13 +150,11 @@ fn repeat_paths(
     pat: &Pattern,
     env: &Envelope,
     path: &Path,
-    min: usize,
-    max: Option<usize>,
-    mode: Greediness,
+    quantifier: Quantifier,
 ) -> Vec<(Envelope, Path)> {
     let mut states: Vec<Vec<(Envelope, Path)>> =
         vec![vec![(env.clone(), path.clone())]];
-    let bound = max.unwrap_or(usize::MAX);
+    let bound = quantifier.max().unwrap_or(usize::MAX);
     for _ in 0..bound {
         let mut next = Vec::new();
         for (e, pth) in states.last().unwrap().iter() {
@@ -183,14 +181,14 @@ fn repeat_paths(
 
     let max_possible = states.len() - 1;
     let max_allowed = bound.min(max_possible);
-    if max_allowed < min {
+    if max_allowed < quantifier.min() {
         return Vec::new();
     }
 
-    let counts: Vec<usize> = match mode {
-        Greediness::Greedy => (min..=max_allowed).rev().collect(),
-        Greediness::Lazy => (min..=max_allowed).collect(),
-        Greediness::Possessive => vec![max_allowed],
+    let counts: Vec<usize> = match quantifier.reluctance() {
+        Reluctance::Greedy => (quantifier.min()..=max_allowed).rev().collect(),
+        Reluctance::Lazy => (quantifier.min()..=max_allowed).collect(),
+        Reluctance::Possessive => vec![max_allowed],
     };
 
     let mut out = Vec::new();
@@ -415,10 +413,10 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
                     }
                     th.pc += 1;
                 }
-                Repeat { pat_idx, min, max, mode } => {
+                Repeat { pat_idx, quantifier } => {
                     let pat = &prog.literals[pat_idx];
                     let results =
-                        repeat_paths(pat, &th.env, &th.path, min, max, mode);
+                        repeat_paths(pat, &th.env, &th.path, quantifier);
                     if results.is_empty() {
                         break;
                     }

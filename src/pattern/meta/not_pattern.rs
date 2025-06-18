@@ -5,22 +5,22 @@ use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 /// A pattern that negates another pattern; matches when the inner pattern does
 /// not match.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct NotPattern {
-    pub pattern: Box<Pattern>,
-}
+pub struct NotPattern(Box<Pattern>);
 
 impl NotPattern {
     /// Creates a new `NotPattern` with the given pattern.
     pub fn new(pattern: Pattern) -> Self {
-        NotPattern { pattern: Box::new(pattern) }
+        NotPattern(Box::new(pattern))
     }
+
+    pub fn pattern(&self) -> &Pattern { &self.0 }
 }
 
 impl Matcher for NotPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         // If the inner pattern doesn't match, then we return the current
         // envelope as a match
-        if !self.pattern.matches(envelope) {
+        if !self.pattern().matches(envelope) {
             vec![vec![envelope.clone()]]
         } else {
             vec![]
@@ -31,14 +31,14 @@ impl Matcher for NotPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         // NOT = check that pattern doesn't match
         let idx = literals.len();
-        literals.push(self.pattern.as_ref().clone());
+        literals.push(self.pattern().clone());
         code.push(Instr::NotMatch { pat_idx: idx });
     }
 }
 
 impl std::fmt::Display for NotPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "!{}", self.pattern)
+        write!(f, "!{}", self.pattern())
     }
 }
 

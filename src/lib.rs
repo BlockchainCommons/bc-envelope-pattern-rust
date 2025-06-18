@@ -1,7 +1,11 @@
-mod pattern;
 mod parse;
+mod pattern;
 mod repeat;
+mod reluctance;
 
-pub use pattern::{Matcher, Path, Pattern, Greediness};
-pub use parse::{parse_pattern, Token, Error as ParseError, Result as ParseResult};
-pub use repeat::{Repeat, RepeatRange};
+pub use parse::{
+    Error as ParseError, Result as ParseResult, Token, parse_pattern,
+};
+pub use pattern::{Matcher, Path, Pattern};
+pub use repeat::{Interval, Quantifier};
+pub use reluctance::Reluctance;

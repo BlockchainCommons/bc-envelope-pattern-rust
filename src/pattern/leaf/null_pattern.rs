@@ -2,34 +2,32 @@ use bc_envelope::Envelope;
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching null values.
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub enum NullPattern {
-    /// Matches any null value.
-    Any,
-}
+pub struct NullPattern;
 
 impl NullPattern {
     /// Creates a new `NullPattern` that matches any null value.
-    pub fn any() -> Self { NullPattern::Any }
+    pub fn new() ->  Self {
+        NullPattern
+    }
+}
+
+impl Default for NullPattern {
+    fn default() -> Self {
+        NullPattern::new()
+    }
 }
 
 impl Matcher for NullPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        match self {
-            NullPattern::Any => {
-                if envelope.subject().is_null() {
-                    vec![vec![envelope.clone()]]
-                } else {
-                    vec![]
-                }
-            }
+        if envelope.subject().is_null() {
+            vec![vec![envelope.clone()]]
+        } else {
+            vec![]
         }
     }
 
@@ -44,9 +42,7 @@ impl Matcher for NullPattern {
 
 impl std::fmt::Display for NullPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            NullPattern::Any => write!(f, "NULL"),
-        }
+        write!(f, "NULL")
     }
 }
 
@@ -59,7 +55,7 @@ mod tests {
     #[test]
     fn test_null_pattern_any() {
         let null_envelope = Envelope::null();
-        let pattern = NullPattern::any();
+        let pattern = NullPattern::new();
         let paths = pattern.paths(&null_envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![null_envelope.clone()]);
@@ -72,6 +68,6 @@ mod tests {
 
     #[test]
     fn test_null_pattern_display() {
-        assert_eq!(NullPattern::any().to_string(), "NULL");
+        assert_eq!(NullPattern::new().to_string(), "NULL");
     }
 }

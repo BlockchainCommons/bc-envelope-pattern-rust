@@ -3,27 +3,27 @@
 use bc_envelope::Envelope;
 
 use crate::{
-    Matcher, Path, RepeatRange,
+    Matcher, Path, Quantifier,
     pattern::{Pattern, vm::Instr},
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RepeatPattern {
     pattern: Box<Pattern>,
-    range: RepeatRange,
+    quantifier: Quantifier,
 }
 
 impl RepeatPattern {
     /// Creates a new `RepeatPattern` with the specified sub-pattern and range.
-    pub fn new(sub: Pattern, range: RepeatRange) -> Self {
-        RepeatPattern { pattern: Box::new(sub), range }
+    pub fn new(sub: Pattern, quantifier: Quantifier) -> Self {
+        RepeatPattern { pattern: Box::new(sub), quantifier }
     }
 
     /// Returns the sub-pattern of this repeat pattern.
     pub fn pattern(&self) -> &Pattern { &self.pattern }
 
-    /// Returns the range of this repeat pattern.
-    pub fn range(&self) -> &RepeatRange { &self.range }
+    /// Returns the quantifier of this repeat pattern.
+    pub fn quantifier(&self) -> &Quantifier { &self.quantifier }
 }
 
 impl Matcher for RepeatPattern {
@@ -37,21 +37,18 @@ impl Matcher for RepeatPattern {
         lits.push((*self.pattern).clone());
         code.push(Instr::Repeat {
             pat_idx: idx,
-            min: self.range.min(),
-            max: self.range.max(),
-            mode: self.range.mode(),
+            quantifier: self.quantifier,
         });
     }
 }
 
 impl std::fmt::Display for RepeatPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let formatted_range = self.range.to_string();
+        let formatted_range = self.quantifier.to_string();
         if self.pattern.is_complex() && !formatted_range.is_empty() {
             write!(f, "({}){}", self.pattern, formatted_range)
         } else {
             write!(f, "{}{}", self.pattern, formatted_range)
         }
-
     }
 }

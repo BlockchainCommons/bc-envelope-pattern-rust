@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Greediness, Matcher, Pattern};
+use bc_envelope_pattern::{Reluctance, Matcher, Pattern};
 use indoc::indoc;
 
 use crate::common::pattern_utils::*;
@@ -237,7 +237,7 @@ fn test_wrapped_sequence() {
 fn optional_wrapped_pattern() {
     // A pattern that matches an envelope that may or may not be wrapped.
     let optional_wrapped_pattern = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Greediness::Greedy),
+        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Greedy),
         Pattern::any_number(),
     ]);
     assert_eq!(

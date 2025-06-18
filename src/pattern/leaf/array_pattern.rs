@@ -3,11 +3,8 @@ use std::ops::RangeBounds;
 use bc_envelope::Envelope;
 
 use crate::{
-    Pattern, Repeat,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    Interval, Pattern,
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching arrays.
@@ -16,7 +13,7 @@ pub enum ArrayPattern {
     /// Matches any array.
     Any,
     /// Matches arrays with a specific count of elements.
-    Count(Repeat),
+    Interval(Interval),
 }
 
 impl ArrayPattern {
@@ -25,8 +22,8 @@ impl ArrayPattern {
 
     /// Creates a new `ArrayPattern` that matches arrays with a count
     /// of elements in the specified range.
-    pub fn count(range: impl RangeBounds<usize>) -> Self {
-        ArrayPattern::Count(Repeat::new(range))
+    pub fn interval(range: impl RangeBounds<usize>) -> Self {
+        ArrayPattern::Interval(Interval::new(range))
     }
 }
 
@@ -35,7 +32,7 @@ impl Matcher for ArrayPattern {
         if let Some(array) = envelope.subject().as_array() {
             match self {
                 ArrayPattern::Any => vec![vec![envelope.clone()]],
-                ArrayPattern::Count(range) => {
+                ArrayPattern::Interval(range) => {
                     if range.contains(array.len()) {
                         vec![vec![envelope.clone()]]
                     } else {
@@ -61,7 +58,7 @@ impl std::fmt::Display for ArrayPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ArrayPattern::Any => write!(f, "ARRAY"),
-            ArrayPattern::Count(range) => {
+            ArrayPattern::Interval(range) => {
                 if range.is_single() {
                     write!(f, "ARRAY({{{}}})", range.min())
                 } else {
@@ -107,17 +104,17 @@ mod tests {
         let envelope = Envelope::new(cbor_array);
 
         // Test exact count
-        let pattern = ArrayPattern::count(3..=3);
+        let pattern = ArrayPattern::interval(3..=3);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test count range
-        let pattern = ArrayPattern::count(2..=4);
+        let pattern = ArrayPattern::interval(2..=4);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test count mismatch
-        let pattern = ArrayPattern::count(5..=5);
+        let pattern = ArrayPattern::interval(5..=5);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }

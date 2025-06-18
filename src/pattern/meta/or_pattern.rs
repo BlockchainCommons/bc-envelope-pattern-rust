@@ -4,19 +4,19 @@ use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 /// A pattern that matches if any contained pattern matches.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct OrPattern {
-    pub patterns: Vec<Pattern>,
-}
+pub struct OrPattern(Vec<Pattern>);
 
 impl OrPattern {
     /// Creates a new `OrPattern` with the given patterns.
-    pub fn new(patterns: Vec<Pattern>) -> Self { OrPattern { patterns } }
+    pub fn new(patterns: Vec<Pattern>) -> Self { OrPattern(patterns) }
+
+    pub fn patterns(&self) -> &[Pattern] { &self.0 }
 }
 
 impl Matcher for OrPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         if self
-            .patterns
+            .patterns()
             .iter()
             .any(|pattern| pattern.matches(envelope))
         {
@@ -28,7 +28,7 @@ impl Matcher for OrPattern {
 
     /// Compile into byte-code (OR = any can match).
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
-        if self.patterns.is_empty() {
+        if self.patterns().is_empty() {
             return;
         }
 
@@ -36,13 +36,13 @@ impl Matcher for OrPattern {
         let mut splits = Vec::new();
 
         // Generate splits for all but the last pattern
-        for _ in 0..self.patterns.len() - 1 {
+        for _ in 0..self.patterns().len() - 1 {
             splits.push(code.len());
             code.push(Instr::Split { a: 0, b: 0 }); // Placeholder
         }
 
         // Now fill in the actual split targets
-        for (i, pattern) in self.patterns.iter().enumerate() {
+        for (i, pattern) in self.patterns().iter().enumerate() {
             let pattern_start = code.len();
 
             // Compile this pattern
@@ -53,7 +53,7 @@ impl Matcher for OrPattern {
             code.push(Instr::Jump(0)); // Placeholder
 
             // If there's a next pattern, update the split to point here
-            if i < self.patterns.len() - 1 {
+            if i < self.patterns().len() - 1 {
                 let next_pattern = code.len();
                 code[splits[i]] =
                     Instr::Split { a: pattern_start, b: next_pattern };
@@ -65,15 +65,15 @@ impl Matcher for OrPattern {
 
         // Now patch all the jumps to point past all the patterns
         let past_all = code.len();
-        for &jump in &splits[self.patterns.len() - 1..] {
+        for &jump in &splits[self.patterns().len() - 1..] {
             code[jump] = Instr::Jump(past_all);
         }
     }
 
     fn is_complex(&self) -> bool {
-        // The pattern is complex if it contains more than one pattern, or if the one
-        // pattern is complex itself.
-        self.patterns.len() > 1 || self.patterns.iter().any(|p| p.is_complex())
+        // The pattern is complex if it contains more than one pattern, or if
+        // the one pattern is complex itself.
+        self.patterns().len() > 1 || self.patterns().iter().any(|p| p.is_complex())
     }
 }
 
@@ -82,7 +82,7 @@ impl std::fmt::Display for OrPattern {
         write!(
             f,
             "{}",
-            self.patterns
+            self.patterns()
                 .iter()
                 .map(|p| p.to_string())
                 .collect::<Vec<_>>()

@@ -2,10 +2,7 @@ use bc_envelope::Envelope;
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching text values.
@@ -14,7 +11,7 @@ pub enum TextPattern {
     /// Matches any text.
     Any,
     /// Matches the specific text.
-    Exact(String),
+    Value(String),
     /// Matches the regex for a text.
     Regex(regex::Regex),
 }
@@ -23,7 +20,7 @@ impl PartialEq for TextPattern {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (TextPattern::Any, TextPattern::Any) => true,
-            (TextPattern::Exact(a), TextPattern::Exact(b)) => a == b,
+            (TextPattern::Value(a), TextPattern::Value(b)) => a == b,
             (TextPattern::Regex(a), TextPattern::Regex(b)) => {
                 a.as_str() == b.as_str()
             }
@@ -40,7 +37,7 @@ impl std::hash::Hash for TextPattern {
             TextPattern::Any => {
                 0u8.hash(state);
             }
-            TextPattern::Exact(s) => {
+            TextPattern::Value(s) => {
                 1u8.hash(state);
                 s.hash(state);
             }
@@ -58,8 +55,8 @@ impl TextPattern {
     pub fn any() -> Self { TextPattern::Any }
 
     /// Creates a new `TextPattern` that matches the specific text.
-    pub fn exact<T: Into<String>>(value: T) -> Self {
-        TextPattern::Exact(value.into())
+    pub fn value<T: Into<String>>(value: T) -> Self {
+        TextPattern::Value(value.into())
     }
 
     /// Creates a new `TextPattern` that matches the regex for a text.
@@ -74,7 +71,7 @@ impl Matcher for TextPattern {
                 .ok()
                 .is_some_and(|value| match self {
                     TextPattern::Any => true,
-                    TextPattern::Exact(want) => value == *want,
+                    TextPattern::Value(want) => value == *want,
                     TextPattern::Regex(regex) => regex.is_match(&value),
                 });
 
@@ -98,7 +95,7 @@ impl std::fmt::Display for TextPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TextPattern::Any => write!(f, "TEXT"),
-            TextPattern::Exact(value) => write!(f, r#"TEXT("{}")"#, value),
+            TextPattern::Value(value) => write!(f, r#"TEXT("{}")"#, value),
             TextPattern::Regex(regex) => write!(f, r#"TEXT(/{}/)"#, regex),
         }
     }
@@ -111,10 +108,7 @@ mod tests {
     #[test]
     fn test_text_pattern_display() {
         assert_eq!(TextPattern::any().to_string(), "TEXT");
-        assert_eq!(
-            TextPattern::exact("Hello").to_string(),
-            r#"TEXT("Hello")"#
-        );
+        assert_eq!(TextPattern::value("Hello").to_string(), r#"TEXT("Hello")"#);
         assert_eq!(
             TextPattern::regex(regex::Regex::new(r"^\d+$").unwrap())
                 .to_string(),

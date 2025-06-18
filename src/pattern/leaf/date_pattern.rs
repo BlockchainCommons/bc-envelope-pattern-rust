@@ -5,10 +5,7 @@ use dcbor::{Date, prelude::*};
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching dates.
@@ -17,7 +14,7 @@ pub enum DatePattern {
     /// Matches any date.
     Any,
     /// Matches a specific date.
-    Date(Date),
+    Value(Date),
     /// Matches dates within a range (inclusive).
     Range(RangeInclusive<Date>),
     /// Matches dates that are on or after the specified date.
@@ -35,7 +32,7 @@ impl PartialEq for DatePattern {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (DatePattern::Any, DatePattern::Any) => true,
-            (DatePattern::Date(a), DatePattern::Date(b)) => a == b,
+            (DatePattern::Value(a), DatePattern::Value(b)) => a == b,
             (DatePattern::Range(a), DatePattern::Range(b)) => a == b,
             (DatePattern::Earliest(a), DatePattern::Earliest(b)) => a == b,
             (DatePattern::Latest(a), DatePattern::Latest(b)) => a == b,
@@ -56,7 +53,7 @@ impl std::hash::Hash for DatePattern {
             DatePattern::Any => {
                 0u8.hash(state);
             }
-            DatePattern::Date(date) => {
+            DatePattern::Value(date) => {
                 1u8.hash(state);
                 date.hash(state);
             }
@@ -91,7 +88,7 @@ impl DatePattern {
     pub fn any() -> Self { DatePattern::Any }
 
     /// Creates a new `DatePattern` that matches a specific date.
-    pub fn date(date: Date) -> Self { DatePattern::Date(date) }
+    pub fn value(date: Date) -> Self { DatePattern::Value(date) }
 
     /// Creates a new `DatePattern` that matches dates within a range
     /// (inclusive).
@@ -129,7 +126,7 @@ impl Matcher for DatePattern {
                     if let Ok(date) = Date::try_from(cbor.clone()) {
                         match self {
                             DatePattern::Any => vec![vec![envelope.clone()]],
-                            DatePattern::Date(expected_date) => {
+                            DatePattern::Value(expected_date) => {
                                 if date == *expected_date {
                                     vec![vec![envelope.clone()]]
                                 } else {
@@ -205,13 +202,10 @@ impl std::fmt::Display for DatePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             DatePattern::Any => write!(f, "DATE"),
-            DatePattern::Date(date) => write!(f, "DATE({})", date),
-            DatePattern::Range(range) => write!(
-                f,
-                "DATE({}...{})",
-                range.start(),
-                range.end()
-            ),
+            DatePattern::Value(date) => write!(f, "DATE({})", date),
+            DatePattern::Range(range) => {
+                write!(f, "DATE({}...{})", range.start(), range.end())
+            }
             DatePattern::Earliest(date) => write!(f, "DATE({}...)", date),
             DatePattern::Latest(date) => write!(f, "DATE(...{})", date),
             DatePattern::Iso8601(iso_string) => {
@@ -254,13 +248,13 @@ mod tests {
         let envelope = Envelope::new(date.clone());
 
         // Test matching date
-        let pattern = DatePattern::date(date.clone());
+        let pattern = DatePattern::value(date.clone());
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test non-matching date
         let different_date = Date::from_ymd(2023, 12, 24);
-        let pattern = DatePattern::date(different_date);
+        let pattern = DatePattern::value(different_date);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }
@@ -366,10 +360,12 @@ mod tests {
         let pattern = DatePattern::any();
         assert_eq!(pattern.to_string(), "DATE");
 
-        let pattern = DatePattern::date(Date::from_ymd(2023, 12, 25));
+        let pattern = DatePattern::value(Date::from_ymd(2023, 12, 25));
         assert_eq!(pattern.to_string(), "DATE(2023-12-25)");
 
-        let pattern = DatePattern::range(Date::from_ymd(2023, 12, 20)..=Date::from_ymd(2023, 12, 30));
+        let pattern = DatePattern::range(
+            Date::from_ymd(2023, 12, 20)..=Date::from_ymd(2023, 12, 30),
+        );
         assert_eq!(pattern.to_string(), "DATE(2023-12-20...2023-12-30)");
 
         let pattern = DatePattern::earliest(Date::from_ymd(2023, 12, 25));
@@ -381,7 +377,8 @@ mod tests {
         let pattern = DatePattern::iso8601("2023-12-25");
         assert_eq!(pattern.to_string(), "DATE(2023-12-25)");
 
-        let pattern = DatePattern::regex(regex::Regex::new(r"^2023-.*").unwrap());
+        let pattern =
+            DatePattern::regex(regex::Regex::new(r"^2023-.*").unwrap());
         assert_eq!(pattern.to_string(), "DATE(/^2023-.*/)");
     }
 }

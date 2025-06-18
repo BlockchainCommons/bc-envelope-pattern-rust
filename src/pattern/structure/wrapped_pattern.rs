@@ -10,14 +10,19 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub enum WrappedPattern {
-    /// Matches any wrapped envelope.
-    Any,
-}
+pub struct WrappedPattern;
 
 impl WrappedPattern {
     /// Creates a new `WrappedPattern` that matches any wrapped envelope.
-    pub fn any() -> Self { WrappedPattern::Any }
+    pub fn new() -> WrappedPattern {
+        WrappedPattern
+    }
+}
+
+impl Default for WrappedPattern {
+    fn default() -> Self {
+        WrappedPattern::new()
+    }
 }
 
 impl Matcher for WrappedPattern {
@@ -25,11 +30,7 @@ impl Matcher for WrappedPattern {
         // println!("Matching WrappedPattern: {:?}", self);
         let subject = envelope.subject();
         if subject.is_wrapped() {
-            match self {
-                WrappedPattern::Any => {
-                    vec![vec![envelope.clone()]]
-                }
-            }
+            vec![vec![envelope.clone()]]
         } else {
             vec![]
         }
@@ -50,8 +51,6 @@ impl Matcher for WrappedPattern {
 
 impl std::fmt::Display for WrappedPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            WrappedPattern::Any => write!(f, "WRAPPED"),
-        }
+        write!(f, "WRAPPED")
     }
 }

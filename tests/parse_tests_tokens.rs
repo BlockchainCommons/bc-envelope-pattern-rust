@@ -1,4 +1,4 @@
-use bc_envelope_pattern::{Greediness, RepeatRange, Token};
+use bc_envelope_pattern::{Quantifier, Reluctance, Token};
 use logos::Logos;
 
 #[test]
@@ -80,44 +80,44 @@ fn test_unsigned_integer() {
 fn test_range() {
     struct RangeTestCase {
         input: &'static str,
-        expected: RepeatRange,
+        expected: Quantifier,
     }
     let test_cases = vec![
         RangeTestCase {
             input: "{1, 5}",
-            expected: RepeatRange::new(1..=5, Greediness::default()),
+            expected: Quantifier::new(1..=5, Reluctance::default()),
         },
         RangeTestCase {
             input: "{ 3 , }",
-            expected: RepeatRange::new(3.., Greediness::default()),
+            expected: Quantifier::new(3.., Reluctance::default()),
         },
         RangeTestCase {
             input: "{ 5 }",
-            expected: RepeatRange::new(5..=5, Greediness::default()),
+            expected: Quantifier::new(5..=5, Reluctance::default()),
         },
         RangeTestCase {
             input: "{1, 5 }?",
-            expected: RepeatRange::new(1..=5, Greediness::Lazy),
+            expected: Quantifier::new(1..=5, Reluctance::Lazy),
         },
         RangeTestCase {
             input: "{ 3 , }?",
-            expected: RepeatRange::new(3.., Greediness::Lazy),
+            expected: Quantifier::new(3.., Reluctance::Lazy),
         },
         RangeTestCase {
             input: "{5}?",
-            expected: RepeatRange::new(5..=5, Greediness::Lazy),
+            expected: Quantifier::new(5..=5, Reluctance::Lazy),
         },
         RangeTestCase {
             input: "{ 1,5}+",
-            expected: RepeatRange::new(1..=5, Greediness::Possessive),
+            expected: Quantifier::new(1..=5, Reluctance::Possessive),
         },
         RangeTestCase {
             input: "{ 3 , }+",
-            expected: RepeatRange::new(3.., Greediness::Possessive),
+            expected: Quantifier::new(3.., Reluctance::Possessive),
         },
         RangeTestCase {
             input: "{5}+",
-            expected: RepeatRange::new(5..=5, Greediness::Possessive),
+            expected: Quantifier::new(5..=5, Reluctance::Possessive),
         },
     ];
 

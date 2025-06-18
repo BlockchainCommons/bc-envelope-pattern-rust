@@ -3,8 +3,8 @@ use logos::Logos;
 use super::{Result, Token};
 use crate::Pattern;
 
-pub fn parse_pattern(input: impl AsRef<str>) -> Result<Pattern> {
-    let mut lexer = Token::lexer(input.as_ref());
+pub fn parse_pattern(_input: impl AsRef<str>) -> Result<Pattern> {
+    let mut _lexer = Token::lexer(_input.as_ref());
     todo!();
 }
 

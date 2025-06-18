@@ -4,19 +4,19 @@ use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 /// A pattern that matches if all contained patterns match.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct AndPattern {
-    pub patterns: Vec<Pattern>,
-}
+pub struct AndPattern(Vec<Pattern>);
 
 impl AndPattern {
     /// Creates a new `AndPattern` with the given patterns.
-    pub fn new(patterns: Vec<Pattern>) -> Self { AndPattern { patterns } }
+    pub fn new(patterns: Vec<Pattern>) -> Self { AndPattern(patterns) }
+
+    pub fn patterns(&self) -> &[Pattern] { &self.0 }
 }
 
 impl Matcher for AndPattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
         if self
-            .patterns
+            .patterns()
             .iter()
             .all(|pattern| pattern.matches(envelope))
         {
@@ -29,15 +29,15 @@ impl Matcher for AndPattern {
     /// Compile into byte-code (AND = all must match).
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         // Each pattern must match at this position
-        for pattern in &self.patterns {
+        for pattern in self.patterns() {
             pattern.compile(code, lits);
         }
     }
 
     fn is_complex(&self) -> bool {
-        // The pattern is complex if it contains more than one pattern, or if the one
-        // pattern is complex itself.
-        self.patterns.len() > 1 || self.patterns.iter().any(|p| p.is_complex())
+        // The pattern is complex if it contains more than one pattern, or if
+        // the one pattern is complex itself.
+        self.patterns().len() > 1 || self.patterns().iter().any(|p| p.is_complex())
     }
 }
 
@@ -46,7 +46,7 @@ impl std::fmt::Display for AndPattern {
         write!(
             f,
             "{}",
-            self.patterns
+            self.patterns()
                 .iter()
                 .map(|p| p.to_string())
                 .collect::<Vec<_>>()

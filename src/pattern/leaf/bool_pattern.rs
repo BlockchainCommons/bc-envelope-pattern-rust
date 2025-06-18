@@ -2,10 +2,7 @@ use bc_envelope::Envelope;
 
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching boolean values.
@@ -14,7 +11,7 @@ pub enum BoolPattern {
     /// Matches any boolean value.
     Any,
     /// Matches the specific boolean value.
-    Exact(bool),
+    Value(bool),
 }
 
 impl BoolPattern {
@@ -22,7 +19,7 @@ impl BoolPattern {
     pub fn any() -> Self { BoolPattern::Any }
 
     /// Creates a new `BoolPattern` that matches the specific boolean value.
-    pub fn exact(value: bool) -> Self { BoolPattern::Exact(value) }
+    pub fn value(value: bool) -> Self { BoolPattern::Value(value) }
 }
 
 impl Matcher for BoolPattern {
@@ -33,7 +30,7 @@ impl Matcher for BoolPattern {
                 .ok()
                 .is_some_and(|value| match self {
                     BoolPattern::Any => true,
-                    BoolPattern::Exact(want) => value == *want,
+                    BoolPattern::Value(want) => value == *want,
                 });
 
         if is_hit {
@@ -56,7 +53,7 @@ impl std::fmt::Display for BoolPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BoolPattern::Any => write!(f, "BOOL"),
-            BoolPattern::Exact(value) => write!(f, "BOOL({})", value),
+            BoolPattern::Value(value) => write!(f, "BOOL({})", value),
         }
     }
 }
@@ -68,7 +65,7 @@ mod tests {
     #[test]
     fn test_bool_pattern_display() {
         assert_eq!(BoolPattern::any().to_string(), "BOOL");
-        assert_eq!(BoolPattern::exact(true).to_string(), "BOOL(true)");
-        assert_eq!(BoolPattern::exact(false).to_string(), "BOOL(false)");
+        assert_eq!(BoolPattern::value(true).to_string(), "BOOL(true)");
+        assert_eq!(BoolPattern::value(false).to_string(), "BOOL(false)");
     }
 }

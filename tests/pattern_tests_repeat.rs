@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Greediness, Matcher, Path, Pattern};
+use bc_envelope_pattern::{Reluctance, Matcher, Path, Pattern};
 use indoc::indoc;
 
 use crate::common::pattern_utils::format_paths;
@@ -108,7 +108,7 @@ fn repeat_test() {
     assert_eq!(format!("{}", assertion_object_pattern), "ASSERT>OBJECT");
 
     let pattern =
-        Pattern::repeat(assertion_object_pattern, 3..=3, Greediness::Greedy);
+        Pattern::repeat(assertion_object_pattern, 3..=3, Reluctance::Greedy);
     assert_eq!(format!("{}", pattern), "(ASSERT>OBJECT){3}");
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
@@ -149,19 +149,19 @@ fn test_repeat_2() {
         ])
     };
 
-    let pattern = pat(Greediness::Greedy);
+    let pattern = pat(Reluctance::Greedy);
     assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*>ASSERTOBJ(TEXT("B"))>OBJECT"#);
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
     assert_eq!(transpose(&paths[0]), "AabBbabB");
 
-    let pattern = pat(Greediness::Lazy);
+    let pattern = pat(Reluctance::Lazy);
     assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*?>ASSERTOBJ(TEXT("B"))>OBJECT"#);
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
     assert_eq!(transpose(&paths[0]), "AabB");
 
-    let pattern = pat(Greediness::Possessive);
+    let pattern = pat(Reluctance::Possessive);
     assert_eq!(format!("{}", pattern), r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*+>ASSERTOBJ(TEXT("B"))>OBJECT"#);
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 0);
@@ -185,7 +185,7 @@ fn wrap_n(mut env: Envelope, n: usize) -> Envelope {
 #[test]
 fn repeat_any_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), .., Greediness::Greedy),
+        Pattern::repeat(Pattern::wrapped(), .., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
 
@@ -206,7 +206,7 @@ fn repeat_any_greedy() {
 fn repeat_any_lazy() {
     let env = wrap_n(Envelope::new(42), 4);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), .., Greediness::Lazy),
+        Pattern::repeat(Pattern::wrapped(), .., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -225,7 +225,7 @@ fn repeat_any_lazy() {
 fn repeat_any_possessive() {
     let env = wrap_n(Envelope::new(42), 4);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), .., Greediness::Possessive),
+        Pattern::repeat(Pattern::wrapped(), .., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -244,7 +244,7 @@ fn repeat_any_possessive() {
 fn repeat_some_greedy() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 1.., Greediness::Greedy),
+        Pattern::repeat(Pattern::wrapped(), 1.., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -262,7 +262,7 @@ fn repeat_some_greedy() {
 fn repeat_some_lazy() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 1.., Greediness::Lazy),
+        Pattern::repeat(Pattern::wrapped(), 1.., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -280,7 +280,7 @@ fn repeat_some_lazy() {
 fn repeat_some_possessive() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 1.., Greediness::Possessive),
+        Pattern::repeat(Pattern::wrapped(), 1.., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -297,7 +297,7 @@ fn repeat_some_possessive() {
 #[test]
 fn repeat_optional_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Greediness::Greedy),
+        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -319,7 +319,7 @@ fn repeat_optional_greedy() {
 #[test]
 fn repeat_optional_lazy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Greediness::Lazy),
+        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -340,7 +340,7 @@ fn repeat_optional_lazy() {
 #[test]
 fn repeat_optional_possessive() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Greediness::Possessive),
+        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -361,7 +361,7 @@ fn repeat_optional_possessive() {
 #[test]
 fn repeat_range_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 2..=3, Greediness::Greedy),
+        Pattern::repeat(Pattern::wrapped(), 2..=3, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -380,7 +380,7 @@ fn repeat_range_greedy() {
 #[test]
 fn repeat_range_lazy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 2..=3, Greediness::Lazy),
+        Pattern::repeat(Pattern::wrapped(), 2..=3, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -398,7 +398,7 @@ fn repeat_range_lazy() {
 #[test]
 fn repeat_range_possessive() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 2..=3, Greediness::Possessive),
+        Pattern::repeat(Pattern::wrapped(), 2..=3, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -425,9 +425,9 @@ fn repeat_any_modes() {
         ])
     };
 
-    let greedy_paths = pat(Greediness::Greedy).paths(&env);
-    let lazy_paths = pat(Greediness::Lazy).paths(&env);
-    let possessive_paths = pat(Greediness::Possessive).paths(&env);
+    let greedy_paths = pat(Reluctance::Greedy).paths(&env);
+    let lazy_paths = pat(Reluctance::Lazy).paths(&env);
+    let possessive_paths = pat(Reluctance::Possessive).paths(&env);
 
     assert_eq!(greedy_paths, lazy_paths);
     assert!(possessive_paths.is_empty());
@@ -452,7 +452,7 @@ fn repeat_optional_modes() {
         ])
     };
 
-    let greedy_paths = pat(Greediness::Greedy).paths(&env);
+    let greedy_paths = pat(Reluctance::Greedy).paths(&env);
     let expected = indoc! {r#"
         58b1ac6a { 42 }
             7f83f7bd 42
@@ -460,7 +460,7 @@ fn repeat_optional_modes() {
     .trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
-    let lazy_paths = pat(Greediness::Lazy).paths(&env);
+    let lazy_paths = pat(Reluctance::Lazy).paths(&env);
     let expected = indoc! {r#"
         58b1ac6a { 42 }
             7f83f7bd 42
@@ -468,7 +468,7 @@ fn repeat_optional_modes() {
     .trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
-    let possessive_paths = pat(Greediness::Possessive).paths(&env);
+    let possessive_paths = pat(Reluctance::Possessive).paths(&env);
     let expected = indoc! {r#"
         58b1ac6a { 42 }
             7f83f7bd 42
@@ -496,7 +496,7 @@ fn repeat_some_order() {
         ])
     };
 
-    let greedy_paths = pat(Greediness::Greedy).paths(&env);
+    let greedy_paths = pat(Reluctance::Greedy).paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 { { "x" } }
@@ -505,7 +505,7 @@ fn repeat_some_order() {
     "#}.trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
-    let lazy_paths = pat(Greediness::Lazy).paths(&env);
+    let lazy_paths = pat(Reluctance::Lazy).paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 { { "x" } }
@@ -513,7 +513,7 @@ fn repeat_some_order() {
     "#}.trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
-    let possessive_paths = pat(Greediness::Possessive).paths(&env);
+    let possessive_paths = pat(Reluctance::Possessive).paths(&env);
     let expected = indoc! {r#"
         06bb2465 { { "x" } }
             70b5f17d { "x" }
@@ -534,7 +534,7 @@ fn repeat_range_order() {
         ])
     };
 
-    let greedy_paths = pat(Greediness::Greedy).paths(&env);
+    let greedy_paths = pat(Reluctance::Greedy).paths(&env);
     let expected = indoc! {r#"
         88e28c8b { { { { "x" } } } }
             79962374 { { { "x" } } }
@@ -544,7 +544,7 @@ fn repeat_range_order() {
     .trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
-    let lazy_paths = pat(Greediness::Lazy).paths(&env);
+    let lazy_paths = pat(Reluctance::Lazy).paths(&env);
     let expected = indoc! {r#"
         88e28c8b { { { { "x" } } } }
             79962374 { { { "x" } } }
@@ -553,7 +553,7 @@ fn repeat_range_order() {
     .trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
-    let possessive_paths = pat(Greediness::Possessive).paths(&env);
+    let possessive_paths = pat(Reluctance::Possessive).paths(&env);
     let expected = indoc! {r#"
         88e28c8b { { { { "x" } } } }
             79962374 { { { "x" } } }

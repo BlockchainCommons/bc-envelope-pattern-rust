@@ -1,14 +1,14 @@
 use std::ops::{Bound, RangeBounds};
 
-use crate::Greediness;
+use crate::Reluctance;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct Repeat {
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub struct Interval {
     min: usize,
     max: Option<usize>, // None == unbounded
 }
 
-impl Repeat {
+impl Interval {
     pub fn new(range: impl RangeBounds<usize>) -> Self {
         let min = match range.start_bound() {
             Bound::Included(&start) => start,
@@ -55,8 +55,7 @@ impl Repeat {
     }
 }
 
-impl RangeBounds<usize> for Repeat
-{
+impl RangeBounds<usize> for Interval {
     fn start_bound(&self) -> Bound<&usize> {
         if self.min == 0 {
             Bound::Unbounded
@@ -73,40 +72,48 @@ impl RangeBounds<usize> for Repeat
     }
 }
 
-impl std::fmt::Display for Repeat {
+impl std::fmt::Display for Interval {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.range_notation())
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct RepeatRange {
-    repeat: Repeat,
-    mode: Greediness,
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub struct Quantifier {
+    interval: Interval,
+    reluctance: Reluctance,
 }
 
-impl RepeatRange {
-    pub fn new(range: impl RangeBounds<usize>, mode: Greediness) -> Self {
-        let repeat = Repeat::new(range);
-        Self { repeat, mode }
+impl Quantifier {
+    pub fn new(
+        interval: impl RangeBounds<usize>,
+        reluctance: Reluctance,
+    ) -> Self {
+        let repeat = Interval::new(interval);
+        Self { interval: repeat, reluctance }
     }
 
-    pub fn min(&self) -> usize { self.repeat.min() }
+    pub fn min(&self) -> usize { self.interval.min() }
 
-    pub fn max(&self) -> Option<usize> { self.repeat.max() }
+    pub fn max(&self) -> Option<usize> { self.interval.max() }
 
-    pub fn mode(&self) -> Greediness { self.mode }
+    pub fn reluctance(&self) -> Reluctance { self.reluctance }
 
     pub fn contains(&self, count: usize) -> bool {
-        self.repeat.contains(count)
+        self.interval.contains(count)
     }
 
-    pub fn is_unbounded(&self) -> bool { self.repeat.is_unbounded() }
+    pub fn is_unbounded(&self) -> bool { self.interval.is_unbounded() }
 }
 
-impl std::fmt::Display for RepeatRange {
+impl std::fmt::Display for Quantifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.repeat.shorthand_notation(), self.mode.modifier())
+        write!(
+            f,
+            "{}{}",
+            self.interval.shorthand_notation(),
+            self.reluctance.suffix()
+        )
     }
 }
 
@@ -115,62 +122,30 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_repeat_display() {
-        let repeat = Repeat::new(1..=5);
-        assert_eq!(format!("{}", repeat), "{1,5}");
-
-        let repeat = Repeat::new(3..=3);
-        assert_eq!(format!("{}", repeat), "{3}");
-
-        let repeat = Repeat::new(2..);
-        assert_eq!(format!("{}", repeat), "{2,}");
-
-        let repeat = Repeat::new(0..);
-        assert_eq!(format!("{}", repeat), "{0,}");
-
-        let repeat = Repeat::new(1..);
-        assert_eq!(format!("{}", repeat), "{1,}");
-
-        let repeat = Repeat::new(0..=1);
-        assert_eq!(format!("{}", repeat), "{0,1}");
+    #[rustfmt::skip]
+    fn test_interval_display() {
+        assert_eq!(format!("{}", Interval::new(1..=5)), "{1,5}");
+        assert_eq!(format!("{}", Interval::new(3..=3)), "{3}");
+        assert_eq!(format!("{}", Interval::new(2..)), "{2,}");
+        assert_eq!(format!("{}", Interval::new(0..)), "{0,}");
+        assert_eq!(format!("{}", Interval::new(1..)), "{1,}");
+        assert_eq!(format!("{}", Interval::new(0..=1)), "{0,1}");
     }
 
     #[test]
-    fn test_repeat_range_display() {
-        let repeat = RepeatRange::new(1..=5, Greediness::Greedy);
-        assert_eq!(format!("{}", repeat), "{1,5}");
-
-        let repeat = RepeatRange::new(3..=3, Greediness::Lazy);
-        assert_eq!(format!("{}", repeat), "{3}?");
-
-        let repeat = RepeatRange::new(2.., Greediness::Possessive);
-        assert_eq!(format!("{}", repeat), "{2,}+");
-
-        let repeat = RepeatRange::new(0.., Greediness::Greedy);
-        assert_eq!(format!("{}", repeat), "*");
-
-        let repeat = RepeatRange::new(0.., Greediness::Lazy);
-        assert_eq!(format!("{}", repeat), "*?");
-
-        let repeat = RepeatRange::new(0.., Greediness::Possessive);
-        assert_eq!(format!("{}", repeat), "*+");
-
-        let repeat = RepeatRange::new(1.., Greediness::Greedy);
-        assert_eq!(format!("{}", repeat), "+");
-
-        let repeat = RepeatRange::new(1.., Greediness::Lazy);
-        assert_eq!(format!("{}", repeat), "+?");
-
-        let repeat = RepeatRange::new(1.., Greediness::Possessive);
-        assert_eq!(format!("{}", repeat), "++");
-
-        let repeat = RepeatRange::new(0..=1, Greediness::Greedy);
-        assert_eq!(format!("{}", repeat), "?");
-
-        let repeat = RepeatRange::new(0..=1, Greediness::Lazy);
-        assert_eq!(format!("{}", repeat), "??");
-
-        let repeat = RepeatRange::new(0..=1, Greediness::Possessive);
-        assert_eq!(format!("{}", repeat), "?+");
+    #[rustfmt::skip]
+    fn test_quantifier_display() {
+        assert_eq!(format!("{}", Quantifier::new(1..=5, Reluctance::Greedy)), "{1,5}");
+        assert_eq!(format!("{}", Quantifier::new(3..=3, Reluctance::Lazy)), "{3}?");
+        assert_eq!(format!("{}", Quantifier::new(2.., Reluctance::Possessive)), "{2,}+");
+        assert_eq!(format!("{}", Quantifier::new(0.., Reluctance::Greedy)), "*");
+        assert_eq!(format!("{}", Quantifier::new(0.., Reluctance::Lazy)), "*?");
+        assert_eq!(format!("{}", Quantifier::new(0.., Reluctance::Possessive)), "*+");
+        assert_eq!(format!("{}", Quantifier::new(1.., Reluctance::Greedy)), "+");
+        assert_eq!(format!("{}", Quantifier::new(1.., Reluctance::Lazy)), "+?");
+        assert_eq!(format!("{}", Quantifier::new(1.., Reluctance::Possessive)), "++");
+        assert_eq!(format!("{}", Quantifier::new(0..=1, Reluctance::Greedy)), "?");
+        assert_eq!(format!("{}", Quantifier::new(0..=1, Reluctance::Lazy)), "??");
+        assert_eq!(format!("{}", Quantifier::new(0..=1, Reluctance::Possessive)), "?+");
     }
 }

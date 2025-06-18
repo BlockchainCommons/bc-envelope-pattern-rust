@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use super::{
-    AndPattern, GroupPattern, NotPattern, OrPattern, RepeatPattern,
+    AndPattern, CapturePattern, NotPattern, OrPattern, RepeatPattern,
     SearchPattern, SequencePattern,
 };
 use crate::{
@@ -33,7 +33,7 @@ pub enum MetaPattern {
     /// Matches with repetition.
     Repeat(RepeatPattern),
     /// Groups (captures) a pattern match.
-    Group(GroupPattern),
+    Group(CapturePattern),
 }
 
 impl Matcher for MetaPattern {

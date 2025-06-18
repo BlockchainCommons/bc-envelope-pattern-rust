@@ -62,14 +62,14 @@ use dcbor::prelude::*;
 use known_values::KnownValue;
 
 use super::{
-    Greediness, Matcher, Path,
+    Matcher, Path,
     leaf::{
         ArrayPattern, BoolPattern, ByteStringPattern, DatePattern,
         KnownValuePattern, LeafPattern, MapPattern, NullPattern, NumberPattern,
         TaggedPattern, TextPattern,
     },
     meta::{
-        AndPattern, GroupPattern, MetaPattern, NotPattern, OrPattern,
+        AndPattern, CapturePattern, MetaPattern, NotPattern, OrPattern,
         RepeatPattern, SearchPattern, SequencePattern,
     },
     structure::{
@@ -80,7 +80,7 @@ use super::{
     vm,
 };
 use crate::{
-    RepeatRange,
+    Quantifier, Reluctance,
     pattern::{
         leaf::CBORPattern,
         meta::{AnyPattern, NonePattern},
@@ -158,7 +158,7 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific CBOR value.
     pub fn cbor(cbor: impl CBOREncodable) -> Self {
-        Pattern::Leaf(LeafPattern::Cbor(CBORPattern::exact(cbor)))
+        Pattern::Leaf(LeafPattern::Cbor(CBORPattern::value(cbor)))
     }
 }
 
@@ -170,7 +170,7 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific boolean value.
     pub fn bool(b: bool) -> Self {
-        Pattern::Leaf(LeafPattern::Bool(BoolPattern::exact(b)))
+        Pattern::Leaf(LeafPattern::Bool(BoolPattern::value(b)))
     }
 }
 
@@ -182,7 +182,7 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific text value.
     pub fn text<T: Into<String>>(value: T) -> Self {
-        Pattern::Leaf(LeafPattern::Text(TextPattern::exact(value)))
+        Pattern::Leaf(LeafPattern::Text(TextPattern::value(value)))
     }
 
     /// Creates a new `Pattern` that matches text values that match the given
@@ -200,7 +200,7 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific Date (CBOR tag 1) value.
     pub fn date(date: dcbor::Date) -> Self {
-        Pattern::Leaf(LeafPattern::Date(DatePattern::date(date)))
+        Pattern::Leaf(LeafPattern::Date(DatePattern::value(date)))
     }
 
     /// Creates a new `Pattern` that matches Date (CBOR tag 1) values within a
@@ -294,15 +294,13 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific byte string value.
     pub fn byte_string(value: impl AsRef<[u8]>) -> Self {
-        Pattern::Leaf(LeafPattern::ByteString(ByteStringPattern::exact(value)))
+        Pattern::Leaf(LeafPattern::ByteString(ByteStringPattern::value(value)))
     }
 
     /// Creates a new `Pattern` that matches byte string values that match the
     /// given binary regular expression.
     pub fn byte_string_binary_regex(regex: regex::bytes::Regex) -> Self {
-        Pattern::Leaf(LeafPattern::ByteString(ByteStringPattern::binary_regex(
-            regex,
-        )))
+        Pattern::Leaf(LeafPattern::ByteString(ByteStringPattern::regex(regex)))
     }
 }
 
@@ -312,9 +310,7 @@ impl Pattern {
     }
 
     pub fn known_value(value: KnownValue) -> Self {
-        Pattern::Leaf(LeafPattern::KnownValue(KnownValuePattern::known_value(
-            value,
-        )))
+        Pattern::Leaf(LeafPattern::KnownValue(KnownValuePattern::value(value)))
     }
 
     pub fn known_value_named<T: Into<String>>(name: T) -> Self {
@@ -334,11 +330,11 @@ impl Pattern {
     }
 
     pub fn array_with_range(range: impl RangeBounds<usize>) -> Self {
-        Pattern::Leaf(LeafPattern::Array(ArrayPattern::count(range)))
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::interval(range)))
     }
 
     pub fn array_with_count(count: usize) -> Self {
-        Pattern::Leaf(LeafPattern::Array(ArrayPattern::count(count..=count)))
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::interval(count..=count)))
     }
 }
 
@@ -348,17 +344,17 @@ impl Pattern {
     }
 
     pub fn map_with_range(range: impl RangeBounds<usize>) -> Self {
-        Pattern::Leaf(LeafPattern::Map(MapPattern::count(range)))
+        Pattern::Leaf(LeafPattern::Map(MapPattern::interval(range)))
     }
 
     pub fn map_with_count(count: usize) -> Self {
-        Pattern::Leaf(LeafPattern::Map(MapPattern::count(count..=count)))
+        Pattern::Leaf(LeafPattern::Map(MapPattern::interval(count..=count)))
     }
 }
 
 impl Pattern {
     pub fn null() -> Self {
-        Pattern::Leaf(LeafPattern::Null(NullPattern::any()))
+        Pattern::Leaf(LeafPattern::Null(NullPattern::new()))
     }
 }
 
@@ -368,19 +364,19 @@ impl Pattern {
     }
 
     pub fn tagged(tag: dcbor::Tag) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::with_tag(tag)))
+        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::value(tag)))
     }
 
     pub fn tagged_with_value(value: u64) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::with_tag_value(value)))
+        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::value(value)))
     }
 
     pub fn tagged_with_name(name: impl Into<String>) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::with_tag_name(name)))
+        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::named(name)))
     }
 
     pub fn tagged_with_regex(regex: regex::Regex) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::with_tag_regex(regex)))
+        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::regex(regex)))
     }
 }
 
@@ -394,7 +390,7 @@ impl Pattern {
 
 impl Pattern {
     pub fn wrapped() -> Self {
-        Pattern::Structure(StructurePattern::Wrapped(WrappedPattern::any()))
+        Pattern::Structure(StructurePattern::Wrapped(WrappedPattern::new()))
     }
 }
 
@@ -476,11 +472,11 @@ impl Pattern {
     }
 
     pub fn node_with_assertions_range(range: impl RangeBounds<usize>) -> Self {
-        Pattern::Structure(StructurePattern::Node(NodePattern::count(range)))
+        Pattern::Structure(StructurePattern::Node(NodePattern::interval(range)))
     }
 
     pub fn node_with_assertions_count(count: usize) -> Self {
-        Pattern::Structure(StructurePattern::Node(NodePattern::count(
+        Pattern::Structure(StructurePattern::Node(NodePattern::interval(
             count..=count,
         )))
     }
@@ -597,12 +593,12 @@ impl Pattern {
     /// | `n..=n`       | `{n}`        |
     pub fn repeat(
         pattern: Pattern,
-        range: impl RangeBounds<usize>,
-        mode: Greediness,
+        interval: impl RangeBounds<usize>,
+        reluctance: Reluctance,
     ) -> Self {
         Pattern::Meta(MetaPattern::Repeat(RepeatPattern::new(
             pattern,
-            RepeatRange::new(range, mode),
+            Quantifier::new(interval, reluctance),
         )))
     }
 }
@@ -610,10 +606,7 @@ impl Pattern {
 impl Pattern {
     /// Creates a new `Pattern` that will capture a pattern match with a name.
     pub fn capture(name: &str, pattern: Pattern) -> Self {
-        Pattern::Meta(MetaPattern::Group(GroupPattern {
-            name: name.to_string(),
-            inner: Box::new(pattern),
-        }))
+        Pattern::Meta(MetaPattern::Group(CapturePattern::new(name, pattern)))
     }
 }
 
