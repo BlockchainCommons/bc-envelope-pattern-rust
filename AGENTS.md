@@ -152,7 +152,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
 
 Structure patterns match parts of Gordian Envelope structures.
 
-- [ ] Assertions
+- [x] Assertions
     - `ASSERT`
         - Matches any assertion.
     - `ASSERTPRED ( pattern )`
@@ -169,12 +169,12 @@ Structure patterns match parts of Gordian Envelope structures.
         - Matches any Gordian Envelope node, which is an envelope with at least one assertion.
     - `NODE ( { m, n } )`
         - Matches a Gordian Envelope node with between `m` and `n` assertions, inclusive.
-- [ ] Objects
+- [x] Objects
     - `OBJ`
         - Matches any object.
     - `OBJ ( pattern )`
         - Matches an object that matches the specified pattern.
-- [ ] Obscured
+- [x] Obscured
     - `OBSCURED`
         - Matches any obscured (elided, encrypted, or compressed) branch of the Envelope tree.
     - `ELIDED`
@@ -183,7 +183,7 @@ Structure patterns match parts of Gordian Envelope structures.
         - Matches any encrypted branch of the Envelope tree.
     - `COMPRESSED`
         - Matches any compressed branch of the Envelope tree.
-- [ ] Predicates
+- [x] Predicates
     - `PRED`
         - Matches any predicate.
     - `PRED ( pattern )`
