@@ -82,11 +82,17 @@ impl Matcher for TextPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::Text(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

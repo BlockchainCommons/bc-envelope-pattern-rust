@@ -63,47 +63,53 @@ impl Matcher for LeafPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         match self {
             LeafPattern::Any => {
                 compile_as_atomic(
                     &Pattern::Leaf(LeafPattern::Any),
                     code,
                     literals,
+                    captures,
                 );
             }
             LeafPattern::Cbor(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Number(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Text(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::ByteString(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Tag(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Array(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Map(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Bool(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Null(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::Date(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
             LeafPattern::KnownValue(pattern) => {
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
             }
         }
     }

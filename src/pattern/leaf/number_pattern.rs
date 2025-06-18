@@ -184,7 +184,12 @@ impl Matcher for NumberPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         // A NumberPattern is a *leaf* predicate; it never changes
         // the current envelope pointer, so the default atomic helper
         // is perfect.  We must wrap `self` back into the outer
@@ -193,6 +198,7 @@ impl Matcher for NumberPattern {
             &Pattern::Leaf(LeafPattern::Number(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

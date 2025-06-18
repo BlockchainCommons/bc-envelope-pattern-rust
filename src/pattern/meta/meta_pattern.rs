@@ -51,17 +51,22 @@ impl Matcher for MetaPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         match self {
-            MetaPattern::Any(pattern) => pattern.compile(code, lits),
-            MetaPattern::None(pattern) => pattern.compile(code, lits),
-            MetaPattern::And(pattern) => pattern.compile(code, lits),
-            MetaPattern::Or(pattern) => pattern.compile(code, lits),
-            MetaPattern::Not(pattern) => pattern.compile(code, lits),
-            MetaPattern::Search(pattern) => pattern.compile(code, lits),
-            MetaPattern::Sequence(pattern) => pattern.compile(code, lits),
-            MetaPattern::Group(pattern) => pattern.compile(code, lits),
-            MetaPattern::Capture(pattern) => pattern.compile(code, lits),
+            MetaPattern::Any(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::None(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::And(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Or(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Not(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Search(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Sequence(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Group(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Capture(pattern) => pattern.compile(code, lits, captures),
         }
     }
 

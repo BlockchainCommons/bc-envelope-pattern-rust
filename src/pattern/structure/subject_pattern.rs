@@ -33,7 +33,12 @@ impl Matcher for SubjectPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         match self {
             SubjectPattern::Any => {
                 code.push(Instr::NavigateSubject);
@@ -47,7 +52,7 @@ impl Matcher for SubjectPattern {
                 // that any paths produced by `pattern` are appended to the
                 // subject path rather than replacing it.
                 code.push(Instr::ExtendSequence);
-                pattern.compile(code, literals);
+                pattern.compile(code, literals, captures);
                 code.push(Instr::CombineSequence);
             }
         }

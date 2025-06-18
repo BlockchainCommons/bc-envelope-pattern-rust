@@ -50,11 +50,17 @@ impl Matcher for NodePattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Structure(StructurePattern::Node(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

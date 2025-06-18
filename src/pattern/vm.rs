@@ -93,12 +93,17 @@ pub enum Instr {
         pat_idx: usize,
         quantifier: Quantifier,
     },
+    /// Mark the start of a capture group
+    CaptureStart(usize),
+    /// Mark the end of a capture group
+    CaptureEnd(usize),
 }
 
 #[derive(Debug, Clone)]
 pub struct Program {
     pub code: Vec<Instr>,
     pub literals: Vec<Pattern>,
+    pub capture_names: Vec<String>,
 }
 
 /// Internal back-tracking state.
@@ -109,6 +114,8 @@ struct Thread {
     path: Path,
     /// Stack of saved paths for nested sequence patterns
     saved_paths: Vec<Path>,
+    captures: Vec<Vec<Path>>,
+    capture_stack: Vec<Vec<usize>>,
 }
 
 /// Match atomic patterns without recursion into the VM.
@@ -203,7 +210,11 @@ fn repeat_paths(
 /// current `path` is pushed into result.
 /// Execute a single thread until it halts. Returns true if any paths were
 /// produced.
-fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
+fn run_thread(
+    prog: &Program,
+    start: Thread,
+    out: &mut Vec<(Path, Vec<Vec<Path>>)>,
+) -> bool {
     use Instr::*;
     let mut produced = false;
     let mut stack = vec![start];
@@ -282,12 +293,12 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
                     th.pc += 1;
                 }
                 Save => {
-                    out.push(th.path.clone());
+                    out.push((th.path.clone(), th.captures.clone()));
                     produced = true;
                     th.pc += 1;
                 }
                 Accept => {
-                    out.push(th.path.clone());
+                    out.push((th.path.clone(), th.captures.clone()));
                     produced = true;
                     break;
                 }
@@ -319,12 +330,12 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
                             // emit the current path instead of extending it
                             if found_path.len() == 1 && found_path[0] == th.env
                             {
-                                out.push(th.path.clone());
+                                out.push((th.path.clone(), th.captures.clone()));
                             } else {
                                 // Extend current path with the found path
                                 let mut result_path = th.path.clone();
                                 result_path.extend(found_path);
-                                out.push(result_path);
+                                out.push((result_path, th.captures.clone()));
                             }
                         }
                     }
@@ -483,6 +494,23 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
                         th.pc += 1;
                     }
                 }
+                CaptureStart(id) => {
+                    if th.capture_stack.len() > id {
+                        th.capture_stack[id].push(th.path.len() - 1);
+                    }
+                    th.pc += 1;
+                }
+                CaptureEnd(id) => {
+                    if th.capture_stack.len() > id {
+                        if let Some(start_idx) = th.capture_stack[id].pop() {
+                            if th.captures.len() > id {
+                                let cap = th.path[start_idx..].to_vec();
+                                th.captures[id].push(cap);
+                            }
+                        }
+                    }
+                    th.pc += 1;
+                }
             }
         }
     }
@@ -491,14 +519,29 @@ fn run_thread(prog: &Program, start: Thread, out: &mut Vec<Path>) -> bool {
 
 /// Execute `prog` starting at `root`.  Every time `SAVE` or `ACCEPT` executes,
 /// the current `path` is pushed into the result.
-pub fn run(prog: &Program, root: &Envelope) -> Vec<Path> {
+pub fn run(
+    prog: &Program,
+    root: &Envelope,
+) -> Vec<(Path, std::collections::HashMap<String, Vec<Path>>)> {
     let mut out = Vec::new();
     let start = Thread {
         pc: 0,
         env: root.clone(),
         path: vec![root.clone()],
         saved_paths: Vec::new(),
+        captures: vec![Vec::new(); prog.capture_names.len()],
+        capture_stack: vec![Vec::new(); prog.capture_names.len()],
     };
     run_thread(prog, start, &mut out);
-    out
+    out.into_iter()
+        .map(|(path, caps)| {
+            let mut map = std::collections::HashMap::new();
+            for (i, paths) in caps.into_iter().enumerate() {
+                if !paths.is_empty() {
+                    map.insert(prog.capture_names[i].clone(), paths);
+                }
+            }
+            (path, map)
+        })
+        .collect()
 }

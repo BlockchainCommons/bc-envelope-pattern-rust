@@ -56,15 +56,20 @@ impl Matcher for SequencePattern {
     }
 
     /// Compile into byte-code (sequential).
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         // Compile the first pattern
-        self.first.compile(code, lits);
+        self.first.compile(code, lits, captures);
 
         if let Some(rest) = &self.rest {
             // Save the current path and switch to last envelope
             code.push(Instr::ExtendSequence);
             // Compile the rest of the sequence
-            rest.compile(code, lits);
+            rest.compile(code, lits, captures);
             // Combine the paths correctly
             code.push(Instr::CombineSequence);
         }

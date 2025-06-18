@@ -51,11 +51,17 @@ impl Matcher for ObscuredPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Structure(StructurePattern::Obscured(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

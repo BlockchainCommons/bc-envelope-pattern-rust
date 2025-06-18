@@ -26,7 +26,12 @@ impl Matcher for NotPattern {
     }
 
     /// Compile into byte-code (NOT = negation of the inner pattern).
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        _captures: &mut Vec<String>,
+    ) {
         // NOT = check that pattern doesn't match
         let idx = literals.len();
         literals.push(self.pattern().clone());

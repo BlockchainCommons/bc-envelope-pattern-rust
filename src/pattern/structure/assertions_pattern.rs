@@ -58,7 +58,12 @@ impl Matcher for AssertionsPattern {
         result
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        _captures: &mut Vec<String>,
+    ) {
         let idx = literals.len();
         literals.push(Pattern::Structure(StructurePattern::Assertions(
             self.clone(),

@@ -747,3 +747,31 @@ fn test_capture_multiple_matches() {
     let nums = captures.get("num").unwrap();
     assert_eq!(nums.len(), 2);
 }
+
+#[test]
+fn test_capture_in_and_failure() {
+    let envelope = Envelope::new(42);
+
+    let pattern = Pattern::and(vec![
+        Pattern::capture("num", Pattern::number(42)),
+        Pattern::bool(true),
+    ]);
+
+    let (paths, captures) = pattern.paths_with_captures(&envelope);
+    assert!(paths.is_empty());
+    assert!(captures.get("num").is_none());
+}
+
+#[test]
+fn test_capture_in_sequence_failure() {
+    let envelope = Envelope::new(42).add_assertion("an", "assertion");
+
+    let pattern = Pattern::sequence(vec![
+        Pattern::capture("num", Pattern::subject(Pattern::number(42))),
+        Pattern::bool(true),
+    ]);
+
+    let (paths, captures) = pattern.paths_with_captures(&envelope);
+    assert!(paths.is_empty());
+    assert!(captures.get("num").is_none());
+}

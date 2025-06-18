@@ -110,9 +110,15 @@ impl Matcher for Pattern {
         &self,
         env: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = self.vm_paths(env);
-        let mut captures = HashMap::new();
-        self.collect_captures(env, &mut captures);
+        let results = self.vm_run(env);
+        let mut paths = Vec::new();
+        let mut captures: HashMap<String, Vec<Path>> = HashMap::new();
+        for (p, caps) in results {
+            paths.push(p);
+            for (name, mut vals) in caps {
+                captures.entry(name).or_default().append(&mut vals);
+            }
+        }
         (paths, captures)
     }
 
@@ -550,12 +556,13 @@ impl Pattern {
         &self,
         code: &mut Vec<Instr>,
         lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
     ) {
         use Pattern::*;
         match self {
-            Leaf(leaf_pattern) => leaf_pattern.compile(code, lits),
-            Structure(struct_pattern) => struct_pattern.compile(code, lits),
-            Meta(meta_pattern) => meta_pattern.compile(code, lits),
+            Leaf(leaf_pattern) => leaf_pattern.compile(code, lits, captures),
+            Structure(struct_pattern) => struct_pattern.compile(code, lits, captures),
+            Meta(meta_pattern) => meta_pattern.compile(code, lits, captures),
         }
     }
 }
@@ -615,7 +622,7 @@ impl std::fmt::Display for Pattern {
 impl Pattern {
     /// Internal helper that runs the pattern through the VM and returns the
     /// matching paths.
-    fn vm_paths(&self, env: &Envelope) -> Vec<Path> {
+    fn vm_run(&self, env: &Envelope) -> Vec<(Path, HashMap<String, Vec<Path>>)> {
         thread_local! {
             static PROG: RefCell<HashMap<u64, vm::Program>> = RefCell::new(HashMap::new());
         }
@@ -633,8 +640,8 @@ impl Pattern {
             .with(|cell| cell.borrow().get(&key).cloned())
             .unwrap_or_else(|| {
                 let mut p =
-                    vm::Program { code: Vec::new(), literals: Vec::new() };
-                self.compile(&mut p.code, &mut p.literals);
+                    vm::Program { code: Vec::new(), literals: Vec::new(), capture_names: Vec::new() };
+                self.compile(&mut p.code, &mut p.literals, &mut p.capture_names);
                 p.code.push(Instr::Accept);
                 PROG.with(|cell| {
                     cell.borrow_mut().insert(key, p.clone());
@@ -645,53 +652,7 @@ impl Pattern {
         vm::run(&prog, env)
     }
 
-    fn collect_captures(
-        &self,
-        env: &Envelope,
-        map: &mut HashMap<String, Vec<Path>>,
-    ) {
-        match self {
-            Pattern::Leaf(_) | Pattern::Structure(_) => {}
-            Pattern::Meta(meta) => meta.collect_captures(env, map),
-        }
-    }
-}
-
-impl MetaPattern {
-    fn collect_captures(
-        &self,
-        env: &Envelope,
-        map: &mut HashMap<String, Vec<Path>>,
-    ) {
-        match self {
-            MetaPattern::Capture(cap) => {
-                let paths = cap.pattern().vm_paths(env);
-                if !paths.is_empty() {
-                    map.entry(cap.name().to_string())
-                        .or_default()
-                        .extend(paths.clone());
-                }
-                cap.pattern().collect_captures(env, map);
-            }
-            MetaPattern::And(a) => {
-                for p in a.patterns() {
-                    p.collect_captures(env, map);
-                }
-            }
-            MetaPattern::Or(o) => {
-                for p in o.patterns() {
-                    p.collect_captures(env, map);
-                }
-            }
-            MetaPattern::Not(n) => n.pattern().collect_captures(env, map),
-            MetaPattern::Search(s) => s.pattern().collect_captures(env, map),
-            MetaPattern::Sequence(seq) => {
-                for p in seq.patterns() {
-                    p.collect_captures(env, map);
-                }
-            }
-            MetaPattern::Group(g) => g.pattern().collect_captures(env, map),
-            MetaPattern::Any(_) | MetaPattern::None(_) => {}
-        }
+    fn vm_paths(&self, env: &Envelope) -> Vec<Path> {
+        self.vm_run(env).into_iter().map(|(p, _)| p).collect()
     }
 }
