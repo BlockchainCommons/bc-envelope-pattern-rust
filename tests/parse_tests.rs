@@ -125,3 +125,64 @@ fn parse_operator_precedence() {
     assert_eq!(p, expected);
     assert_eq!(p.to_string(), "ANY>BOOL(true)&BOOL(false)>NONE|ANY>BOOL(true)&BOOL(false)>ANY");
 }
+
+#[test]
+fn parse_text_patterns() {
+    let p = parse_pattern("TEXT").unwrap();
+    assert_eq!(p, Pattern::any_text());
+    assert_eq!(p.to_string(), "TEXT");
+
+    let p = parse_pattern("TEXT(\"hello\")").unwrap();
+    assert_eq!(p, Pattern::text("hello"));
+    assert_eq!(p.to_string(), "TEXT(\"hello\")");
+
+    let spaced = "TEXT ( \"hello\" )";
+    let p_spaced = parse_pattern(spaced).unwrap();
+    assert_eq!(p_spaced, Pattern::text("hello"));
+    assert_eq!(p_spaced.to_string(), "TEXT(\"hello\")");
+
+    let p = parse_pattern("TEXT(/h.*o/)").unwrap();
+    let regex = regex::Regex::new("h.*o").unwrap();
+    assert_eq!(p, Pattern::text_regex(regex));
+    assert_eq!(p.to_string(), "TEXT(/h.*o/)");
+}
+
+#[test]
+fn parse_number_patterns() {
+    let p = parse_pattern("NUMBER").unwrap();
+    assert_eq!(p, Pattern::any_number());
+    assert_eq!(p.to_string(), "NUMBER");
+
+    let p = parse_pattern("NUMBER(42)").unwrap();
+    assert_eq!(p, Pattern::number(42));
+    assert_eq!(p.to_string(), "NUMBER(42)");
+
+    let spaced = "NUMBER ( 42 )";
+    let p_spaced = parse_pattern(spaced).unwrap();
+    assert_eq!(p_spaced, Pattern::number(42));
+    assert_eq!(p_spaced.to_string(), "NUMBER(42)");
+
+    let p = parse_pattern("NUMBER(1...3)").unwrap();
+    assert_eq!(p, Pattern::number_range(1..=3));
+    assert_eq!(p.to_string(), "NUMBER(1...3)");
+
+    let p = parse_pattern("NUMBER(>5)").unwrap();
+    assert_eq!(p, Pattern::number_greater_than(5));
+    assert_eq!(p.to_string(), "NUMBER(>5)");
+
+    let p = parse_pattern("NUMBER(>=5)").unwrap();
+    assert_eq!(p, Pattern::number_greater_than_or_equal(5));
+    assert_eq!(p.to_string(), "NUMBER(>=5)");
+
+    let p = parse_pattern("NUMBER(<5)").unwrap();
+    assert_eq!(p, Pattern::number_less_than(5));
+    assert_eq!(p.to_string(), "NUMBER(<5)");
+
+    let p = parse_pattern("NUMBER(<=5)").unwrap();
+    assert_eq!(p, Pattern::number_less_than_or_equal(5));
+    assert_eq!(p.to_string(), "NUMBER(<=5)");
+
+    let p = parse_pattern("NUMBER(NaN)").unwrap();
+    assert_eq!(p, Pattern::number_nan());
+    assert_eq!(p.to_string(), "NUMBER(NaN)");
+}
