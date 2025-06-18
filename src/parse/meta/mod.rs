@@ -26,14 +26,14 @@ pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
 }
 
 pub(crate) fn parse_sequence(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
-    let mut patterns = vec![parse_and(lexer)?];
+    let mut patterns = vec![parse_not(lexer)?];
 
     loop {
         let mut lookahead = lexer.clone();
         match lookahead.next() {
             Some(Ok(Token::Sequence)) => {
                 lexer.next();
-                patterns.push(parse_and(lexer)?);
+                patterns.push(parse_not(lexer)?);
             }
             _ => break,
         }
@@ -43,6 +43,18 @@ pub(crate) fn parse_sequence(lexer: &mut logos::Lexer<Token>) -> Result<Pattern>
         Ok(patterns.remove(0))
     } else {
         Ok(Pattern::sequence(patterns))
+    }
+}
+
+pub(crate) fn parse_not(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+    let mut lookahead = lexer.clone();
+    match lookahead.next() {
+        Some(Ok(Token::Not)) => {
+            lexer.next();
+            let pat = parse_not(lexer)?;
+            Ok(Pattern::not_matching(pat))
+        }
+        _ => parse_and(lexer),
     }
 }
 
