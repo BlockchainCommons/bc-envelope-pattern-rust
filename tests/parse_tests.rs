@@ -2,7 +2,6 @@ use bc_envelope::prelude::*;
 use bc_envelope_pattern::{parse_pattern, Pattern};
 use dcbor::Date;
 use known_values::KnownValue;
-use hex;
 use bc_components::Digest;
 
 #[test]
@@ -509,6 +508,7 @@ fn parse_not_patterns() {
     let expected = Pattern::not_matching(Pattern::and(vec![Pattern::any(), Pattern::none()]));
     assert_eq!(p, expected);
     assert_eq!(p.to_string(), "!ANY&NONE");
+}
 
 #[test]
 fn parse_digest_patterns() {
