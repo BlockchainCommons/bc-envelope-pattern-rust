@@ -716,3 +716,20 @@ fn test_not_pattern_with_search() {
         }
     }
 }
+
+#[test]
+fn test_capture_pattern() {
+    let envelope = Envelope::new(42);
+
+    let inner = Pattern::number(42);
+    let capture = Pattern::capture("num", inner.clone());
+
+    assert_eq!(format!("{}", capture), "(NUMBER(42))");
+    assert!(capture.matches(&envelope));
+
+    let inner_paths = inner.paths(&envelope);
+    let (capture_paths, captures) = capture.paths_with_captures(&envelope);
+    assert!(capture_paths.iter().any(|p| *p == inner_paths[0]));
+    assert!(captures.contains_key("num"));
+    assert_eq!(captures.get("num").unwrap(), &inner_paths[0]);
+}

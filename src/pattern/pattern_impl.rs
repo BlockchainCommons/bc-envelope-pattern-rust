@@ -103,33 +103,14 @@ pub enum Pattern {
 
 impl Matcher for Pattern {
     fn paths(&self, env: &Envelope) -> Vec<Path> {
-        thread_local! {
-            static PROG: RefCell<HashMap<u64, vm::Program>> = RefCell::new(HashMap::new());
-        }
+        self.paths_with_captures(env).0
+    }
 
-        // cheap structural hash
-        use std::{
-            collections::hash_map::DefaultHasher,
-            hash::{Hash, Hasher},
-        };
-        let mut h = DefaultHasher::new();
-        self.hash(&mut h);
-        let key = h.finish();
-
-        let prog = PROG
-            .with(|cell| cell.borrow().get(&key).cloned())
-            .unwrap_or_else(|| {
-                let mut p =
-                    vm::Program { code: Vec::new(), literals: Vec::new() };
-                self.compile(&mut p.code, &mut p.literals);
-                p.code.push(Instr::Accept);
-                PROG.with(|cell| {
-                    cell.borrow_mut().insert(key, p.clone());
-                });
-                p
-            });
-
-        vm::run(&prog, env)
+    fn paths_with_captures(&self, env: &Envelope) -> (Vec<Path>, HashMap<String, Path>) {
+        let paths = self.vm_paths(env);
+        let mut captures = HashMap::new();
+        self.collect_captures(env, &mut captures);
+        (paths, captures)
     }
 
     fn is_complex(&self) -> bool {
@@ -624,6 +605,79 @@ impl std::fmt::Display for Pattern {
             Pattern::Leaf(leaf) => write!(f, "{}", leaf),
             Pattern::Structure(structure) => write!(f, "{}", structure),
             Pattern::Meta(meta) => write!(f, "{}", meta),
+        }
+    }
+}
+
+impl Pattern {
+    /// Internal helper that runs the pattern through the VM and returns the
+    /// matching paths.
+    fn vm_paths(&self, env: &Envelope) -> Vec<Path> {
+        thread_local! {
+            static PROG: RefCell<HashMap<u64, vm::Program>> = RefCell::new(HashMap::new());
+        }
+
+        // cheap structural hash
+        use std::{
+            collections::hash_map::DefaultHasher,
+            hash::{Hash, Hasher},
+        };
+        let mut h = DefaultHasher::new();
+        self.hash(&mut h);
+        let key = h.finish();
+
+        let prog = PROG
+            .with(|cell| cell.borrow().get(&key).cloned())
+            .unwrap_or_else(|| {
+                let mut p = vm::Program { code: Vec::new(), literals: Vec::new() };
+                self.compile(&mut p.code, &mut p.literals);
+                p.code.push(Instr::Accept);
+                PROG.with(|cell| {
+                    cell.borrow_mut().insert(key, p.clone());
+                });
+                p
+            });
+
+        vm::run(&prog, env)
+    }
+
+    fn collect_captures(&self, env: &Envelope, map: &mut HashMap<String, Path>) {
+        match self {
+            Pattern::Leaf(_) | Pattern::Structure(_) => {}
+            Pattern::Meta(meta) => meta.collect_captures(env, map),
+        }
+    }
+}
+
+impl MetaPattern {
+    fn collect_captures(&self, env: &Envelope, map: &mut HashMap<String, Path>) {
+        match self {
+            MetaPattern::Capture(cap) => {
+                let paths = cap.pattern().vm_paths(env);
+                if let Some(p) = paths.first() {
+                    map.insert(cap.name().to_string(), p.clone());
+                }
+                cap.pattern().collect_captures(env, map);
+            }
+            MetaPattern::And(a) => {
+                for p in a.patterns() {
+                    p.collect_captures(env, map);
+                }
+            }
+            MetaPattern::Or(o) => {
+                for p in o.patterns() {
+                    p.collect_captures(env, map);
+                }
+            }
+            MetaPattern::Not(n) => n.pattern().collect_captures(env, map),
+            MetaPattern::Search(s) => s.pattern().collect_captures(env, map),
+            MetaPattern::Sequence(seq) => {
+                for p in seq.patterns() {
+                    p.collect_captures(env, map);
+                }
+            }
+            MetaPattern::Group(g) => g.pattern().collect_captures(env, map),
+            MetaPattern::Any(_) | MetaPattern::None(_) => {}
         }
     }
 }
