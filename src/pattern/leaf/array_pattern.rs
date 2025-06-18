@@ -58,18 +58,7 @@ impl std::fmt::Display for ArrayPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ArrayPattern::Any => write!(f, "ARRAY"),
-            ArrayPattern::Interval(range) => {
-                if range.is_single() {
-                    write!(f, "ARRAY({{{}}})", range.min())
-                } else {
-                    write!(
-                        f,
-                        "ARRAY({{{}}},{{{}}})",
-                        range.min(),
-                        range.max().unwrap()
-                    )
-                }
-            }
+            ArrayPattern::Interval(range) => write!(f, "ARRAY({})", range),
         }
     }
 }
