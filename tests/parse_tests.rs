@@ -1,6 +1,6 @@
-use dcbor::Date;
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Pattern, parse_pattern};
+use bc_envelope_pattern::{parse_pattern, Pattern};
+use dcbor::Date;
 use known_values::KnownValue;
 
 #[test]
@@ -434,7 +434,10 @@ fn parse_assert_patterns() {
 
     let spaced = "ASSERTPRED ( TEXT(\"hi\") )";
     let p_spaced = parse_pattern(spaced).unwrap();
-    assert_eq!(p_spaced, Pattern::assertion_with_predicate(Pattern::text("hi")));
+    assert_eq!(
+        p_spaced,
+        Pattern::assertion_with_predicate(Pattern::text("hi"))
+    );
     assert_eq!(p_spaced.to_string(), "ASSERTPRED(TEXT(\"hi\"))");
 
     let p = parse_pattern("ASSERTOBJ(NUMBER(1))").unwrap();
@@ -491,4 +494,17 @@ fn parse_obscured_patterns() {
     let p = parse_pattern("COMPRESSED").unwrap();
     assert_eq!(p, Pattern::compressed());
     assert_eq!(p.to_string(), "COMPRESSED");
+}
+
+#[test]
+fn parse_not_patterns() {
+    let p = parse_pattern("!TEXT(\"hi\")").unwrap();
+    assert_eq!(p, Pattern::not_matching(Pattern::text("hi")));
+    assert_eq!(p.to_string(), "!TEXT(\"hi\")");
+
+    let expr = "!ANY & NONE";
+    let p = parse_pattern(expr).unwrap();
+    let expected = Pattern::not_matching(Pattern::and(vec![Pattern::any(), Pattern::none()]));
+    assert_eq!(p, expected);
+    assert_eq!(p.to_string(), "!ANY&NONE");
 }
