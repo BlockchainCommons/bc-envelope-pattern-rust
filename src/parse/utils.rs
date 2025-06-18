@@ -1,6 +1,7 @@
 // Utility parsing helpers shared across pattern parsers
 
 use crate::{Error, Pattern, Result};
+use dcbor_parse;
 
 pub(crate) fn skip_ws(src: &str, pos: &mut usize) {
     while let Some(ch) = src[*pos..].chars().next() {
@@ -256,6 +257,68 @@ pub(crate) fn parse_date_inner(src: &str) -> Result<(Pattern, usize)> {
     }
 
     Ok((Pattern::date(first), pos))
+}
+
+pub(crate) fn parse_cbor_inner(src: &str) -> Result<(Pattern, usize)> {
+    let mut pos = 0;
+    skip_ws(src, &mut pos);
+    let mut in_dquote = false;
+    let mut in_squote = false;
+    let mut escape = false;
+    let mut in_hash_comment = false;
+    let mut depth: usize = 0;
+    let bytes = src.as_bytes();
+    let mut i = pos;
+    while i < src.len() {
+        let ch = bytes[i] as char;
+        if in_hash_comment {
+            if ch == '\n' { in_hash_comment = false; }
+            i += 1;
+            continue;
+        }
+        if in_dquote {
+            if escape { escape = false; i += 1; continue; }
+            match ch {
+                '\\' => { escape = true; i += 1; continue; }
+                '"' => { in_dquote = false; i += 1; continue; }
+                _ => { i += 1; continue; }
+            }
+        }
+        if in_squote {
+            if ch == '\'' { in_squote = false; }
+            i += 1;
+            continue;
+        }
+        match ch {
+            '"' => { in_dquote = true; }
+            '\'' => { in_squote = true; }
+            '/' => {
+                if let Some(off) = src[i+1..].find('/') {
+                    i += off + 1;
+                    continue;
+                }
+            }
+            '#' => { in_hash_comment = true; }
+            '(' => { depth += 1; }
+            ')' => {
+                if depth == 0 {
+                    let candidate = &src[pos..i];
+                    let diag = candidate.trim_end();
+                    let cbor_v20 = dcbor_parse::parse_dcbor_item(diag)
+                        .map_err(|_| Error::Unknown)?;
+                    let bytes = cbor_v20.to_cbor_data();
+                    let cbor = dcbor::CBOR::try_from_data(bytes)
+                        .map_err(|_| Error::Unknown)?;
+                    return Ok((Pattern::cbor(cbor), i));
+                } else {
+                    depth -= 1;
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    Err(Error::UnexpectedEndOfInput)
 }
 
 pub(crate) fn parse_bare_word(src: &str) -> Result<(String, usize)> {
