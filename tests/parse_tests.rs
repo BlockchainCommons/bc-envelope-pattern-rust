@@ -322,11 +322,11 @@ fn parse_known_value_patterns() {
 
     let p = parse_pattern("KNOWN('1')").unwrap();
     assert_eq!(p, Pattern::known_value(KnownValue::new(1)));
-    assert_eq!(p.to_string(), "KNOWN(1)");
+    assert_eq!(p.to_string(), "KNOWN('1')");
 
     let p = parse_pattern("KNOWN('date')").unwrap();
     assert_eq!(p, Pattern::known_value_named("date"));
-    assert_eq!(p.to_string(), "KNOWN(date)");
+    assert_eq!(p.to_string(), "KNOWN('date')");
 
     let p = parse_pattern("KNOWN(/da.*/)").unwrap();
     let regex = regex::Regex::new("da.*").unwrap();

@@ -142,9 +142,9 @@ impl std::fmt::Display for KnownValuePattern {
         match self {
             KnownValuePattern::Any => write!(f, "KNOWN"),
             KnownValuePattern::Value(value) => {
-                write!(f, "KNOWN({})", value.name())
+                write!(f, "KNOWN('{}')", value.name())
             }
-            KnownValuePattern::Named(name) => write!(f, "KNOWN({})", name),
+            KnownValuePattern::Named(name) => write!(f, "KNOWN('{}')", name),
             KnownValuePattern::Regex(regex) => {
                 write!(f, "KNOWN(/{}/)", regex.as_str())
             }
@@ -258,9 +258,9 @@ mod tests {
         let pattern = KnownValuePattern::any();
         assert_eq!(pattern.to_string(), "KNOWN");
         let pattern = KnownValuePattern::value(known_values::DATE);
-        assert_eq!(pattern.to_string(), "KNOWN(date)");
+        assert_eq!(pattern.to_string(), "KNOWN('date')");
         let pattern = KnownValuePattern::named("date");
-        assert_eq!(pattern.to_string(), "KNOWN(date)");
+        assert_eq!(pattern.to_string(), "KNOWN('date')");
         let regex = regex::Regex::new(r"^da.*").unwrap();
         let pattern = KnownValuePattern::regex(regex);
         assert_eq!(pattern.to_string(), "KNOWN(/^da.*/)");

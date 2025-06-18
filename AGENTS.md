@@ -95,7 +95,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a date value less than or equal to the specified ISO 8601 date.
     - `DATE ( /regex/ )`
         - Matches a date value that matches the specified regex.
-- [ ] Known Value
+- [x] Known Value
     - `KNOWN`
         - Matches any known value. (See the `known-values` crate for more information.)
     - `KNOWN ( 'value' )`
@@ -131,7 +131,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a number less than the specified value.
     - `NUMBER ( NaN )`
         - Matches the NaN (Not a Number) value.
-- [ ] Tagged
+- [x] Tagged
     - `TAG`
         - Matches any CBOR tagged value.
     - `TAG ( value )`
