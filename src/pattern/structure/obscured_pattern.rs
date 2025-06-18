@@ -3,7 +3,7 @@ use bc_envelope::Envelope;
 use crate::{
     Pattern,
     pattern::{
-        Compilable, Matcher, Path, compile_as_atomic,
+        Matcher, Path, compile_as_atomic,
         structure::StructurePattern, vm::Instr,
     },
 };
@@ -50,9 +50,7 @@ impl Matcher for ObscuredPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for ObscuredPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
             &Pattern::Structure(StructurePattern::Obscured(self.clone())),

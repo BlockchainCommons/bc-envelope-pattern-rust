@@ -7,7 +7,7 @@ use super::{
 };
 use crate::{
     Pattern,
-    pattern::{Compilable, Matcher, Path, compile_as_atomic, vm::Instr},
+    pattern::{Matcher, Path, compile_as_atomic, vm::Instr},
 };
 
 /// Pattern for matching leaf values.
@@ -62,9 +62,7 @@ impl Matcher for LeafPattern {
             LeafPattern::KnownValue(pattern) => pattern.paths(envelope),
         }
     }
-}
 
-impl Compilable for LeafPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         match self {
             LeafPattern::Any => {

@@ -4,7 +4,7 @@ use known_values::{KNOWN_VALUES, KnownValue};
 use crate::{
     Pattern,
     pattern::{
-        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
     },
 };
@@ -133,9 +133,7 @@ impl Matcher for KnownValuePattern {
             vec![]
         }
     }
-}
 
-impl Compilable for KnownValuePattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::KnownValue(self.clone())),

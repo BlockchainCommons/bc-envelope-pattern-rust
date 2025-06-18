@@ -4,7 +4,7 @@ use bc_envelope::Envelope;
 
 use crate::{
     pattern::{
-        compile_as_atomic, structure::StructurePattern, vm::Instr, Compilable, Matcher, Path
+        compile_as_atomic, structure::StructurePattern, vm::Instr, Matcher, Path
     }, Pattern, Repeat
 };
 
@@ -47,9 +47,7 @@ impl Matcher for NodePattern {
             vec![]
         }
     }
-}
 
-impl Compilable for NodePattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
             &Pattern::Structure(StructurePattern::Node(self.clone())),

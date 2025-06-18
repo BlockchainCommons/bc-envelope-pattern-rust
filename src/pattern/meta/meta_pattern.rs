@@ -7,7 +7,7 @@ use super::{
 use crate::{
     Pattern,
     pattern::{
-        Compilable, Matcher, Path,
+        Matcher, Path,
         meta::{AnyPattern, NonePattern},
         vm::Instr,
     },
@@ -50,9 +50,7 @@ impl Matcher for MetaPattern {
             MetaPattern::Group(pattern) => pattern.paths(envelope),
         }
     }
-}
 
-impl Compilable for MetaPattern {
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         match self {
             MetaPattern::Any(pattern) => pattern.compile(code, lits),

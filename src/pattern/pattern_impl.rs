@@ -80,9 +80,12 @@ use super::{
     vm,
 };
 use crate::{
+    RepeatRange,
     pattern::{
-        leaf::CBORPattern, meta::{AnyPattern, NonePattern}, vm::Instr, Compilable
-    }, Repeat, RepeatRange
+        leaf::CBORPattern,
+        meta::{AnyPattern, NonePattern},
+        vm::Instr,
+    },
 };
 
 /// The main pattern type used for matching envelopes.
@@ -591,7 +594,7 @@ impl Pattern {
     ) -> Self {
         Pattern::Meta(MetaPattern::Repeat(RepeatPattern::new(
             pattern,
-            RepeatRange::new(range, mode)
+            RepeatRange::new(range, mode),
         )))
     }
 }

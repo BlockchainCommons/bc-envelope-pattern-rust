@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use crate::pattern::{
-    Compilable, Matcher, Path, Pattern, compile_as_atomic, meta::MetaPattern,
+    Matcher, Path, Pattern, compile_as_atomic, meta::MetaPattern,
     vm::Instr,
 };
 
@@ -23,9 +23,7 @@ impl Matcher for AnyPattern {
         // Always return a path containing the envelope itself.
         vec![vec![envelope.clone()]]
     }
-}
 
-impl Compilable for AnyPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
             &Pattern::Meta(MetaPattern::Any(self.clone())),

@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use crate::{
-    pattern::{Compilable, Matcher, Path, Pattern, vm::Instr},
+    pattern::{Matcher, Path, Pattern, vm::Instr},
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -56,9 +56,7 @@ impl Matcher for SequencePattern {
             head_paths
         }
     }
-}
 
-impl Compilable for SequencePattern {
     /// Compile into byte-code (sequential).
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         // Compile the first pattern

@@ -1,6 +1,6 @@
 use bc_envelope::Envelope;
 
-use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 /// A pattern that negates another pattern; matches when the inner pattern does
 /// not match.
@@ -26,9 +26,7 @@ impl Matcher for NotPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for NotPattern {
     /// Compile into byte-code (NOT = negation of the inner pattern).
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         // NOT = check that pattern doesn't match

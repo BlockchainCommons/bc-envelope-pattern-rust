@@ -1,7 +1,7 @@
 use bc_envelope::Envelope;
 
 use crate::pattern::{
-    Compilable, Matcher, Path, Pattern, vm::Instr,
+    Matcher, Path, Pattern, vm::Instr,
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -34,9 +34,7 @@ impl Matcher for SubjectPattern {
             }
         }
     }
-}
 
-impl Compilable for SubjectPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         match self {
             SubjectPattern::Any => {

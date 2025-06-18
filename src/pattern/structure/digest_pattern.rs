@@ -4,7 +4,7 @@ use bc_envelope::prelude::*;
 use crate::{
     Pattern,
     pattern::{
-        Compilable, Matcher, Path, compile_as_atomic,
+        Matcher, Path, compile_as_atomic,
         structure::StructurePattern, vm::Instr,
     },
 };
@@ -90,9 +90,7 @@ impl Matcher for DigestPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for DigestPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
             &Pattern::Structure(StructurePattern::Digest(self.clone())),

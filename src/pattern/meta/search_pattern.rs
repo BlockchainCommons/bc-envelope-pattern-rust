@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use bc_components::DigestProvider;
 use bc_envelope::{EdgeType, Envelope};
 
-use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct SearchPattern(Box<Pattern>);
@@ -58,9 +58,7 @@ impl Matcher for SearchPattern {
 
         result_paths.into_inner()
     }
-}
 
-impl Compilable for SearchPattern {
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         let idx = lits.len();
         lits.push((*self.0).clone());

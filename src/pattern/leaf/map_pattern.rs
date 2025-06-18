@@ -5,7 +5,7 @@ use bc_envelope::Envelope;
 use crate::{
     Pattern, Repeat,
     pattern::{
-        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
     },
 };
@@ -47,9 +47,7 @@ impl Matcher for MapPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for MapPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::Map(self.clone())),

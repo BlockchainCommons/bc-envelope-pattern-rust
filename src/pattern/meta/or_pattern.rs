@@ -1,6 +1,6 @@
 use bc_envelope::Envelope;
 
-use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 /// A pattern that matches if any contained pattern matches.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -25,9 +25,7 @@ impl Matcher for OrPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for OrPattern {
     /// Compile into byte-code (OR = any can match).
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         if self.patterns.is_empty() {

@@ -1,5 +1,4 @@
 // Pattern module - provides pattern matching functionality for envelopes
-mod compile;
 mod greediness;
 mod matcher;
 mod pattern_impl;
@@ -11,7 +10,6 @@ mod meta;
 mod structure;
 
 // Re-export all types
-pub use compile::{Compilable, compile_as_atomic};
 pub use greediness::Greediness;
-pub use matcher::{Matcher, Path};
+pub use matcher::{Matcher, Path, compile_as_atomic};
 pub use pattern_impl::Pattern;

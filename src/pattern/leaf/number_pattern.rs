@@ -5,7 +5,7 @@ use bc_envelope::Envelope;
 use crate::{
     Pattern,
     pattern::{
-        Compilable, Matcher, Path, compile_as_atomic, leaf::LeafPattern,
+        Matcher, Path, compile_as_atomic, leaf::LeafPattern,
         vm::Instr,
     },
 };
@@ -186,9 +186,7 @@ impl Matcher for NumberPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for NumberPattern {
     fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
         // A NumberPattern is a *leaf* predicate; it never changes
         // the current envelope pointer, so the default atomic helper

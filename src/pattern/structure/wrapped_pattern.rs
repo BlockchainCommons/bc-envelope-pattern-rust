@@ -3,7 +3,7 @@ use bc_envelope::Envelope;
 use crate::{
     Pattern,
     pattern::{
-        Compilable, Matcher, Path,
+        Matcher, Path,
         structure::StructurePattern,
         vm::{Axis, Instr},
     },
@@ -34,9 +34,7 @@ impl Matcher for WrappedPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for WrappedPattern {
     /// Emit predicate + descent so the VM makes progress.
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         // println!("Compiling WrappedPattern: {:?}", self);

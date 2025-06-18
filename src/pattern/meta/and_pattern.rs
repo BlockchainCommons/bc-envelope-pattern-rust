@@ -1,6 +1,6 @@
 use bc_envelope::Envelope;
 
-use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 /// A pattern that matches if all contained patterns match.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -25,9 +25,7 @@ impl Matcher for AndPattern {
             vec![]
         }
     }
-}
 
-impl Compilable for AndPattern {
     /// Compile into byte-code (AND = all must match).
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         // Each pattern must match at this position

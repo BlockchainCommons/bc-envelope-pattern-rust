@@ -5,7 +5,7 @@ use bc_envelope::Envelope;
 
 use crate::{
     Matcher, Path,
-    pattern::{Compilable, Pattern, vm::Instr},
+    pattern::{Pattern, vm::Instr},
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -18,9 +18,7 @@ impl Matcher for GroupPattern {
     fn paths(&self, _envelope: &Envelope) -> Vec<Path> {
         todo!();
     }
-}
 
-impl Compilable for GroupPattern {
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         code.push(Instr::Save); // start
         self.inner.compile(code, lits);

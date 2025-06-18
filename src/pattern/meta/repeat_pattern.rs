@@ -4,7 +4,7 @@ use bc_envelope::Envelope;
 
 use crate::{
     Matcher, Path, RepeatRange,
-    pattern::{Compilable, Pattern, vm::Instr},
+    pattern::{Pattern, vm::Instr},
 };
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -30,9 +30,7 @@ impl Matcher for RepeatPattern {
     fn paths(&self, _envelope: &Envelope) -> Vec<Path> {
         todo!();
     }
-}
 
-impl Compilable for RepeatPattern {
     /// Emit a high-level `Repeat` instruction for the VM.
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         let idx = lits.len();

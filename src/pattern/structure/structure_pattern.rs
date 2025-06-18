@@ -4,7 +4,7 @@ use super::{
     AssertionsPattern, DigestPattern, NodePattern, ObjectPattern,
     ObscuredPattern, PredicatePattern, SubjectPattern, WrappedPattern,
 };
-use crate::pattern::{Compilable, Matcher, Path, Pattern, vm::Instr};
+use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
 /// Pattern for matching envelope structure elements.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -40,9 +40,7 @@ impl Matcher for StructurePattern {
             StructurePattern::Wrapped(pattern) => pattern.paths(envelope),
         }
     }
-}
 
-impl Compilable for StructurePattern {
     fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
         match self {
             StructurePattern::Subject(s) => s.compile(code, lits),
