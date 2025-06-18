@@ -1,7 +1,7 @@
 // Utility parsing helpers shared across pattern parsers
 
 use crate::{Error, Pattern, Result};
-use dcbor_parse;
+use dcbor_parse::parse_dcbor_item;
 
 pub(crate) fn skip_ws(src: &str, pos: &mut usize) {
     while let Some(ch) = src[*pos..].chars().next() {
@@ -304,7 +304,7 @@ pub(crate) fn parse_cbor_inner(src: &str) -> Result<(Pattern, usize)> {
                 if depth == 0 {
                     let candidate = &src[pos..i];
                     let diag = candidate.trim_end();
-                    let cbor_v20 = dcbor_parse::parse_dcbor_item(diag)
+                    let cbor_v20 = parse_dcbor_item(diag)
                         .map_err(|_| Error::Unknown)?;
                     let bytes = cbor_v20.to_cbor_data();
                     let cbor = dcbor::CBOR::try_from_data(bytes)
