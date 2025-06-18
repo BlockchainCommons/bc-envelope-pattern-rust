@@ -1,4 +1,5 @@
 use bc_envelope_pattern::{Pattern, parse_pattern};
+use known_values::KnownValue;
 
 #[test]
 fn parse_any() {
@@ -291,4 +292,44 @@ fn parse_null_pattern() {
     let p = parse_pattern("NULL").unwrap();
     assert_eq!(p, Pattern::null());
     assert_eq!(p.to_string(), "NULL");
+}
+
+#[test]
+fn parse_tag_patterns() {
+    let p = parse_pattern("TAG").unwrap();
+    assert_eq!(p, Pattern::any_tag());
+    assert_eq!(p.to_string(), "TAG");
+
+    let p = parse_pattern("TAG(100)").unwrap();
+    assert_eq!(p, Pattern::tagged_with_value(100));
+    assert_eq!(p.to_string(), "TAG(100)");
+
+    let p = parse_pattern("TAG(date)").unwrap();
+    assert_eq!(p, Pattern::tagged_with_name("date"));
+    assert_eq!(p.to_string(), "TAG(date)");
+
+    let p = parse_pattern("TAG(/da.*/)").unwrap();
+    let regex = regex::Regex::new("da.*").unwrap();
+    assert_eq!(p, Pattern::tagged_with_regex(regex));
+    assert_eq!(p.to_string(), "TAG(/da.*/)");
+}
+
+#[test]
+fn parse_known_value_patterns() {
+    let p = parse_pattern("KNOWN").unwrap();
+    assert_eq!(p, Pattern::any_known_value());
+    assert_eq!(p.to_string(), "KNOWN");
+
+    let p = parse_pattern("KNOWN('1')").unwrap();
+    assert_eq!(p, Pattern::known_value(KnownValue::new(1)));
+    assert_eq!(p.to_string(), "KNOWN(1)");
+
+    let p = parse_pattern("KNOWN('date')").unwrap();
+    assert_eq!(p, Pattern::known_value_named("date"));
+    assert_eq!(p.to_string(), "KNOWN(date)");
+
+    let p = parse_pattern("KNOWN(/da.*/)").unwrap();
+    let regex = regex::Regex::new("da.*").unwrap();
+    assert_eq!(p, Pattern::known_value_regex(regex));
+    assert_eq!(p.to_string(), "KNOWN(/da.*/)");
 }
