@@ -63,11 +63,26 @@ impl Matcher for SearchPattern {
         &self,
         code: &mut Vec<Instr>,
         lits: &mut Vec<Pattern>,
-        _captures: &mut Vec<String>,
+        captures: &mut Vec<String>,
     ) {
         let idx = lits.len();
         lits.push((*self.0).clone());
-        code.push(Instr::Search { pat_idx: idx });
+
+        let mut inner_names = Vec::new();
+        self.0.collect_capture_names(&mut inner_names);
+        let mut map = Vec::new();
+        for name in inner_names {
+            let pos = if let Some(i) = captures.iter().position(|n| n == &name) {
+                i
+            } else {
+                let i = captures.len();
+                captures.push(name.clone());
+                i
+            };
+            map.push((name, pos));
+        }
+
+        code.push(Instr::Search { pat_idx: idx, capture_map: map });
     }
 }
 

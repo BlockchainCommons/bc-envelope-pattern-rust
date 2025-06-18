@@ -78,8 +78,11 @@ pub enum Instr {
     Save,
     /// Final accept, emit current path and halt thread
     Accept,
-    /// Recursively search for pattern at `pat_idx`
-    Search { pat_idx: usize },
+    /// Recursively search for pattern at `pat_idx` and propagate captures
+    Search {
+        pat_idx: usize,
+        capture_map: Vec<(String, usize)>,
+    },
     /// Save current path and start new sequence from last envelope
     ExtendSequence,
     /// Combine saved path with current path for final result
@@ -302,41 +305,26 @@ fn run_thread(
                     produced = true;
                     break;
                 }
-                Search { pat_idx } => {
-                    // old SearchPattern::paths logic, but in-place and
-                    // non-recursive
+                Search { pat_idx, ref capture_map } => {
                     let inner = &prog.literals[pat_idx];
+                    let (found_paths, caps) = inner.paths_with_captures(&th.env);
 
-                    // 1) check current node and get the actual paths it matches
-                    let found_paths = match inner {
-                        crate::pattern::Pattern::Leaf(_) => {
-                            inner.paths(&th.env)
-                        }
-                        crate::pattern::Pattern::Structure(_) => {
-                            inner.paths(&th.env)
-                        }
-                        crate::pattern::Pattern::Meta(_) => {
-                            inner.paths(&th.env)
-                        }
-                    };
-
-                    // If we found any paths, emit them by extending the current
-                    // path
                     if !found_paths.is_empty() {
                         produced = true;
                         for found_path in found_paths {
-                            // Special case: if the found path is just the
-                            // current envelope,
-                            // emit the current path instead of extending it
-                            if found_path.len() == 1 && found_path[0] == th.env
-                            {
-                                out.push((th.path.clone(), th.captures.clone()));
-                            } else {
-                                // Extend current path with the found path
-                                let mut result_path = th.path.clone();
+                            let mut result_path = th.path.clone();
+                            if !(found_path.len() == 1 && found_path[0] == th.env) {
                                 result_path.extend(found_path);
-                                out.push((result_path, th.captures.clone()));
                             }
+
+                            let mut result_caps = th.captures.clone();
+                            for (name, idx) in capture_map {
+                                if let Some(pths) = caps.get(name) {
+                                    result_caps[*idx].extend(pths.clone());
+                                }
+                            }
+
+                            out.push((result_path, result_caps));
                         }
                     }
 

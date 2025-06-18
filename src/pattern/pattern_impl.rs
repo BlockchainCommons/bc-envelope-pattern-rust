@@ -656,4 +656,11 @@ impl Pattern {
     fn vm_paths(&self, env: &Envelope) -> Vec<Path> {
         self.vm_run(env).into_iter().map(|(p, _)| p).collect()
     }
+
+    pub(crate) fn collect_capture_names(&self, out: &mut Vec<String>) {
+        match self {
+            Pattern::Meta(meta) => meta.collect_capture_names(out),
+            _ => {}
+        }
+    }
 }

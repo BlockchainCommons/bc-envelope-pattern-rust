@@ -1,6 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
+use bc_envelope_pattern::{Matcher, parse_pattern};
 use indoc::indoc;
 
 use crate::common::test_data::{credential, redacted_credential};
@@ -155,4 +156,66 @@ fn test_redacted_credential() {
     "#}
         .trim()
     );
+}
+
+#[test]
+fn test_parsed_search_text_or_number() {
+    let env = credential();
+    let pattern = parse_pattern("SEARCH(ASSERTOBJ(TEXT|NUMBER))").unwrap();
+    let paths = pattern.paths(&env);
+    assert_eq!(paths.len(), 11);
+}
+
+#[test]
+fn test_parsed_firstname_capture() {
+    let env = credential();
+    let pattern_str =
+        "SEARCH(ASSERTPRED(TEXT(\"firstName\"))>OBJ(TEXT(\"James\")))";
+    let pattern = parse_pattern(pattern_str).unwrap();
+    let paths = pattern.paths(&env);
+    assert_eq!(paths.len(), 1);
+}
+
+#[test]
+fn test_search_capture_propagation() {
+    let env = credential();
+    let pattern_str =
+        "SEARCH(@cap(ASSERTPRED(TEXT(\"firstName\"))>OBJ(TEXT(\"James\"))))";
+    let pattern = parse_pattern(pattern_str).unwrap();
+    let (paths, caps) = pattern.paths_with_captures(&env);
+    assert_eq!(paths.len(), 1);
+    assert_eq!(caps.get("cap").unwrap().len(), 1);
+}
+
+#[test]
+fn test_parsed_node_structure() {
+    let env = credential();
+    let pat = parse_pattern("SEARCH(NODE({13}))").unwrap();
+    let paths = pat.paths(&env);
+    assert_eq!(paths.len(), 1);
+}
+
+#[test]
+fn test_digest_and_not() {
+    let env = credential();
+    let digest = env.short_id(bc_envelope::DigestDisplayFormat::Short);
+    let pattern_str = format!("DIGEST({})&(!OBSCURED)", digest);
+    let pat = parse_pattern(&pattern_str).unwrap();
+    assert!(pat.matches(&env));
+}
+
+#[test]
+fn test_search_elided() {
+    let env = redacted_credential();
+    let pat = parse_pattern("SEARCH(ELIDED)").unwrap();
+    let paths = pat.paths(&env);
+    assert_eq!(paths.len(), 7);
+}
+
+#[test]
+fn test_wrapped_repeat() {
+    let env = credential();
+    let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
+    let paths = pat.paths(&env);
+    assert!(paths.iter().any(|p| p.last().unwrap().is_node()));
 }
