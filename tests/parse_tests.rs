@@ -123,7 +123,10 @@ fn parse_operator_precedence() {
     let expected = Pattern::or(vec![left_seq, right_seq]);
 
     assert_eq!(p, expected);
-    assert_eq!(p.to_string(), "ANY>BOOL(true)&BOOL(false)>NONE|ANY>BOOL(true)&BOOL(false)>ANY");
+    assert_eq!(
+        p.to_string(),
+        "ANY>BOOL(true)&BOOL(false)>NONE|ANY>BOOL(true)&BOOL(false)>ANY"
+    );
 }
 
 #[test]
@@ -140,7 +143,6 @@ fn parse_text_patterns() {
     let p_spaced = parse_pattern(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::text("hello"));
     assert_eq!(p_spaced.to_string(), r#"TEXT("hello")"#);
-
 
     let p = parse_pattern("TEXT(/h.*o/)").unwrap();
     let regex = regex::Regex::new("h.*o").unwrap();
@@ -228,4 +230,65 @@ fn parse_bstr_patterns() {
     let regex = regex::bytes::Regex::new("abc").unwrap();
     assert_eq!(p, Pattern::byte_string_binary_regex(regex));
     assert_eq!(p.to_string(), "BSTR(/abc/)");
+}
+
+#[test]
+fn parse_date_patterns() {
+    use dcbor::Date;
+
+    let p = parse_pattern("DATE").unwrap();
+    assert_eq!(p, Pattern::any_date());
+    assert_eq!(p.to_string(), "DATE");
+
+    let p = parse_pattern("DATE(2023-12-25)").unwrap();
+    let d = Date::from_string("2023-12-25").unwrap();
+    assert_eq!(p, Pattern::date(d.clone()));
+    assert_eq!(p.to_string(), "DATE(2023-12-25)");
+
+    let p = parse_pattern("DATE(2023-12-24...2023-12-26)").unwrap();
+    let start = Date::from_string("2023-12-24").unwrap();
+    let end = Date::from_string("2023-12-26").unwrap();
+    assert_eq!(p, Pattern::date_range(start..=end));
+    assert_eq!(p.to_string(), "DATE(2023-12-24...2023-12-26)");
+
+    let p = parse_pattern("DATE(2023-12-24...)").unwrap();
+    let start = Date::from_string("2023-12-24").unwrap();
+    assert_eq!(p, Pattern::date_earliest(start.clone()));
+    assert_eq!(p.to_string(), "DATE(2023-12-24...)");
+
+    let p = parse_pattern("DATE(...2023-12-26)").unwrap();
+    let end = Date::from_string("2023-12-26").unwrap();
+    assert_eq!(p, Pattern::date_latest(end.clone()));
+    assert_eq!(p.to_string(), "DATE(...2023-12-26)");
+
+    let p = parse_pattern("DATE(/2023-.*/)").unwrap();
+    let regex = regex::Regex::new("2023-.*").unwrap();
+    assert_eq!(p, Pattern::date_regex(regex));
+    assert_eq!(p.to_string(), "DATE(/2023-.*/)");
+}
+
+#[test]
+fn parse_map_patterns() {
+    let p = parse_pattern("MAP").unwrap();
+    assert_eq!(p, Pattern::any_map());
+    assert_eq!(p.to_string(), "MAP");
+
+    let p = parse_pattern("MAP(3)").unwrap();
+    assert_eq!(p, Pattern::map_with_count(3));
+    assert_eq!(p.to_string(), "MAP({3})");
+
+    let p = parse_pattern("MAP({2,4})").unwrap();
+    assert_eq!(p, Pattern::map_with_range(2..=4));
+    assert_eq!(p.to_string(), "MAP({2,4})");
+
+    let p = parse_pattern("MAP({2,})").unwrap();
+    assert_eq!(p, Pattern::map_with_range(2..));
+    assert_eq!(p.to_string(), "MAP({2,})");
+}
+
+#[test]
+fn parse_null_pattern() {
+    let p = parse_pattern("NULL").unwrap();
+    assert_eq!(p, Pattern::null());
+    assert_eq!(p.to_string(), "NULL");
 }

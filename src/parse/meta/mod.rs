@@ -83,7 +83,9 @@ fn parse_primary(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
         Token::Leaf => Ok(Pattern::any_leaf()),
         Token::Array => leaf::parse_array(lexer),
         Token::ByteString => leaf::parse_byte_string(lexer),
+        Token::Date => leaf::parse_date(lexer),
+        Token::Map => leaf::parse_map(lexer),
+        Token::Null => leaf::parse_null(lexer),
         t => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
     }
 }
-
