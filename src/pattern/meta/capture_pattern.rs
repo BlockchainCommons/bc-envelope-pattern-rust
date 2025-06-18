@@ -59,6 +59,6 @@ impl Matcher for CapturePattern {
 
 impl std::fmt::Display for CapturePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({})", self.pattern)
+        write!(f, "@{}({})", self.name, self.pattern)
     }
 }

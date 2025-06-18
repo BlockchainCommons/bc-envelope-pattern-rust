@@ -724,7 +724,7 @@ fn test_capture_pattern() {
     let inner = Pattern::number(42);
     let capture = Pattern::capture("num", inner.clone());
 
-    assert_eq!(format!("{}", capture), "(NUMBER(42))");
+    assert_eq!(format!("{}", capture), "@num(NUMBER(42))");
     assert!(capture.matches(&envelope));
 
     let inner_paths = inner.paths(&envelope);
