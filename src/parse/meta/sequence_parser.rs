@@ -1,5 +1,4 @@
-use super::super::Token;
-use super::not_parser::parse_not;
+use super::{super::Token, not_parser::parse_not};
 use crate::{Pattern, Result};
 
 pub(crate) fn parse_sequence(

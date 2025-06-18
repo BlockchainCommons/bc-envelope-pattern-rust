@@ -1,5 +1,6 @@
-use bc_envelope::Envelope;
 use std::collections::HashMap;
+
+use bc_envelope::Envelope;
 
 use crate::pattern::{Pattern, vm::Instr};
 
@@ -11,7 +12,10 @@ pub trait Matcher: std::fmt::Debug + std::fmt::Display + Clone {
         &self,
         _envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Path>) {
-        unimplemented!("Matcher::paths_with_captures not implemented for {:?}", self)
+        unimplemented!(
+            "Matcher::paths_with_captures not implemented for {:?}",
+            self
+        )
     }
 
     /// Return only the matching paths, discarding any captures.

@@ -106,7 +106,10 @@ impl Matcher for Pattern {
         self.paths_with_captures(env).0
     }
 
-    fn paths_with_captures(&self, env: &Envelope) -> (Vec<Path>, HashMap<String, Path>) {
+    fn paths_with_captures(
+        &self,
+        env: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Path>) {
         let paths = self.vm_paths(env);
         let mut captures = HashMap::new();
         self.collect_captures(env, &mut captures);
@@ -629,7 +632,8 @@ impl Pattern {
         let prog = PROG
             .with(|cell| cell.borrow().get(&key).cloned())
             .unwrap_or_else(|| {
-                let mut p = vm::Program { code: Vec::new(), literals: Vec::new() };
+                let mut p =
+                    vm::Program { code: Vec::new(), literals: Vec::new() };
                 self.compile(&mut p.code, &mut p.literals);
                 p.code.push(Instr::Accept);
                 PROG.with(|cell| {
@@ -641,7 +645,11 @@ impl Pattern {
         vm::run(&prog, env)
     }
 
-    fn collect_captures(&self, env: &Envelope, map: &mut HashMap<String, Path>) {
+    fn collect_captures(
+        &self,
+        env: &Envelope,
+        map: &mut HashMap<String, Path>,
+    ) {
         match self {
             Pattern::Leaf(_) | Pattern::Structure(_) => {}
             Pattern::Meta(meta) => meta.collect_captures(env, map),
@@ -650,7 +658,11 @@ impl Pattern {
 }
 
 impl MetaPattern {
-    fn collect_captures(&self, env: &Envelope, map: &mut HashMap<String, Path>) {
+    fn collect_captures(
+        &self,
+        env: &Envelope,
+        map: &mut HashMap<String, Path>,
+    ) {
         match self {
             MetaPattern::Capture(cap) => {
                 let paths = cap.pattern().vm_paths(env);

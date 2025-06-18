@@ -1,5 +1,7 @@
-use crate::parse::{Token, utils};
-use crate::{Error, Pattern, Result};
+use crate::{
+    Error, Pattern, Result,
+    parse::{Token, utils},
+};
 
 pub(crate) fn parse_byte_string(
     lexer: &mut logos::Lexer<Token>,

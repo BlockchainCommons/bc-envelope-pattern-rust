@@ -1,5 +1,4 @@
-use super::super::Token;
-use super::and_parser::parse_and;
+use super::{super::Token, and_parser::parse_and};
 use crate::{Pattern, Result};
 
 pub(crate) fn parse_not(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {

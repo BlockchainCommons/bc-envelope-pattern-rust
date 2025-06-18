@@ -1,6 +1,9 @@
-use crate::parse::{Token, utils};
-use crate::{Error, Pattern, Result};
 use known_values::KnownValue;
+
+use crate::{
+    Error, Pattern, Result,
+    parse::{Token, utils},
+};
 
 pub(crate) fn parse_known_value(
     lexer: &mut logos::Lexer<Token>,

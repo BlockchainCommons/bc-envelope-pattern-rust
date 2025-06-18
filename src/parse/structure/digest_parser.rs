@@ -1,7 +1,8 @@
-use super::super::Token;
-use crate::{Error, Pattern, Result};
 use bc_components::Digest;
 use bc_envelope::prelude::URDecodable;
+
+use super::super::Token;
+use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_digest(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     match lexer.next() {

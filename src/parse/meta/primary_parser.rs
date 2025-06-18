@@ -1,5 +1,8 @@
-use super::super::{Token, leaf, structure};
-use super::{group_parser::parse_group, search_parser::parse_search};
+use super::{
+    super::{Token, leaf, structure},
+    group_parser::parse_group,
+    search_parser::parse_search,
+};
 use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_primary(

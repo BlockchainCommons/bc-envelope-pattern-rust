@@ -1,6 +1,9 @@
-use crate::parse::{Token, utils};
-use crate::{Error, Pattern, Result};
 use regex::Regex;
+
+use crate::{
+    Error, Pattern, Result,
+    parse::{Token, utils},
+};
 
 pub(crate) fn parse_text(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();

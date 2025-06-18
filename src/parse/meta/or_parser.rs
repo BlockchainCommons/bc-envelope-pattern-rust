@@ -1,5 +1,4 @@
-use super::super::Token;
-use super::sequence_parser::parse_sequence;
+use super::{super::Token, sequence_parser::parse_sequence};
 use crate::{Pattern, Result};
 
 pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
