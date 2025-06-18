@@ -59,7 +59,12 @@ impl Matcher for SearchPattern {
         result_paths.into_inner()
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        _captures: &mut Vec<String>,
+    ) {
         let idx = lits.len();
         lits.push((*self.0).clone());
         code.push(Instr::Search { pat_idx: idx });

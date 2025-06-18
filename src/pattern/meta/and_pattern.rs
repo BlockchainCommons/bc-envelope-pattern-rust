@@ -27,10 +27,15 @@ impl Matcher for AndPattern {
     }
 
     /// Compile into byte-code (AND = all must match).
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         // Each pattern must match at this position
         for pattern in self.patterns() {
-            pattern.compile(code, lits);
+            pattern.compile(code, lits, captures);
         }
     }
 

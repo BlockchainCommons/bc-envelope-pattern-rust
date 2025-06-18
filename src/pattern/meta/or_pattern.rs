@@ -27,7 +27,12 @@ impl Matcher for OrPattern {
     }
 
     /// Compile into byte-code (OR = any can match).
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         if self.patterns().is_empty() {
             return;
         }
@@ -46,7 +51,7 @@ impl Matcher for OrPattern {
             let pattern_start = code.len();
 
             // Compile this pattern
-            pattern.compile(code, lits);
+            pattern.compile(code, lits, captures);
 
             // This pattern will jump to the end if it matches
             let jump_past_all = code.len();

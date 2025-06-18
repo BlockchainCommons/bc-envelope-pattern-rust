@@ -36,7 +36,12 @@ impl GroupPattern {
 
 impl Matcher for GroupPattern {
     /// Emit a high-level `Repeat` instruction for the VM.
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        _captures: &mut Vec<String>,
+    ) {
         let idx = lits.len();
         lits.push((*self.pattern).clone());
         code.push(Instr::Repeat { pat_idx: idx, quantifier: self.quantifier });

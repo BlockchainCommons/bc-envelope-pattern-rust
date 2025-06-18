@@ -27,7 +27,12 @@ pub trait Matcher: std::fmt::Debug + std::fmt::Display + Clone {
         !self.paths(envelope).is_empty()
     }
 
-    fn compile(&self, _code: &mut Vec<Instr>, _literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        _code: &mut Vec<Instr>,
+        _literals: &mut Vec<Pattern>,
+        _captures: &mut Vec<String>,
+    ) {
         unimplemented!("Matcher::compile not implemented for {:?}", self);
     }
 
@@ -44,6 +49,7 @@ pub fn compile_as_atomic(
     pat: &Pattern,
     code: &mut Vec<Instr>,
     lits: &mut Vec<Pattern>,
+    _captures: &mut Vec<String>,
 ) {
     let idx = lits.len();
     lits.push(pat.clone());

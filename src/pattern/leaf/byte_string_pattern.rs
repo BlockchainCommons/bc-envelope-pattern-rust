@@ -93,11 +93,17 @@ impl Matcher for ByteStringPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::ByteString(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

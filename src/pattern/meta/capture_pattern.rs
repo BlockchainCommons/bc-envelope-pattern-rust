@@ -48,10 +48,17 @@ impl Matcher for CapturePattern {
         (paths, caps)
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
-        code.push(Instr::Save); // start
-        self.pattern.compile(code, lits);
-        code.push(Instr::Save); // end
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
+        let id = captures.len();
+        captures.push(self.name.clone());
+        code.push(Instr::CaptureStart(id));
+        self.pattern.compile(code, lits, captures);
+        code.push(Instr::CaptureEnd(id));
     }
 }
 

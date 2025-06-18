@@ -63,11 +63,17 @@ impl Matcher for CBORPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::Cbor(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

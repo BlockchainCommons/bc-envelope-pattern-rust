@@ -41,16 +41,21 @@ impl Matcher for StructurePattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         match self {
-            StructurePattern::Subject(s) => s.compile(code, lits),
-            StructurePattern::Assertions(s) => s.compile(code, lits),
-            StructurePattern::Wrapped(s) => s.compile(code, lits),
-            StructurePattern::Object(s) => s.compile(code, lits),
-            StructurePattern::Digest(s) => s.compile(code, lits),
-            StructurePattern::Node(s) => s.compile(code, lits),
-            StructurePattern::Obscured(s) => s.compile(code, lits),
-            StructurePattern::Predicate(s) => s.compile(code, lits),
+            StructurePattern::Subject(s) => s.compile(code, lits, captures),
+            StructurePattern::Assertions(s) => s.compile(code, lits, captures),
+            StructurePattern::Wrapped(s) => s.compile(code, lits, captures),
+            StructurePattern::Object(s) => s.compile(code, lits, captures),
+            StructurePattern::Digest(s) => s.compile(code, lits, captures),
+            StructurePattern::Node(s) => s.compile(code, lits, captures),
+            StructurePattern::Obscured(s) => s.compile(code, lits, captures),
+            StructurePattern::Predicate(s) => s.compile(code, lits, captures),
         }
     }
 

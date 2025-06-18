@@ -33,7 +33,12 @@ impl Matcher for WrappedPattern {
     }
 
     /// Emit predicate + descent so the VM makes progress.
-    fn compile(&self, code: &mut Vec<Instr>, lits: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        lits: &mut Vec<Pattern>,
+        _captures: &mut Vec<String>,
+    ) {
         // println!("Compiling WrappedPattern: {:?}", self);
         // 1) atomic predicate “is wrapped”
         let idx = lits.len();

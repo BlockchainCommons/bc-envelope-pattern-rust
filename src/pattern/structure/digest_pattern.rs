@@ -89,11 +89,17 @@ impl Matcher for DigestPattern {
         }
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Structure(StructurePattern::Digest(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }

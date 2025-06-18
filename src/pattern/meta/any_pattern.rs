@@ -23,11 +23,17 @@ impl Matcher for AnyPattern {
         vec![vec![envelope.clone()]]
     }
 
-    fn compile(&self, code: &mut Vec<Instr>, literals: &mut Vec<Pattern>) {
+    fn compile(
+        &self,
+        code: &mut Vec<Instr>,
+        literals: &mut Vec<Pattern>,
+        captures: &mut Vec<String>,
+    ) {
         compile_as_atomic(
             &Pattern::Meta(MetaPattern::Any(self.clone())),
             code,
             literals,
+            captures,
         );
     }
 }
