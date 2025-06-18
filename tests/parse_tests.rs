@@ -1,4 +1,4 @@
-use bc_envelope_pattern::{Pattern, parse_pattern};
+use bc_envelope_pattern::{parse_pattern, Pattern};
 use known_values::KnownValue;
 
 #[test]
@@ -337,8 +337,8 @@ fn parse_known_value_patterns() {
 #[test]
 fn parse_cbor_patterns() {
     use bc_envelope::prelude::*;
-    use dcbor::{CBOR, Map};
     use bc_tags::register_tags as register_old_tags;
+    use dcbor::{Map, CBOR};
     bc_envelope::register_tags();
     register_old_tags();
 
@@ -369,5 +369,37 @@ fn parse_cbor_patterns() {
     let expr = format!("CBOR({})", ur);
     let p = parse_pattern(&expr).unwrap();
     assert_eq!(p, Pattern::cbor(date.clone()));
-    assert_eq!(p.to_string(), format!("CBOR({})", date.to_cbor().diagnostic_flat()));
+    assert_eq!(
+        p.to_string(),
+        format!("CBOR({})", date.to_cbor().diagnostic_flat())
+    );
+}
+
+#[test]
+fn parse_node_patterns() {
+    let p = parse_pattern("NODE").unwrap();
+    assert_eq!(p, Pattern::any_node());
+    assert_eq!(p.to_string(), "NODE");
+
+    let p = parse_pattern("NODE({1,3})").unwrap();
+    assert_eq!(p, Pattern::node_with_assertions_range(1..=3));
+    assert_eq!(p.to_string(), "NODE({1,3})");
+}
+
+#[test]
+fn parse_wrapped_pattern() {
+    let p = parse_pattern("WRAPPED").unwrap();
+    assert_eq!(p, Pattern::wrapped());
+    assert_eq!(p.to_string(), "WRAPPED");
+}
+
+#[test]
+fn parse_subject_patterns() {
+    let p = parse_pattern("SUBJECT").unwrap();
+    assert_eq!(p, Pattern::any_subject());
+    assert_eq!(p.to_string(), "SUBJECT");
+
+    let p = parse_pattern("SUBJECT(TEXT(\"hi\"))").unwrap();
+    assert_eq!(p, Pattern::subject(Pattern::text("hi")));
+    assert_eq!(p.to_string(), "SUBJECT(TEXT(\"hi\"))");
 }
