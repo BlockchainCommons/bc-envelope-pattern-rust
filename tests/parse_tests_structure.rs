@@ -1,8 +1,6 @@
 use bc_components::Digest;
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Pattern, Reluctance, parse_pattern};
-use dcbor::Date;
-use known_values::KnownValue;
+use bc_envelope_pattern::{Pattern, parse_pattern};
 
 #[test]
 fn parse_node_patterns() {
@@ -45,7 +43,10 @@ fn parse_assert_patterns() {
 
     let spaced = "ASSERTPRED ( TEXT(\"hi\") )";
     let p_spaced = parse_pattern(spaced).unwrap();
-    assert_eq!(p_spaced, Pattern::assertion_with_predicate(Pattern::text("hi")));
+    assert_eq!(
+        p_spaced,
+        Pattern::assertion_with_predicate(Pattern::text("hi"))
+    );
     assert_eq!(p_spaced.to_string(), "ASSERTPRED(TEXT(\"hi\"))");
 
     let p = parse_pattern("ASSERTOBJ(NUMBER(1))").unwrap();
@@ -112,7 +113,10 @@ fn parse_digest_patterns() {
 
     let spaced = "DIGEST ( a1b2c3 )";
     let p_spaced = parse_pattern(spaced).unwrap();
-    assert_eq!(p_spaced, Pattern::digest_prefix(hex::decode("a1b2c3").unwrap()));
+    assert_eq!(
+        p_spaced,
+        Pattern::digest_prefix(hex::decode("a1b2c3").unwrap())
+    );
     assert_eq!(p_spaced.to_string(), "DIGEST(a1b2c3)");
 }
 

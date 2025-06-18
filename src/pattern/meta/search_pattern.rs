@@ -72,7 +72,8 @@ impl Matcher for SearchPattern {
         self.0.collect_capture_names(&mut inner_names);
         let mut map = Vec::new();
         for name in inner_names {
-            let pos = if let Some(i) = captures.iter().position(|n| n == &name) {
+            let pos = if let Some(i) = captures.iter().position(|n| n == &name)
+            {
                 i
             } else {
                 let i = captures.len();

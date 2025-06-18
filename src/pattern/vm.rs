@@ -307,13 +307,16 @@ fn run_thread(
                 }
                 Search { pat_idx, ref capture_map } => {
                     let inner = &prog.literals[pat_idx];
-                    let (found_paths, caps) = inner.paths_with_captures(&th.env);
+                    let (found_paths, caps) =
+                        inner.paths_with_captures(&th.env);
 
                     if !found_paths.is_empty() {
                         produced = true;
                         for found_path in found_paths {
                             let mut result_path = th.path.clone();
-                            if !(found_path.len() == 1 && found_path[0] == th.env) {
+                            if !(found_path.len() == 1
+                                && found_path[0] == th.env)
+                            {
                                 result_path.extend(found_path);
                             }
 

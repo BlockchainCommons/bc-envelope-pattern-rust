@@ -1,6 +1,5 @@
-use bc_components::Digest;
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Pattern, Reluctance, parse_pattern};
+use bc_envelope_pattern::{Pattern, parse_pattern};
 use dcbor::Date;
 use known_values::KnownValue;
 
@@ -291,5 +290,8 @@ fn parse_cbor_patterns_2() {
     let expr = format!(r#"CBOR({})"#, ur);
     let p = parse_pattern(&expr).unwrap();
     assert_eq!(p, Pattern::cbor(date.clone()));
-    assert_eq!(p.to_string(), format!("CBOR({})", date.to_cbor().diagnostic_flat()));
+    assert_eq!(
+        p.to_string(),
+        format!("CBOR({})", date.to_cbor().diagnostic_flat())
+    );
 }

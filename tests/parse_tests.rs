@@ -1,8 +1,4 @@
-use bc_components::Digest;
-use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Pattern, Reluctance, parse_pattern};
-use dcbor::Date;
-use known_values::KnownValue;
+use bc_envelope_pattern::{Pattern, parse_pattern};
 
 #[test]
 fn parse_any() {
@@ -19,4 +15,3 @@ fn parse_none() {
     assert_eq!(p, Pattern::none());
     assert_eq!(p.to_string(), src);
 }
-

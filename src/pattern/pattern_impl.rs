@@ -561,7 +561,9 @@ impl Pattern {
         use Pattern::*;
         match self {
             Leaf(leaf_pattern) => leaf_pattern.compile(code, lits, captures),
-            Structure(struct_pattern) => struct_pattern.compile(code, lits, captures),
+            Structure(struct_pattern) => {
+                struct_pattern.compile(code, lits, captures)
+            }
             Meta(meta_pattern) => meta_pattern.compile(code, lits, captures),
         }
     }
@@ -622,7 +624,10 @@ impl std::fmt::Display for Pattern {
 impl Pattern {
     /// Internal helper that runs the pattern through the VM and returns the
     /// matching paths.
-    fn vm_run(&self, env: &Envelope) -> Vec<(Path, HashMap<String, Vec<Path>>)> {
+    fn vm_run(
+        &self,
+        env: &Envelope,
+    ) -> Vec<(Path, HashMap<String, Vec<Path>>)> {
         thread_local! {
             static PROG: RefCell<HashMap<u64, vm::Program>> = RefCell::new(HashMap::new());
         }
@@ -639,9 +644,16 @@ impl Pattern {
         let prog = PROG
             .with(|cell| cell.borrow().get(&key).cloned())
             .unwrap_or_else(|| {
-                let mut p =
-                    vm::Program { code: Vec::new(), literals: Vec::new(), capture_names: Vec::new() };
-                self.compile(&mut p.code, &mut p.literals, &mut p.capture_names);
+                let mut p = vm::Program {
+                    code: Vec::new(),
+                    literals: Vec::new(),
+                    capture_names: Vec::new(),
+                };
+                self.compile(
+                    &mut p.code,
+                    &mut p.literals,
+                    &mut p.capture_names,
+                );
                 p.code.push(Instr::Accept);
                 PROG.with(|cell| {
                     cell.borrow_mut().insert(key, p.clone());
@@ -658,9 +670,8 @@ impl Pattern {
     }
 
     pub(crate) fn collect_capture_names(&self, out: &mut Vec<String>) {
-        match self {
-            Pattern::Meta(meta) => meta.collect_capture_names(out),
-            _ => {}
+        if let Pattern::Meta(meta) = self {
+            meta.collect_capture_names(out)
         }
     }
 }

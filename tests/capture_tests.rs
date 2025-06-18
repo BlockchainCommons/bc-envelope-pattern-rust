@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{parse_pattern, Matcher};
+use bc_envelope_pattern::{Matcher, parse_pattern};
 
 #[test]
 fn capture_simple_number() {

@@ -63,10 +63,18 @@ impl Matcher for MetaPattern {
             MetaPattern::And(pattern) => pattern.compile(code, lits, captures),
             MetaPattern::Or(pattern) => pattern.compile(code, lits, captures),
             MetaPattern::Not(pattern) => pattern.compile(code, lits, captures),
-            MetaPattern::Search(pattern) => pattern.compile(code, lits, captures),
-            MetaPattern::Sequence(pattern) => pattern.compile(code, lits, captures),
-            MetaPattern::Group(pattern) => pattern.compile(code, lits, captures),
-            MetaPattern::Capture(pattern) => pattern.compile(code, lits, captures),
+            MetaPattern::Search(pattern) => {
+                pattern.compile(code, lits, captures)
+            }
+            MetaPattern::Sequence(pattern) => {
+                pattern.compile(code, lits, captures)
+            }
+            MetaPattern::Group(pattern) => {
+                pattern.compile(code, lits, captures)
+            }
+            MetaPattern::Capture(pattern) => {
+                pattern.compile(code, lits, captures)
+            }
         }
     }
 
@@ -83,7 +91,6 @@ impl Matcher for MetaPattern {
             MetaPattern::Capture(pattern) => pattern.is_complex(),
         }
     }
-
 }
 
 impl std::fmt::Display for MetaPattern {
@@ -106,11 +113,23 @@ impl MetaPattern {
     pub(crate) fn collect_capture_names(&self, out: &mut Vec<String>) {
         match self {
             MetaPattern::Any(_) | MetaPattern::None(_) => {}
-            MetaPattern::And(p) => for pat in p.patterns() { pat.collect_capture_names(out); },
-            MetaPattern::Or(p) => for pat in p.patterns() { pat.collect_capture_names(out); },
+            MetaPattern::And(p) => {
+                for pat in p.patterns() {
+                    pat.collect_capture_names(out);
+                }
+            }
+            MetaPattern::Or(p) => {
+                for pat in p.patterns() {
+                    pat.collect_capture_names(out);
+                }
+            }
             MetaPattern::Not(p) => p.pattern().collect_capture_names(out),
             MetaPattern::Search(p) => p.pattern().collect_capture_names(out),
-            MetaPattern::Sequence(p) => for pat in p.patterns() { pat.collect_capture_names(out); },
+            MetaPattern::Sequence(p) => {
+                for pat in p.patterns() {
+                    pat.collect_capture_names(out);
+                }
+            }
             MetaPattern::Group(p) => p.pattern().collect_capture_names(out),
             MetaPattern::Capture(p) => {
                 if !out.contains(&p.name().to_string()) {
