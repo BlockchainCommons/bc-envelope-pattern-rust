@@ -638,11 +638,7 @@ fn test_not_pattern() {
         .filter(|path| path.last().unwrap().is_assertion())
         .filter_map(|path| {
             let assertion = path.last().unwrap();
-            if let Ok(obj) = assertion.extract_object::<i32>() {
-                Some(obj)
-            } else {
-                None
-            }
+            assertion.extract_object::<i32>().ok()
         })
         .collect::<Vec<_>>();
 

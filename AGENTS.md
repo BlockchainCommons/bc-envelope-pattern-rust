@@ -13,7 +13,7 @@ Write unit tests for these patterns to ensure they are parsed correctly. Refer t
 - Running `clippy`:
 
 ```bash
-cargo +nightly clippy --all-features --no-deps -- -D warnings
+cargo clippy --all-features --no-deps -- -D warnings
 ```
 
 - Running `fmt`:
@@ -235,7 +235,7 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, a
 - [x] Or
     - `pattern | pattern | pattern…`
         - Matches if any of the specified patterns match.
-- [ ] Repeat
+- [x] Repeat
     - Greedy — grabs as many repetitions as possible, then backtracks if the rest of the pattern cannot match.
         - `( pattern )` (exactly once, this is used to group patterns)
         - `( pattern )*` (0 or more)
@@ -252,7 +252,7 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, a
         - `( pattern )?+` (0 or 1)
         - `( pattern )++` (1 or more)
         - `( pattern ){ n , m }+` (`n` to `m` repeats, inclusive)
-- [ ] Search
+- [x] Search
     - `SEARCH ( pattern )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.
 - [x] Sequence

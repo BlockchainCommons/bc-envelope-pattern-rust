@@ -1,5 +1,3 @@
-#![allow(clippy::collapsible_if)]
-
 use bc_envelope::Envelope;
 
 use crate::pattern::{

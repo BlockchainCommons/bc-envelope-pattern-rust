@@ -1,0 +1,28 @@
+# opt into nightly-only extras
+unstable_features  = true
+
+# Preserve the structure of imports and avoid adding spaces in braced use statements
+#imports_granularity = "Preserve"
+imports_granularity = "Crate"
+group_imports = "StdExternalCrate"
+
+# Ensure no extra spaces are added inside braced use statements
+normalize_doc_attributes = true
+
+# Other formatting preferences for better readability
+edition = "2024"   # Use Rust 2024 edition formatting rules
+max_width = 80     # Adjust line width to avoid excessive wrapping
+hard_tabs = false  # Use spaces instead of tabs
+tab_spaces = 4     # Set indentation to 4 spaces
+reorder_imports = true  # Keep imports ordered
+reorder_modules = true  # Keep module declarations ordered
+use_field_init_shorthand = true  # Prefer field initialization shorthand when possible
+wrap_comments = true  # Auto-wrap comments that exceed max_width
+format_code_in_doc_comments = true  # Format Rust code inside doc comments
+
+# Function and closure formatting
+fn_single_line = true  # Keep short functions in a single line
+
+# Struct and enum formatting
+struct_lit_width = 50  # Allow struct literals to be compact
+enum_discrim_align_threshold = 20  # Align enum discriminants when appropriate
