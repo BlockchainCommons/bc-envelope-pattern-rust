@@ -1,6 +1,6 @@
 use bc_components::Digest;
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Pattern, parse_pattern};
+use bc_envelope_pattern::{Pattern, Reluctance, parse_pattern};
 use dcbor::Date;
 use known_values::KnownValue;
 
@@ -537,4 +537,29 @@ fn parse_digest_ur_pattern() {
     let p = parse_pattern(&expr).unwrap();
     assert_eq!(p, Pattern::digest(digest.clone()));
     assert_eq!(p.to_string(), format!("DIGEST({})", digest));
+}
+
+#[test]
+fn parse_search_pattern() {
+    let p = parse_pattern("SEARCH(TEXT)").unwrap();
+    assert_eq!(p, Pattern::search(Pattern::any_text()));
+    assert_eq!(p.to_string(), "SEARCH(TEXT)");
+}
+
+#[test]
+fn parse_repeat_patterns() {
+    let p = parse_pattern("(WRAPPED)*").unwrap();
+    assert_eq!(p, Pattern::repeat(Pattern::wrapped(), 0.., Reluctance::Greedy));
+    assert_eq!(p.to_string(), "(WRAPPED)*");
+
+    let p = parse_pattern("(TEXT)+?").unwrap();
+    assert_eq!(p, Pattern::repeat(Pattern::any_text(), 1.., Reluctance::Lazy));
+    assert_eq!(p.to_string(), "(TEXT)+?");
+
+    let p = parse_pattern("(NUMBER){2,4}+").unwrap();
+    assert_eq!(
+        p,
+        Pattern::repeat(Pattern::any_number(), 2..=4, Reluctance::Possessive)
+    );
+    assert_eq!(p.to_string(), "(NUMBER){2,4}+");
 }

@@ -1,7 +1,7 @@
 // Parsers for meta-pattern operators
 
 use super::{Token, leaf, structure};
-use crate::{Error, Pattern, Result};
+use crate::{Error, Pattern, Result, Reluctance};
 
 pub(crate) fn parse_or(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut patterns = vec![parse_sequence(lexer)?];
@@ -99,6 +99,8 @@ fn parse_primary(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
         Token::Leaf => Ok(Pattern::any_leaf()),
         Token::Cbor => leaf::parse_cbor(lexer),
         Token::Map => leaf::parse_map(lexer),
+        Token::ParenOpen => parse_group(lexer),
+        Token::Search => parse_search(lexer),
         Token::Node => structure::parse_node(lexer),
         Token::Assertion => structure::parse_assertion(lexer),
         Token::AssertionPred => structure::parse_assertion_pred(lexer),
@@ -117,5 +119,86 @@ fn parse_primary(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
         Token::Number => leaf::parse_number(lexer),
         Token::Text => leaf::parse_text(lexer),
         t => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+    }
+}
+
+fn parse_group(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+    let pat = parse_or(lexer)?;
+    match lexer.next() {
+        Some(Ok(Token::ParenClose)) => {
+            let mut lookahead = lexer.clone();
+            match lookahead.next() {
+                Some(Ok(tok)) => match tok {
+                    Token::RepeatZeroOrMore => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 0.., Reluctance::Greedy))
+                    }
+                    Token::RepeatZeroOrMoreLazy => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 0.., Reluctance::Lazy))
+                    }
+                    Token::RepeatZeroOrMorePossessive => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 0.., Reluctance::Possessive))
+                    }
+                    Token::RepeatOneOrMore => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 1.., Reluctance::Greedy))
+                    }
+                    Token::RepeatOneOrMoreLazy => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 1.., Reluctance::Lazy))
+                    }
+                    Token::RepeatOneOrMorePossessive => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 1.., Reluctance::Possessive))
+                    }
+                    Token::RepeatZeroOrOne => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 0..=1, Reluctance::Greedy))
+                    }
+                    Token::RepeatZeroOrOneLazy => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 0..=1, Reluctance::Lazy))
+                    }
+                    Token::RepeatZeroOrOnePossessive => {
+                        lexer.next();
+                        Ok(Pattern::repeat(pat, 0..=1, Reluctance::Possessive))
+                    }
+                    Token::Range(res) => {
+                        lexer.next();
+                        let q = res?;
+                        let pat = if let Some(max) = q.max() {
+                            Pattern::repeat(pat, q.min()..=max, q.reluctance())
+                        } else {
+                            Pattern::repeat(pat, q.min().., q.reluctance())
+                        };
+                        Ok(pat)
+                    }
+                    _ => Ok(pat),
+                },
+                _ => Ok(pat),
+            }
+        }
+        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+        Some(Err(e)) => Err(e),
+        None => Err(Error::ExpectedCloseParen(lexer.span())),
+    }
+}
+
+fn parse_search(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
+    match lexer.next() {
+        Some(Ok(Token::ParenOpen)) => {
+            let pat = parse_or(lexer)?;
+            match lexer.next() {
+                Some(Ok(Token::ParenClose)) => Ok(Pattern::search(pat)),
+                Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                Some(Err(e)) => Err(e),
+                None => Err(Error::ExpectedCloseParen(lexer.span())),
+            }
+        }
+        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+        Some(Err(e)) => Err(e),
+        None => Err(Error::UnexpectedEndOfInput),
     }
 }
