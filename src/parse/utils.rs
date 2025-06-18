@@ -91,8 +91,8 @@ pub(crate) fn parse_binary_regex(src: &str) -> Result<(regex::bytes::Regex, usiz
         }
         if b == b'/' {
             let inner = &src[start..pos - 1];
-            let regex = regex::bytes::Regex::new(inner)
-                .map_err(|_| Error::InvalidRegex(pos..pos))?;
+            let regex =
+                regex::bytes::Regex::new(inner).map_err(|_| Error::InvalidRegex(pos..pos))?;
             skip_ws(src, &mut pos);
             return Ok((regex, pos));
         }
@@ -112,7 +112,9 @@ pub(crate) fn parse_uint_digits(src: &str, pos: &mut usize) -> Result<f64> {
     if start == *pos {
         return Err(Error::InvalidNumberFormat(0..0));
     }
-    src[start..*pos].parse::<f64>().map_err(|_| Error::InvalidNumberFormat(0..0))
+    src[start..*pos]
+        .parse::<f64>()
+        .map_err(|_| Error::InvalidNumberFormat(0..0))
 }
 
 pub(crate) fn parse_number_inner(src: &str) -> Result<(Pattern, usize)> {
@@ -169,3 +171,84 @@ pub(crate) fn parse_number_inner(src: &str) -> Result<(Pattern, usize)> {
     Ok((Pattern::number(first), pos))
 }
 
+pub(crate) fn parse_text_regex(src: &str) -> Result<(regex::Regex, usize)> {
+    let mut pos = 0;
+    skip_ws(src, &mut pos);
+    if pos >= src.len() || src.as_bytes()[pos] != b'/' {
+        return Err(Error::UnterminatedRegex(pos..pos));
+    }
+    pos += 1;
+    let start = pos;
+    let mut escape = false;
+    while pos < src.len() {
+        let b = src.as_bytes()[pos];
+        pos += 1;
+        if escape {
+            escape = false;
+            continue;
+        }
+        if b == b'\\' {
+            escape = true;
+            continue;
+        }
+        if b == b'/' {
+            let inner = &src[start..pos - 1];
+            let regex = regex::Regex::new(inner).map_err(|_| Error::InvalidRegex(pos..pos))?;
+            skip_ws(src, &mut pos);
+            return Ok((regex, pos));
+        }
+    }
+    Err(Error::UnterminatedRegex(pos..pos))
+}
+
+fn parse_iso8601(src: &str, pos: &mut usize) -> Result<dcbor::Date> {
+    skip_ws(src, pos);
+    let start = *pos;
+    while *pos < src.len() {
+        if src[*pos..].starts_with("...") || src.as_bytes()[*pos] == b')' {
+            break;
+        }
+        let ch = src[*pos..].chars().next().unwrap();
+        if matches!(ch, ' ' | '\t' | '\n' | '\r' | '\u{0c}') {
+            break;
+        }
+        *pos += ch.len_utf8();
+    }
+    if start == *pos {
+        return Err(Error::InvalidDateFormat(0..0));
+    }
+    let iso = &src[start..*pos];
+    let date = dcbor::Date::from_string(iso).map_err(|_| Error::InvalidDateFormat(0..0))?;
+    skip_ws(src, pos);
+    Ok(date)
+}
+
+pub(crate) fn parse_date_inner(src: &str) -> Result<(Pattern, usize)> {
+    let mut pos = 0;
+    skip_ws(src, &mut pos);
+
+    if src[pos..].starts_with('/') {
+        let (regex, used) = parse_text_regex(&src[pos..])?;
+        pos += used;
+        return Ok((Pattern::date_regex(regex), pos));
+    }
+
+    if src[pos..].starts_with("...") {
+        pos += 3;
+        let date = parse_iso8601(src, &mut pos)?;
+        return Ok((Pattern::date_latest(date), pos));
+    }
+
+    let first = parse_iso8601(src, &mut pos)?;
+
+    if src[pos..].starts_with("...") {
+        pos += 3;
+        if let Ok(second) = parse_iso8601(src, &mut pos) {
+            return Ok((Pattern::date_range(first..=second), pos));
+        } else {
+            return Ok((Pattern::date_earliest(first), pos));
+        }
+    }
+
+    Ok((Pattern::date(first), pos))
+}
