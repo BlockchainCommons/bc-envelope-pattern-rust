@@ -38,5 +38,5 @@ fn capture_no_match() {
     let pat = parse_pattern("@n(NUMBER(2))").unwrap();
     let (paths, caps) = pat.paths_with_captures(&env);
     assert!(paths.is_empty());
-    assert!(caps.get("n").is_none());
+    assert!(!caps.contains_key("n"));
 }

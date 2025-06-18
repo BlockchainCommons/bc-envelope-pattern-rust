@@ -9,5 +9,4 @@ mod primary_parser;
 mod search_parser;
 mod sequence_parser;
 
-pub(crate) use capture_parser::parse_capture;
 pub(crate) use or_parser::parse_or;

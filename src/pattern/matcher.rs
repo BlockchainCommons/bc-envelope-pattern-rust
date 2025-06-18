@@ -51,6 +51,7 @@ pub fn compile_as_atomic(
     lits: &mut Vec<Pattern>,
     _captures: &mut Vec<String>,
 ) {
+    let _ = _captures;
     let idx = lits.len();
     lits.push(pat.clone());
     code.push(Instr::MatchPredicate(idx));

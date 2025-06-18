@@ -652,6 +652,7 @@ impl Pattern {
         vm::run(&prog, env)
     }
 
+    #[allow(dead_code)]
     fn vm_paths(&self, env: &Envelope) -> Vec<Path> {
         self.vm_run(env).into_iter().map(|(p, _)| p).collect()
     }

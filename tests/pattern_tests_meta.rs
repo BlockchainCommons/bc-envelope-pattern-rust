@@ -759,7 +759,7 @@ fn test_capture_in_and_failure() {
 
     let (paths, captures) = pattern.paths_with_captures(&envelope);
     assert!(paths.is_empty());
-    assert!(captures.get("num").is_none());
+    assert!(!captures.contains_key("num"));
 }
 
 #[test]
@@ -773,5 +773,5 @@ fn test_capture_in_sequence_failure() {
 
     let (paths, captures) = pattern.paths_with_captures(&envelope);
     assert!(paths.is_empty());
-    assert!(captures.get("num").is_none());
+    assert!(!captures.contains_key("num"));
 }
