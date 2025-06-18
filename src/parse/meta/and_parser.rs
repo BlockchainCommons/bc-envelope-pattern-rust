@@ -1,6 +1,6 @@
 use super::super::Token;
 use super::primary_parser::parse_primary;
-use crate::{Error, Pattern, Result};
+use crate::{Pattern, Result};
 
 pub(crate) fn parse_and(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut patterns = vec![parse_primary(lexer)?];

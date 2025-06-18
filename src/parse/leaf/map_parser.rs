@@ -1,5 +1,4 @@
-use crate::parse::{Token, utils};
-use crate::{Error, Pattern, Result};
+use crate::{Error, Pattern, Result, parse::Token};
 
 pub(crate) fn parse_map(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();

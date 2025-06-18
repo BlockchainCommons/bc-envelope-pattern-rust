@@ -1,6 +1,6 @@
 use super::super::Token;
 use super::not_parser::parse_not;
-use crate::{Error, Pattern, Result};
+use crate::{Pattern, Result};
 
 pub(crate) fn parse_sequence(
     lexer: &mut logos::Lexer<Token>,
