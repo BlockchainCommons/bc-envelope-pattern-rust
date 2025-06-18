@@ -132,14 +132,15 @@ fn parse_text_patterns() {
     assert_eq!(p, Pattern::any_text());
     assert_eq!(p.to_string(), "TEXT");
 
-    let p = parse_pattern("TEXT(\"hello\")").unwrap();
+    let p = parse_pattern(r#"TEXT("hello")"#).unwrap();
     assert_eq!(p, Pattern::text("hello"));
-    assert_eq!(p.to_string(), "TEXT(\"hello\")");
+    assert_eq!(p.to_string(), r#"TEXT("hello")"#);
 
-    let spaced = "TEXT ( \"hello\" )";
+    let spaced = r#"TEXT ( "hello" )"#;
     let p_spaced = parse_pattern(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::text("hello"));
-    assert_eq!(p_spaced.to_string(), "TEXT(\"hello\")");
+    assert_eq!(p_spaced.to_string(), r#"TEXT("hello")"#);
+
 
     let p = parse_pattern("TEXT(/h.*o/)").unwrap();
     let regex = regex::Regex::new("h.*o").unwrap();
