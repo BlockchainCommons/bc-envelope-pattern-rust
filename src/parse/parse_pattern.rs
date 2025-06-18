@@ -424,15 +424,3 @@ fn parse_number_inner(src: &str) -> Result<(Pattern, usize)> {
 
     Ok((Pattern::number(first), pos))
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn test_parse_pattern() {
-//         let input = "ANY";
-//         let pattern = parse_pattern(input).unwrap();
-//         assert_eq!(pattern.to_string(), "ANY");
-//     }
-// }
