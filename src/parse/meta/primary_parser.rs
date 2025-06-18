@@ -1,5 +1,6 @@
 use super::{
     super::{Token, leaf, structure},
+    capture_parser::parse_capture,
     group_parser::parse_group,
     search_parser::parse_search,
 };
@@ -26,6 +27,7 @@ pub(crate) fn parse_primary(
         Token::Cbor => leaf::parse_cbor(lexer),
         Token::Map => leaf::parse_map(lexer),
         Token::ParenOpen => parse_group(lexer),
+        Token::GroupName(name) => parse_capture(lexer, name),
         Token::Search => parse_search(lexer),
         Token::Node => structure::parse_node(lexer),
         Token::Assertion => structure::parse_assertion(lexer),
