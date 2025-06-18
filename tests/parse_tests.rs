@@ -333,3 +333,27 @@ fn parse_known_value_patterns() {
     assert_eq!(p, Pattern::known_value_regex(regex));
     assert_eq!(p.to_string(), "KNOWN(/da.*/)");
 }
+
+#[test]
+fn parse_cbor_patterns() {
+    use dcbor::prelude::*;
+
+    let cases: Vec<(&str, CBOR)> = vec![
+        ("CBOR(true)", true.into()),
+        ("CBOR(42)", 42.into()),
+        ("CBOR(\"hello\")", "hello".into()),
+        ("CBOR([1, 2])", vec![1, 2].into()),
+        ("CBOR({1: 2})", {
+            let mut m = Map::new();
+            m.insert(1, 2);
+            m.into()
+        }),
+        ("CBOR(1(\"t\"))", CBOR::to_tagged_value(1, "t")),
+    ];
+
+    for (src, cbor) in cases {
+        let p = parse_pattern(src).unwrap();
+        assert_eq!(p, Pattern::cbor(cbor.clone()));
+        assert_eq!(p.to_string(), src);
+    }
+}
