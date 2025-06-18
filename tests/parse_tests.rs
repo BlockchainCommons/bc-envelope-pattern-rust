@@ -549,11 +549,17 @@ fn parse_search_pattern() {
 #[test]
 fn parse_repeat_patterns() {
     let p = parse_pattern("(WRAPPED)*").unwrap();
-    assert_eq!(p, Pattern::repeat(Pattern::wrapped(), 0.., Reluctance::Greedy));
+    assert_eq!(
+        p,
+        Pattern::repeat(Pattern::wrapped(), 0.., Reluctance::Greedy)
+    );
     assert_eq!(p.to_string(), "(WRAPPED)*");
 
     let p = parse_pattern("(TEXT)+?").unwrap();
-    assert_eq!(p, Pattern::repeat(Pattern::any_text(), 1.., Reluctance::Lazy));
+    assert_eq!(
+        p,
+        Pattern::repeat(Pattern::any_text(), 1.., Reluctance::Lazy)
+    );
     assert_eq!(p.to_string(), "(TEXT)+?");
 
     let p = parse_pattern("(NUMBER){2,4}+").unwrap();
