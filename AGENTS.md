@@ -6,14 +6,6 @@ This crate [`bc-envelope-pattern`](https://github.com/blockchaincommons/bc-envel
 
 The main task now is to implement the parser for the text-based syntax for patterns that can be used to match parts of Gordian Envelopes. This syntax is inspired by regular expressions but is specifically designed for Gordian Envelopes. The entry point for this functionality is `src/parse/parse_pattern.rs`.
 
-**NEXT STEP**: In this turn you will implement the skeletal parser that only parses:
-
-- `ANY`
-- `NONE`
-- `BOOL`
-- `BOOL ( true )`
-- `BOOL ( false )`
-
 Write unit tests for these patterns to ensure they are parsed correctly. Refer to the syntax guide below and `tests/` for examples of expected behavior.
 
 ## Intro to Gordian Envelopes
