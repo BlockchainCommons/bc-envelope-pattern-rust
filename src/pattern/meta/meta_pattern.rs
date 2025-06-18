@@ -83,6 +83,7 @@ impl Matcher for MetaPattern {
             MetaPattern::Capture(pattern) => pattern.is_complex(),
         }
     }
+
 }
 
 impl std::fmt::Display for MetaPattern {
@@ -97,6 +98,26 @@ impl std::fmt::Display for MetaPattern {
             MetaPattern::Sequence(pattern) => write!(f, "{}", pattern),
             MetaPattern::Group(pattern) => write!(f, "{}", pattern),
             MetaPattern::Capture(pattern) => write!(f, "{}", pattern),
+        }
+    }
+}
+
+impl MetaPattern {
+    pub(crate) fn collect_capture_names(&self, out: &mut Vec<String>) {
+        match self {
+            MetaPattern::Any(_) | MetaPattern::None(_) => {}
+            MetaPattern::And(p) => for pat in p.patterns() { pat.collect_capture_names(out); },
+            MetaPattern::Or(p) => for pat in p.patterns() { pat.collect_capture_names(out); },
+            MetaPattern::Not(p) => p.pattern().collect_capture_names(out),
+            MetaPattern::Search(p) => p.pattern().collect_capture_names(out),
+            MetaPattern::Sequence(p) => for pat in p.patterns() { pat.collect_capture_names(out); },
+            MetaPattern::Group(p) => p.pattern().collect_capture_names(out),
+            MetaPattern::Capture(p) => {
+                if !out.contains(&p.name().to_string()) {
+                    out.push(p.name().to_string());
+                }
+                p.pattern().collect_capture_names(out);
+            }
         }
     }
 }
