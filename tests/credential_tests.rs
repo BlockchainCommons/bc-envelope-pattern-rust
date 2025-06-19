@@ -147,19 +147,25 @@ fn test_wrapped_repeat() {
     //
     // The above line prints:
     //
-    // 0b721f78 NODE               | DUPLICATE
-    //     0b721f78 NODE           | DUPLICATE
-    //         8122ffa9 NODE
     // 0b721f78 NODE
-    //     397a2d4c WRAPPED        | DUPLICATE
-    //         397a2d4c WRAPPED    | DUPLICATE
-    //             8122ffa9 NODE
+    //     8122ffa9 NODE
+    // 0b721f78 NODE
+    //     397a2d4c WRAPPED
+    //         8122ffa9 NODE
     // 0b721f78 NODE
     //     397a2d4c WRAPPED
     //         8122ffa9 NODE
     //
-    // Note the duplicate path elements. This should not happen: each successive
-    // path element should be a step deeper in the tree.
+    // This doesn't seem right. The pattern should match every sequence of zero or mode WRAPPED followed by a NODE.
+    // This means it should match every NODE by itself (there are 2):
+    //
+    // 0b721f78 NODE
+    // 8122ffa9 NODE
+    //
+    // Plus it should match the the only path from a WRAPPED to a NODE:
+    //
+    // 397a2d4c subj WRAPPED
+    //     8122ffa9 subj NODE
     //
     assert!(paths.iter().any(|p| p.last().unwrap().is_node()));
 }
