@@ -56,7 +56,19 @@ impl Matcher for SearchPattern {
         // Start walking from the root with an empty path
         envelope.walk(false, Vec::new(), &visitor);
 
-        result_paths.into_inner()
+        let mut seen = std::collections::HashSet::new();
+        let mut unique = Vec::new();
+        for path in result_paths.into_inner() {
+            let digest_path: Vec<_> = path
+                .iter()
+                .map(|e| e.digest().into_owned())
+                .collect();
+            if seen.insert(digest_path) {
+                unique.push(path);
+            }
+        }
+
+        unique
     }
 
     fn compile(

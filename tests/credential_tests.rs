@@ -143,31 +143,20 @@ fn test_wrapped_repeat() {
     let env = credential();
     let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
-    println!("{}", format_paths_opt(&paths, FormatPathOpts::default().summary(true)));
-    //
-    // The above line prints:
-    //
-    // 0b721f78 NODE
-    //     8122ffa9 NODE
-    // 0b721f78 NODE
-    //     397a2d4c WRAPPED
-    //         8122ffa9 NODE
-    // 0b721f78 NODE
-    //     397a2d4c WRAPPED
-    //         8122ffa9 NODE
-    //
-    // This doesn't seem right. The pattern should match every sequence of zero or mode WRAPPED followed by a NODE.
-    // This means it should match every NODE by itself (there are 2):
-    //
-    // 0b721f78 NODE
-    // 8122ffa9 NODE
-    //
-    // Plus it should match the the only path from a WRAPPED to a NODE:
-    //
-    // 397a2d4c subj WRAPPED
-    //     8122ffa9 subj NODE
-    //
-    assert!(paths.iter().any(|p| p.last().unwrap().is_node()));
+    let expected = indoc! {r#"
+        0b721f78 NODE
+            8122ffa9 NODE
+        0b721f78 NODE
+            397a2d4c WRAPPED
+                8122ffa9 NODE
+    "#}
+    .trim();
+
+    assert_actual_expected!(
+        format_paths_opt(&paths, FormatPathOpts::default().summary(true)),
+        expected
+    );
+    assert_eq!(paths.len(), 2);
 }
 
 #[test]
