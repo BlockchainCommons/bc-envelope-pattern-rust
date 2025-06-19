@@ -166,7 +166,6 @@ fn test_wrapped_repeat() {
 }
 
 #[test]
-#[ignore]
 fn test_search_wrapped_repeat() {
     // See above for the full tree structure of the credential.
     let env = credential();
