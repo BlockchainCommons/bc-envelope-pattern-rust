@@ -35,7 +35,7 @@ fn test_bool_pattern() {
     let paths = Pattern::any_bool().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        50d1019e true [ "an": "assertion" ]
+        50d1019e NODE true [ "an": "assertion" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -47,8 +47,8 @@ fn test_bool_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        50d1019e true [ "an": "assertion" ]
-            27abdedd true
+        50d1019e NODE true [ "an": "assertion" ]
+            27abdedd LEAF true
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -86,7 +86,7 @@ fn test_number_pattern() {
     let paths = Pattern::any_number().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        6cb2ea4a 42 [ "an": "assertion" ]
+        6cb2ea4a NODE 42 [ "an": "assertion" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -98,8 +98,8 @@ fn test_number_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        6cb2ea4a 42 [ "an": "assertion" ]
-            7f83f7bd 42
+        6cb2ea4a NODE 42 [ "an": "assertion" ]
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -132,7 +132,7 @@ fn test_text_pattern() {
     let paths = Pattern::any_text().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        80a8c700 "hello" [ "greeting": "world" ]
+        80a8c700 NODE "hello" [ "greeting": "world" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -144,8 +144,8 @@ fn test_text_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        80a8c700 "hello" [ "greeting": "world" ]
-            cb835593 "hello"
+        80a8c700 NODE "hello" [ "greeting": "world" ]
+            cb835593 LEAF "hello"
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -198,7 +198,7 @@ fn test_date_pattern() {
     let paths = Pattern::any_date().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        20f45d77 2023-12-25 [ "type": "christmas" ]
+        20f45d77 NODE 2023-12-25 [ "type": "christmas" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -210,8 +210,8 @@ fn test_date_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        20f45d77 2023-12-25 [ "type": "christmas" ]
-            3854ff69 2023-12-25
+        20f45d77 NODE 2023-12-25 [ "type": "christmas" ]
+            3854ff69 LEAF 2023-12-25
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -263,7 +263,7 @@ fn test_known_value_pattern() {
     let paths = Pattern::any_known_value().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        813f39cd 'date' [ "meaning": "timestamp" ]
+        813f39cd NODE 'date' [ "meaning": "timestamp" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -271,7 +271,7 @@ fn test_known_value_pattern() {
     let paths = Pattern::known_value_named("date").paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        813f39cd 'date' [ "meaning": "timestamp" ]
+        813f39cd NODE 'date' [ "meaning": "timestamp" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -285,8 +285,8 @@ fn test_known_value_pattern() {
     .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        813f39cd 'date' [ "meaning": "timestamp" ]
-            2e40139b 'date'
+        813f39cd NODE 'date' [ "meaning": "timestamp" ]
+            2e40139b KNOWN_VALUE 'date'
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -345,8 +345,8 @@ fn test_known_value_regex_pattern() {
     .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        813f39cd 'date' [ "meaning": "timestamp" ]
-            2e40139b 'date'
+        813f39cd NODE 'date' [ "meaning": "timestamp" ]
+            2e40139b KNOWN_VALUE 'date'
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -398,7 +398,7 @@ fn test_byte_string_pattern() {
     let paths = Pattern::any_byte_string().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        19c2bef3 Bytes(5) [ "type": "greeting" ]
+        19c2bef3 NODE Bytes(5) [ "type": "greeting" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -412,8 +412,8 @@ fn test_byte_string_pattern() {
     .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        19c2bef3 Bytes(5) [ "type": "greeting" ]
-            3a91d2eb Bytes(5)
+        19c2bef3 NODE Bytes(5) [ "type": "greeting" ]
+            3a91d2eb LEAF Bytes(5)
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -493,7 +493,7 @@ fn test_array_pattern() {
     let paths = Pattern::any_array().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        70db8c16 [1, 2, 3] [ "type": "list" ]
+        70db8c16 NODE [1, 2, 3] [ "type": "list" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -510,8 +510,8 @@ fn test_array_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        70db8c16 [1, 2, 3] [ "type": "list" ]
-            4abc3113 [1, 2, 3]
+        70db8c16 NODE [1, 2, 3] [ "type": "list" ]
+            4abc3113 LEAF [1, 2, 3]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -554,7 +554,7 @@ fn test_map_pattern() {
     let paths = Pattern::any_map().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        1d96ee45 {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
+        1d96ee45 NODE {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -571,8 +571,8 @@ fn test_map_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        1d96ee45 {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
-            0e16f9b4 {"key1": "value1", "key2": "value2"}
+        1d96ee45 NODE {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
+            0e16f9b4 LEAF {"key1": "value1", "key2": "value2"}
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -598,7 +598,7 @@ fn test_null_pattern() {
     let paths = Pattern::null().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a72948d7 null [ "type": "null_value" ]
+        a72948d7 NODE null [ "type": "null_value" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -610,8 +610,8 @@ fn test_null_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a72948d7 null [ "type": "null_value" ]
-            b0b2988b null
+        a72948d7 NODE null [ "type": "null_value" ]
+            b0b2988b LEAF null
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -655,7 +655,7 @@ fn test_tag_pattern() {
     let paths = Pattern::any_tag().paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        b9457c8d 100("tagged_content") [ "format": "tagged" ]
+        b9457c8d NODE 100("tagged_content") [ "format": "tagged" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -665,8 +665,8 @@ fn test_tag_pattern() {
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        b9457c8d 100("tagged_content") [ "format": "tagged" ]
-            a8e58a0d 100("tagged_content")
+        b9457c8d NODE 100("tagged_content") [ "format": "tagged" ]
+            a8e58a0d LEAF 100("tagged_content")
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -708,7 +708,7 @@ fn test_tag_pattern_named() {
     let paths = Pattern::tagged_with_name("date").paths(&envelope);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
-        3854ff69 2023-12-25
+        3854ff69 LEAF 2023-12-25
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);

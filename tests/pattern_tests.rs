@@ -55,11 +55,10 @@ fn test_node_pattern_with_sequence() {
     .paths(&envelope);
 
     #[rustfmt::skip]
-    let expected = format!(
-        "{} \"Person\" [ \"age\": 25, \"name\": \"Alice\" ]\n    {} \"Person\"",
-        envelope.short_id(DigestDisplayFormat::Short),
-        envelope.subject().short_id(DigestDisplayFormat::Short)
-    );
+    let expected = indoc! {r#"
+        3599f346 NODE "Person" [ "age": 25, "name": "Alice" ]
+            bd52917f LEAF "Person"
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
 

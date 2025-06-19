@@ -46,7 +46,7 @@ fn test_and_pattern() {
     let paths = number_range_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        6cb2ea4a 42 [ "an": "assertion" ]
+        6cb2ea4a NODE 42 [ "an": "assertion" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -57,8 +57,8 @@ fn test_and_pattern() {
     let paths = number_range_with_subject_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        6cb2ea4a 42 [ "an": "assertion" ]
-            7f83f7bd 42
+        6cb2ea4a NODE 42 [ "an": "assertion" ]
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
@@ -95,7 +95,7 @@ fn test_or_pattern() {
     let paths = foo_or_greater_than_40_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        6cb2ea4a 42 [ "an": "assertion" ]
+        6cb2ea4a NODE 42 [ "an": "assertion" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -106,8 +106,8 @@ fn test_or_pattern() {
     let paths = foo_or_greater_than_40_with_subject_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        6cb2ea4a 42 [ "an": "assertion" ]
-            7f83f7bd 42
+        6cb2ea4a NODE 42 [ "an": "assertion" ]
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
@@ -124,7 +124,7 @@ fn test_one_element_sequence_pattern() {
 
     let envelope = Envelope::new(42);
     let expected = indoc! {r#"
-        7f83f7bd 42
+        7f83f7bd LEAF 42
     "#}
     .trim();
     let paths = number_pattern.paths(&envelope);
@@ -169,8 +169,8 @@ fn test_wrapped_sequence() {
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        25cb582c { { { { "data" } } } }
-            c1426a18 { { { "data" } } }
+        25cb582c WRAPPED { { { { "data" } } } }
+            c1426a18 WRAPPED { { { "data" } } }
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -182,9 +182,9 @@ fn test_wrapped_sequence() {
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        25cb582c { { { { "data" } } } }
-            c1426a18 { { { "data" } } }
-                ee8cade0 { { "data" } }
+        25cb582c WRAPPED { { { { "data" } } } }
+            c1426a18 WRAPPED { { { "data" } } }
+                ee8cade0 WRAPPED { { "data" } }
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -199,10 +199,10 @@ fn test_wrapped_sequence() {
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        25cb582c { { { { "data" } } } }
-            c1426a18 { { { "data" } } }
-                ee8cade0 { { "data" } }
-                    febc1555 { "data" }
+        25cb582c WRAPPED { { { { "data" } } } }
+            c1426a18 WRAPPED { { { "data" } } }
+                ee8cade0 WRAPPED { { "data" } }
+                    febc1555 WRAPPED { "data" }
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -218,11 +218,11 @@ fn test_wrapped_sequence() {
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        25cb582c { { { { "data" } } } }
-            c1426a18 { { { "data" } } }
-                ee8cade0 { { "data" } }
-                    febc1555 { "data" }
-                        e909da9a "data"
+        25cb582c WRAPPED { { { { "data" } } } }
+            c1426a18 WRAPPED { { { "data" } } }
+                ee8cade0 WRAPPED { { "data" } }
+                    febc1555 WRAPPED { "data" }
+                        e909da9a LEAF "data"
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -251,15 +251,15 @@ fn optional_wrapped_pattern() {
     let inner_paths = optional_wrapped_pattern.paths(&inner);
     #[rustfmt::skip]
     let expected  = indoc! {r#"
-        7f83f7bd 42
+        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&inner_paths), expected);
 
     let wrapped_paths = optional_wrapped_pattern.paths(&wrapped);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&wrapped_paths), expected);
 }
@@ -278,18 +278,18 @@ fn test_search_pattern() {
     let text_search_paths = text_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            13941b48 "Alice"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            0eb5609b "age": 30
-                5943be12 "age"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            78d666eb "knows": "Bob"
-                db7dd21c "knows"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            78d666eb "knows": "Bob"
-                13b74194 "Bob"
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            13941b48 LEAF "Alice"
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            0eb5609b ASSERTION "age": 30
+                5943be12 LEAF "age"
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            78d666eb ASSERTION "knows": "Bob"
+                db7dd21c LEAF "knows"
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            78d666eb ASSERTION "knows": "Bob"
+                13b74194 LEAF "Bob"
     "#}.trim();
     assert_actual_expected!(format_paths(&text_search_paths), expected);
 
@@ -299,9 +299,9 @@ fn test_search_pattern() {
     let bob_search_paths = bob_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            78d666eb "knows": "Bob"
-                13b74194 "Bob"
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            78d666eb ASSERTION "knows": "Bob"
+                13b74194 LEAF "Bob"
     "#}.trim();
     assert_actual_expected!(format_paths(&bob_search_paths), expected);
 
@@ -311,9 +311,9 @@ fn test_search_pattern() {
     let number_search_paths = number_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            0eb5609b "age": 30
-                cf972730 30
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            0eb5609b ASSERTION "age": 30
+                cf972730 LEAF 30
     "#}.trim();
     assert_actual_expected!(format_paths(&number_search_paths), expected);
 
@@ -329,8 +329,8 @@ fn test_search_pattern() {
         number_object_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a47bb3d4 "Alice" [ "age": 30, "knows": "Bob" ]
-            0eb5609b "age": 30
+        a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
+            0eb5609b ASSERTION "age": 30
     "#}.trim();
     assert_actual_expected!(
         format_paths(&number_object_search_paths),
@@ -358,35 +358,35 @@ fn test_search_pattern_nested() {
     assert_eq!(text_search_paths.len(), 9);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            13941b48 "Alice"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            2a26d42a "department": "Engineering"
-                8aaec3ab "department"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            2a26d42a "department": "Engineering"
-                71d7c10e "Engineering"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            c0c35c79 "knows": "Carol" [ "title": "Engineer" ]
-                db7dd21c "knows"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            c0c35c79 "knows": "Carol" [ "title": "Engineer" ]
-                59e8c540 "Carol" [ "title": "Engineer" ]
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            c0c35c79 "knows": "Carol" [ "title": "Engineer" ]
-                59e8c540 "Carol" [ "title": "Engineer" ]
-                    afb8122e "Carol"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            c0c35c79 "knows": "Carol" [ "title": "Engineer" ]
-                59e8c540 "Carol" [ "title": "Engineer" ]
-                    a4d32c8f "title": "Engineer"
-                        d380cf3f "title"
-        a69103e9 "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
-            c0c35c79 "knows": "Carol" [ "title": "Engineer" ]
-                59e8c540 "Carol" [ "title": "Engineer" ]
-                    a4d32c8f "title": "Engineer"
-                        df9ac43f "Engineer"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            13941b48 LEAF "Alice"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            2a26d42a ASSERTION "department": "Engineering"
+                8aaec3ab LEAF "department"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            2a26d42a ASSERTION "department": "Engineering"
+                71d7c10e LEAF "Engineering"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            c0c35c79 ASSERTION "knows": "Carol" [ "title": "Engineer" ]
+                db7dd21c LEAF "knows"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            c0c35c79 ASSERTION "knows": "Carol" [ "title": "Engineer" ]
+                59e8c540 NODE "Carol" [ "title": "Engineer" ]
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            c0c35c79 ASSERTION "knows": "Carol" [ "title": "Engineer" ]
+                59e8c540 NODE "Carol" [ "title": "Engineer" ]
+                    afb8122e LEAF "Carol"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            c0c35c79 ASSERTION "knows": "Carol" [ "title": "Engineer" ]
+                59e8c540 NODE "Carol" [ "title": "Engineer" ]
+                    a4d32c8f ASSERTION "title": "Engineer"
+                        d380cf3f LEAF "title"
+        a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
+            c0c35c79 ASSERTION "knows": "Carol" [ "title": "Engineer" ]
+                59e8c540 NODE "Carol" [ "title": "Engineer" ]
+                    a4d32c8f ASSERTION "title": "Engineer"
+                        df9ac43f LEAF "Engineer"
     "#}.trim();
     assert_actual_expected!(format_paths(&text_search_paths), expected);
 
@@ -423,15 +423,15 @@ fn test_search_pattern_with_wrapped() {
     let secret_text_search_paths = secret_text_search_pattern.paths(&envelope);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
-        1435493d "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
-            a5d4710e "data": { "secret" [ "classification": "top-secret" ] }
-                41dca0cd { "secret" [ "classification": "top-secret" ] }
-                    f66baec9 "secret" [ "classification": "top-secret" ]
-        1435493d "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
-            a5d4710e "data": { "secret" [ "classification": "top-secret" ] }
-                41dca0cd { "secret" [ "classification": "top-secret" ] }
-                    f66baec9 "secret" [ "classification": "top-secret" ]
-                        fa445f41 "secret"
+        1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
+            a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
+                41dca0cd WRAPPED { "secret" [ "classification": "top-secret" ] }
+                    f66baec9 NODE "secret" [ "classification": "top-secret" ]
+        1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
+            a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
+                41dca0cd WRAPPED { "secret" [ "classification": "top-secret" ] }
+                    f66baec9 NODE "secret" [ "classification": "top-secret" ]
+                        fa445f41 LEAF "secret"
     "#}.trim();
     assert_actual_expected!(format_paths(&secret_text_search_paths), expected);
 
@@ -446,21 +446,21 @@ fn test_search_pattern_with_wrapped() {
     let secret_regex_search_paths =
         secret_regex_search_pattern.paths(&envelope);
     let expected = indoc! {r#"
-        1435493d "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
-            a5d4710e "data": { "secret" [ "classification": "top-secret" ] }
-                41dca0cd { "secret" [ "classification": "top-secret" ] }
-                    f66baec9 "secret" [ "classification": "top-secret" ]
-        1435493d "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
-            a5d4710e "data": { "secret" [ "classification": "top-secret" ] }
-                41dca0cd { "secret" [ "classification": "top-secret" ] }
-                    f66baec9 "secret" [ "classification": "top-secret" ]
-                        fa445f41 "secret"
-        1435493d "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
-            a5d4710e "data": { "secret" [ "classification": "top-secret" ] }
-                41dca0cd { "secret" [ "classification": "top-secret" ] }
-                    f66baec9 "secret" [ "classification": "top-secret" ]
-                        7e14bb9e "classification": "top-secret"
-                            c2d8f15f "top-secret"
+        1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
+            a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
+                41dca0cd WRAPPED { "secret" [ "classification": "top-secret" ] }
+                    f66baec9 NODE "secret" [ "classification": "top-secret" ]
+        1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
+            a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
+                41dca0cd WRAPPED { "secret" [ "classification": "top-secret" ] }
+                    f66baec9 NODE "secret" [ "classification": "top-secret" ]
+                        fa445f41 LEAF "secret"
+        1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
+            a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
+                41dca0cd WRAPPED { "secret" [ "classification": "top-secret" ] }
+                    f66baec9 NODE "secret" [ "classification": "top-secret" ]
+                        7e14bb9e ASSERTION "classification": "top-secret"
+                            c2d8f15f LEAF "top-secret"
     "#}.trim();
     assert_actual_expected!(format_paths(&secret_regex_search_paths), expected);
 }
@@ -539,25 +539,25 @@ fn test_search_pattern_credential() {
         .map(|path| vec![(*path.last().unwrap()).clone()])
         .collect();
     let expected = indoc! {r#"
-        9e3bff3a "certificateNumber"
-        21c21808 "123-456-789"
-        6e5d379f "expirationDate"
-        5f82a16a "lastName"
-        fe4d5230 "Maxwell"
-        222afe69 "issueDate"
-        051beee6 "Certificate of Completion"
-        3976ef74 "photo"
-        231b8527 "This is James Maxwell's photo."
-        f13aa855 "professionalDevelopmentHours"
-        4395643b "firstName"
-        d6d0b768 "James"
-        e6bf4dd3 "topics"
-        2b191589 "continuingEducationUnits"
-        f8489ac1 "Example Electrical Engineering Board"
-        8e4e62eb "subject"
-        202c10ef "RF and Microwave Engineering"
-        f8489ac1 "Example Electrical Engineering Board"
-        f106bad1 "Signed by Example Electrical Engineering Board"
+        9e3bff3a LEAF "certificateNumber"
+        21c21808 LEAF "123-456-789"
+        6e5d379f LEAF "expirationDate"
+        5f82a16a LEAF "lastName"
+        fe4d5230 LEAF "Maxwell"
+        222afe69 LEAF "issueDate"
+        051beee6 LEAF "Certificate of Completion"
+        3976ef74 LEAF "photo"
+        231b8527 LEAF "This is James Maxwell's photo."
+        f13aa855 LEAF "professionalDevelopmentHours"
+        4395643b LEAF "firstName"
+        d6d0b768 LEAF "James"
+        e6bf4dd3 LEAF "topics"
+        2b191589 LEAF "continuingEducationUnits"
+        f8489ac1 LEAF "Example Electrical Engineering Board"
+        8e4e62eb LEAF "subject"
+        202c10ef LEAF "RF and Microwave Engineering"
+        f8489ac1 LEAF "Example Electrical Engineering Board"
+        f106bad1 LEAF "Signed by Example Electrical Engineering Board"
     "#}
     .trim();
     assert_actual_expected!(format_paths(&found_elements), expected);
@@ -584,8 +584,8 @@ fn test_search_pattern_credential() {
         .map(|path| vec![(*path.last().unwrap()).clone()])
         .collect();
     let expected = indoc! {r#"
-        54b3e1e7 "professionalDevelopmentHours": 15
-        8ec5e912 "continuingEducationUnits": 1
+        54b3e1e7 ASSERTION "professionalDevelopmentHours": 15
+        8ec5e912 ASSERTION "continuingEducationUnits": 1
     "#}
     .trim();
     assert_actual_expected!(format_paths(&number_paths), expected);

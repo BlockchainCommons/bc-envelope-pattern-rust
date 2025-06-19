@@ -5,7 +5,7 @@ use bc_envelope_pattern::{Matcher, parse_pattern};
 use indoc::indoc;
 
 use crate::common::{
-    pattern_utils::{FormatPathOpts, format_paths_opt},
+    pattern_utils::{format_paths_opt, FormatPathOpts},
     test_data::{credential, redacted_credential},
 };
 
@@ -155,13 +155,13 @@ fn test_wrapped_repeat() {
     // node since the `WRAPPED` repetition can consume the wrapper around the
     // subject.
     let expected = indoc! {r#"
-        0b721f78 NODE
-            8122ffa9 NODE
+        0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
+            8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
     "#}
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathOpts::default().summary(true)),
+        format_paths_opt(&paths, FormatPathOpts::default().max_length(80)),
         expected
     );
 }
@@ -179,16 +179,16 @@ fn test_search_wrapped_repeat() {
     // descends through the wrapper and another that matches the inner node
     // directly.
     let expected = indoc! {r#"
-        0b721f78 NODE
-            8122ffa9 NODE
-        0b721f78 NODE
-            397a2d4c WRAPPED
-                8122ffa9 NODE
+        0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
+            8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
+        0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
+            397a2d4c WRAPPED { ARID(4676635a) [ 'isA': "Certificate of Completion", "certif…
+                8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
     "#}
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathOpts::default().summary(true)),
+        format_paths_opt(&paths, FormatPathOpts::default().max_length(80)),
         expected
     );
 }

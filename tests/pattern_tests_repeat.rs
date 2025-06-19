@@ -202,11 +202,11 @@ fn repeat_any_greedy() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        3a0b1e87 { { { { 42 } } } }
-            75659622 { { { 42 } } }
-                81bb1f5e { { 42 } }
-                    58b1ac6a { 42 }
-                        7f83f7bd 42
+        3a0b1e87 WRAPPED { { { { 42 } } } }
+            75659622 WRAPPED { { { 42 } } }
+                81bb1f5e WRAPPED { { 42 } }
+                    58b1ac6a WRAPPED { 42 }
+                        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -221,11 +221,11 @@ fn repeat_any_lazy() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        3a0b1e87 { { { { 42 } } } }
-            75659622 { { { 42 } } }
-                81bb1f5e { { 42 } }
-                    58b1ac6a { 42 }
-                        7f83f7bd 42
+        3a0b1e87 WRAPPED { { { { 42 } } } }
+            75659622 WRAPPED { { { 42 } } }
+                81bb1f5e WRAPPED { { 42 } }
+                    58b1ac6a WRAPPED { 42 }
+                        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -240,11 +240,11 @@ fn repeat_any_possessive() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        3a0b1e87 { { { { 42 } } } }
-            75659622 { { { 42 } } }
-                81bb1f5e { { 42 } }
-                    58b1ac6a { 42 }
-                        7f83f7bd 42
+        3a0b1e87 WRAPPED { { { { 42 } } } }
+            75659622 WRAPPED { { { 42 } } }
+                81bb1f5e WRAPPED { { 42 } }
+                    58b1ac6a WRAPPED { 42 }
+                        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -259,10 +259,10 @@ fn repeat_some_greedy() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        75659622 { { { 42 } } }
-            81bb1f5e { { 42 } }
-                58b1ac6a { 42 }
-                    7f83f7bd 42
+        75659622 WRAPPED { { { 42 } } }
+            81bb1f5e WRAPPED { { 42 } }
+                58b1ac6a WRAPPED { 42 }
+                    7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -277,10 +277,10 @@ fn repeat_some_lazy() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        75659622 { { { 42 } } }
-            81bb1f5e { { 42 } }
-                58b1ac6a { 42 }
-                    7f83f7bd 42
+        75659622 WRAPPED { { { 42 } } }
+            81bb1f5e WRAPPED { { 42 } }
+                58b1ac6a WRAPPED { 42 }
+                    7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -295,10 +295,10 @@ fn repeat_some_possessive() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        75659622 { { { 42 } } }
-            81bb1f5e { { 42 } }
-                58b1ac6a { 42 }
-                    7f83f7bd 42
+        75659622 WRAPPED { { { 42 } } }
+            81bb1f5e WRAPPED { { 42 } }
+                58b1ac6a WRAPPED { 42 }
+                    7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -312,15 +312,15 @@ fn repeat_optional_greedy() {
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        7f83f7bd 42
+        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     let paths = pat.paths(&wrap_n(Envelope::new(42), 1));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -334,14 +334,14 @@ fn repeat_optional_lazy() {
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        7f83f7bd 42
+        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 1));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -355,14 +355,14 @@ fn repeat_optional_possessive() {
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        7f83f7bd 42
+        7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 1));
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -378,10 +378,10 @@ fn repeat_range_greedy() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        75659622 { { { 42 } } }
-            81bb1f5e { { 42 } }
-                58b1ac6a { 42 }
-                    7f83f7bd 42
+        75659622 WRAPPED { { { 42 } } }
+            81bb1f5e WRAPPED { { 42 } }
+                58b1ac6a WRAPPED { 42 }
+                    7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -396,10 +396,10 @@ fn repeat_range_lazy() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        75659622 { { { 42 } } }
-            81bb1f5e { { 42 } }
-                58b1ac6a { 42 }
-                    7f83f7bd 42
+        75659622 WRAPPED { { { 42 } } }
+            81bb1f5e WRAPPED { { 42 } }
+                58b1ac6a WRAPPED { 42 }
+                    7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -414,10 +414,10 @@ fn repeat_range_possessive() {
     let paths = pat.paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        75659622 { { { 42 } } }
-            81bb1f5e { { 42 } }
-                58b1ac6a { 42 }
-                    7f83f7bd 42
+        75659622 WRAPPED { { { 42 } } }
+            81bb1f5e WRAPPED { { 42 } }
+                58b1ac6a WRAPPED { 42 }
+                    7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -443,9 +443,9 @@ fn repeat_any_modes() {
 
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        ee8cade0 { { "data" } }
-            febc1555 { "data" }
-                e909da9a "data"
+        ee8cade0 WRAPPED { { "data" } }
+            febc1555 WRAPPED { "data" }
+                e909da9a LEAF "data"
     "#}.trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 }
@@ -463,24 +463,24 @@ fn repeat_optional_modes() {
 
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}
     .trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}
     .trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}
     .trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);
@@ -508,25 +508,25 @@ fn repeat_some_order() {
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        06bb2465 { { "x" } }
-            70b5f17d { "x" }
-                5e85370e "x"
+        06bb2465 WRAPPED { { "x" } }
+            70b5f17d WRAPPED { "x" }
+                5e85370e LEAF "x"
     "#}.trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        06bb2465 { { "x" } }
-            70b5f17d { "x" }
+        06bb2465 WRAPPED { { "x" } }
+            70b5f17d WRAPPED { "x" }
     "#}.trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
     let expected = indoc! {r#"
-        06bb2465 { { "x" } }
-            70b5f17d { "x" }
-                5e85370e "x"
+        06bb2465 WRAPPED { { "x" } }
+            70b5f17d WRAPPED { "x" }
+                5e85370e LEAF "x"
     "#}
     .trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);
@@ -545,29 +545,29 @@ fn repeat_range_order() {
 
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
     let expected = indoc! {r#"
-        88e28c8b { { { { "x" } } } }
-            79962374 { { { "x" } } }
-                06bb2465 { { "x" } }
-                    70b5f17d { "x" }
+        88e28c8b WRAPPED { { { { "x" } } } }
+            79962374 WRAPPED { { { "x" } } }
+                06bb2465 WRAPPED { { "x" } }
+                    70b5f17d WRAPPED { "x" }
     "#}
     .trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
     let expected = indoc! {r#"
-        88e28c8b { { { { "x" } } } }
-            79962374 { { { "x" } } }
-                06bb2465 { { "x" } }
+        88e28c8b WRAPPED { { { { "x" } } } }
+            79962374 WRAPPED { { { "x" } } }
+                06bb2465 WRAPPED { { "x" } }
     "#}
     .trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
     let expected = indoc! {r#"
-        88e28c8b { { { { "x" } } } }
-            79962374 { { { "x" } } }
-                06bb2465 { { "x" } }
-                    70b5f17d { "x" }
+        88e28c8b WRAPPED { { { { "x" } } } }
+            79962374 WRAPPED { { { "x" } } }
+                06bb2465 WRAPPED { { "x" } }
+                    70b5f17d WRAPPED { "x" }
     "#}
     .trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);

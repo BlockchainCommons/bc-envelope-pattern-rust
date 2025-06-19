@@ -15,7 +15,7 @@ fn test_subject_pattern() {
 
     #[rustfmt::skip]
     let expected_1 = indoc! {r#"
-        13941b48 "Alice"
+        13941b48 LEAF "Alice"
     "#}.trim();
     assert_actual_expected!(format_paths(&matching_paths), expected_1);
 
@@ -23,8 +23,8 @@ fn test_subject_pattern() {
     let matching_paths = any_subject_pat.paths(&envelope_with_assertions);
     #[rustfmt::skip]
     let expected_2 = indoc! {r#"
-        8955db5e "Alice" [ "knows": "Bob" ]
-            13941b48 "Alice"
+        8955db5e NODE "Alice" [ "knows": "Bob" ]
+            13941b48 LEAF "Alice"
     "#}.trim();
     assert_actual_expected!(format_paths(&matching_paths), expected_2);
 
@@ -52,8 +52,8 @@ fn test_wrapped_pattern() {
     let paths = Pattern::wrapped().paths(&wrapped_envelope);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
-        58b1ac6a { 42 }
-            7f83f7bd 42
+        58b1ac6a WRAPPED { 42 }
+            7f83f7bd LEAF 42
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -64,8 +64,8 @@ fn test_wrapped_pattern() {
     let paths = Pattern::wrapped().paths(&wrapped_envelope_with_assertion);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
-        169aba00 { 42 } [ "an": "assertion" ]
-            7f83f7bd 42
+        169aba00 NODE { 42 } [ "an": "assertion" ]
+            7f83f7bd LEAF 42
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -77,8 +77,8 @@ fn test_wrapped_pattern() {
     let paths = Pattern::wrapped().paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        52d47c15 { { 42 } [ "an": "assertion" ] }
-            169aba00 { 42 } [ "an": "assertion" ]
+        52d47c15 WRAPPED { { 42 } [ "an": "assertion" ] }
+            169aba00 NODE { 42 } [ "an": "assertion" ]
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -87,9 +87,9 @@ fn test_wrapped_pattern() {
     let paths = wrapped_twice_pattern.paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        52d47c15 { { 42 } [ "an": "assertion" ] }
-            169aba00 { 42 } [ "an": "assertion" ]
-                7f83f7bd 42
+        52d47c15 WRAPPED { { 42 } [ "an": "assertion" ] }
+            169aba00 NODE { 42 } [ "an": "assertion" ]
+                7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -109,8 +109,8 @@ fn test_assertion_pattern() {
     let paths = Pattern::any_assertion().paths(&envelope_with_assertions);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        78d666eb "knows": "Bob"
-        c269cf0a "worksWith": "Charlie"
+        78d666eb ASSERTION "knows": "Bob"
+        c269cf0a ASSERTION "worksWith": "Charlie"
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
@@ -128,8 +128,8 @@ fn test_assertion_predicate_pattern() {
         .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        78d666eb "knows": "Bob"
-        7af83724 "knows": "Charlie"
+        78d666eb ASSERTION "knows": "Bob"
+        7af83724 ASSERTION "knows": "Charlie"
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -140,10 +140,10 @@ fn test_assertion_predicate_pattern() {
     let paths = pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
-        78d666eb "knows": "Bob"
-            13b74194 "Bob"
-        7af83724 "knows": "Charlie"
-            ee8e3b02 "Charlie"
+        78d666eb ASSERTION "knows": "Bob"
+            13b74194 LEAF "Bob"
+        7af83724 ASSERTION "knows": "Charlie"
+            ee8e3b02 LEAF "Charlie"
     "#}
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
@@ -182,10 +182,9 @@ fn test_digest_pattern() {
     // Test paths
     let paths = Pattern::digest(digest.clone()).paths(&envelope);
     #[rustfmt::skip]
-    let expected = format!(
-        "{} \"Hello, World!\"",
-        envelope.short_id(DigestDisplayFormat::Short)
-    );
+    let expected = indoc! {r#"
+        0a852327 LEAF "Hello, World!"
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     // No match should return empty paths
@@ -258,10 +257,9 @@ fn test_digest_pattern_binary_regex() {
     )
     .paths(&envelope);
     #[rustfmt::skip]
-    let expected = format!(
-        "{} \"Hello, World!\"",
-        envelope.short_id(DigestDisplayFormat::Short)
-    );
+    let expected = indoc! {r#"
+        0a852327 LEAF "Hello, World!"
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     // Test paths for non-matching regex
@@ -388,10 +386,9 @@ fn test_node_pattern() {
     // Test paths
     let paths = Pattern::any_node().paths(&single_assertion_envelope);
     #[rustfmt::skip]
-    let expected = format!(
-        r#"{} "Alice" [ "knows": "Bob" ]"#,
-        single_assertion_envelope.short_id(DigestDisplayFormat::Short)
-    );
+    let expected = indoc! {r#"
+        8955db5e NODE "Alice" [ "knows": "Bob" ]
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
 

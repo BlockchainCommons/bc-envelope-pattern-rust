@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use bc_envelope::prelude::*;
+use bc_envelope::{base::envelope::EnvelopeCase, format::EnvelopeSummary, prelude::*};
 use bc_envelope_pattern::Path;
 
 /// Options for formatting paths.
@@ -23,16 +23,42 @@ impl FormatPathOpts {
         self.max_length = Some(max_length);
         self
     }
-
-    /// Sets whether to format the path as a summary.
-    pub fn summary(mut self, summary: bool) -> Self {
-        self.summary = summary;
-        self
-    }
 }
 
 impl AsRef<FormatPathOpts> for FormatPathOpts {
     fn as_ref(&self) -> &FormatPathOpts { self }
+}
+
+pub fn envelope_summary(env: &Envelope) -> String {
+    let id = env.short_id(DigestDisplayFormat::Short);
+    let summary = match env.case() {
+        EnvelopeCase::Node { .. } => {
+            format!("NODE {}", env.format_flat())
+        },
+        EnvelopeCase::Leaf { cbor, .. } => {
+            format!("LEAF {}", cbor.envelope_summary(usize::MAX, &FormatContextOpt::default()).unwrap_or_else(|_| "ERROR".to_string()))
+        },
+        EnvelopeCase::Wrapped { .. } => {
+            format!("WRAPPED {}", env.format_flat())
+        },
+        EnvelopeCase::Assertion(_) => {
+            format!("ASSERTION {}", env.format_flat())
+        },
+        EnvelopeCase::Elided(_) => "ELIDED".to_string(),
+        EnvelopeCase::KnownValue { value, .. } => {
+            let content = with_format_context!(|ctx: &FormatContext| {
+                let known_value = KnownValuesStore::known_value_for_raw_value(
+                    value.value(),
+                    Some(ctx.known_values()),
+                );
+                format!("'{}'", known_value)
+            });
+            format!("KNOWN_VALUE {}", content)
+        }
+        EnvelopeCase::Encrypted(_) => "ENCRYPTED".to_string(),
+        EnvelopeCase::Compressed(_) => "COMPRESSED".to_string(),
+    };
+    format!("{} {}", id, summary)
 }
 
 // Format each path element on its own line, each line successively indented by
@@ -45,16 +71,7 @@ pub fn format_path_opt(
     let mut lines = Vec::new();
     for (i, element) in path.iter().enumerate() {
         let indent = " ".repeat(i * 4);
-        let id = element.short_id(DigestDisplayFormat::Short);
-        let content = if opts.summary {
-            let summary = with_format_context!(|ctx| {
-                let max_length = opts.max_length.unwrap_or(usize::MAX);
-                element.summary(max_length, ctx)
-            });
-            format!("{} {}", id, summary)
-        } else {
-            format!("{} {}", id, element.format_flat())
-        };
+        let content = envelope_summary(element);
 
         let content = if let Some(max_len) = opts.max_length {
             if content.len() > max_len {
