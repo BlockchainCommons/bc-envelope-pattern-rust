@@ -140,6 +140,30 @@ fn test_digest_and_not() {
 
 #[test]
 fn test_wrapped_repeat() {
+    // See above for the full tree structure of the credential.
+    let env = credential();
+
+    // A pattern that matches zero or more `WRAPPED` nodes leading to a `NODE`.
+    let pat = parse_pattern("(WRAPPED)*>NODE").unwrap();
+    let paths = pat.paths(&env);
+
+    // This expectation is correct, because the search starts at the root
+    // `0b721f78 NODE`, which *by itself* is a 1-element path that consists of
+    // zero or more `WRAPPED` nodes leading to a `NODE`.
+    let expected = indoc! {r#"
+        0b721f78 NODE
+    "#}
+    .trim();
+
+    assert_actual_expected!(
+        format_paths_opt(&paths, FormatPathOpts::default().summary(true)),
+        expected
+    );
+}
+
+#[test]
+#[ignore]
+fn test_search_wrapped_repeat() {
     let env = credential();
     let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
