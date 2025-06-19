@@ -5,5 +5,4 @@ mod structure;
 mod token;
 mod utils;
 
-pub use parse_pattern::parse_pattern;
 pub use token::Token;

@@ -194,11 +194,7 @@ fn wrap_n(mut env: Envelope, n: usize) -> Envelope {
 #[test]
 fn repeat_any_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            ..,
-            Reluctance::Greedy,
-        ),
+        Pattern::repeat(Pattern::unwrap(), .., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
 
@@ -219,11 +215,7 @@ fn repeat_any_greedy() {
 fn repeat_any_lazy() {
     let env = wrap_n(Envelope::new(42), 4);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            ..,
-            Reluctance::Lazy,
-        ),
+        Pattern::repeat(Pattern::unwrap(), .., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -242,11 +234,7 @@ fn repeat_any_lazy() {
 fn repeat_any_possessive() {
     let env = wrap_n(Envelope::new(42), 4);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            ..,
-            Reluctance::Possessive,
-        ),
+        Pattern::repeat(Pattern::unwrap(), .., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -301,11 +289,7 @@ fn repeat_some_lazy() {
 fn repeat_some_possessive() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            1..,
-            Reluctance::Possessive,
-        ),
+        Pattern::repeat(Pattern::unwrap(), 1.., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -322,11 +306,7 @@ fn repeat_some_possessive() {
 #[test]
 fn repeat_optional_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            0..=1,
-            Reluctance::Greedy,
-        ),
+        Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -348,11 +328,7 @@ fn repeat_optional_greedy() {
 #[test]
 fn repeat_optional_lazy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            0..=1,
-            Reluctance::Lazy,
-        ),
+        Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -373,11 +349,7 @@ fn repeat_optional_lazy() {
 #[test]
 fn repeat_optional_possessive() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            0..=1,
-            Reluctance::Possessive,
-        ),
+        Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -398,11 +370,7 @@ fn repeat_optional_possessive() {
 #[test]
 fn repeat_range_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(
-            Pattern::unwrap(),
-            2..=3,
-            Reluctance::Greedy,
-        ),
+        Pattern::repeat(Pattern::unwrap(), 2..=3, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -460,11 +428,7 @@ fn repeat_any_modes() {
 
     let pat = |mode| {
         Pattern::sequence(vec![
-            Pattern::repeat(
-                Pattern::unwrap(),
-                0..,
-                mode,
-            ),
+            Pattern::repeat(Pattern::unwrap(), 0.., mode),
             Pattern::wrapped(),
             Pattern::unwrap(),
             Pattern::text("data"),
@@ -493,11 +457,7 @@ fn repeat_optional_modes() {
 
     let pat = |mode| {
         Pattern::sequence(vec![
-            Pattern::repeat(
-                Pattern::unwrap(),
-                0..=1,
-                mode,
-            ),
+            Pattern::repeat(Pattern::unwrap(), 0..=1, mode),
             Pattern::number(42),
         ])
     };
@@ -612,4 +572,122 @@ fn repeat_range_order() {
     "#}
     .trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);
+}
+
+#[test]
+#[ignore]
+fn test_repeat() {
+    // A pattern that matches zero or more `UNWRAP` elements leading to a
+    // `NODE`.
+    let pat = Pattern::parse("(UNWRAP)*>NODE").unwrap();
+
+    let env = Envelope::new("Alice");
+    // There is no `NODE` in the envelope, so the pattern should not match.
+    assert!(!pat.matches(&env));
+
+    let env = env.add_assertion("knows", "Bob");
+    let paths = pat.paths(&env);
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        8955db5e NODE "Alice" [ "knows": "Bob" ]
+    "#}.trim();
+    assert_actual_expected!(format_paths(&paths), expected);
+
+    let wrapped_env = env.wrap_envelope();
+    let paths = pat.paths(&wrapped_env);
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+            8955db5e NODE "Alice" [ "knows": "Bob" ]
+    "#}.trim();
+    assert_actual_expected!(format_paths(&paths), expected);
+
+    // A pattern that matches zero or more `WRAPPED` elements leading to a
+    // `NODE`.
+    let pat = Pattern::parse("(WRAPPED)*>NODE").unwrap();
+    // Does not match, because even though the `WRAPPED` part matches, it
+    // does not make progress into the wrapped node to get to the `NODE`.
+    assert!(!pat.matches(&wrapped_env));
+
+    let pat = Pattern::parse("@cap((WRAPPED)*)>UNWRAP>NODE").unwrap();
+    let (paths, captures) = pat.paths_with_captures(&wrapped_env);
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+            8955db5e NODE "Alice" [ "knows": "Bob" ]
+    "#}.trim();
+    assert_actual_expected!(format_paths(&paths), expected);
+    let caps = captures.get("cap").unwrap();
+    assert_eq!(caps.len(), 1);
+    #[rustfmt::skip]
+    let expected_cap = indoc! {r#"
+        fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+    "#}.trim();
+    assert_actual_expected!(format_paths(caps), expected_cap);
+
+    let wrapped_env = wrapped_env.wrap_envelope();
+    let pat = Pattern::parse("@cap((WRAPPED>UNWRAP)*)>NODE").unwrap();
+    let (paths, captures) = pat.paths_with_captures(&wrapped_env);
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
+            fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+                8955db5e NODE "Alice" [ "knows": "Bob" ]
+    "#}.trim();
+    assert_actual_expected!(format_paths(&paths), expected);
+    let caps = captures.get("cap").unwrap();
+    assert_eq!(caps.len(), 1);
+    #[rustfmt::skip]
+    let expected_cap = indoc! {r#"
+        3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
+            fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+    "#}.trim();
+    assert_actual_expected!(format_paths(caps), expected_cap);
+}
+
+#[test]
+fn test_capture() {
+    let env = Envelope::new("Alice")
+        .add_assertion("knows", "Bob")
+        .wrap_envelope()
+        .wrap_envelope();
+
+    let expected = indoc! {r#"
+        3defda74 WRAPPED
+            fd881a24 subj WRAPPED
+                8955db5e subj NODE
+                    13941b48 subj "Alice"
+                    78d666eb ASSERTION
+                        db7dd21c pred "knows"
+                        13b74194 obj "Bob"
+    "#}
+    .trim();
+    assert_actual_expected!(env.tree_format(), expected);
+
+    // Pattern only captures `WRAPPED` elements leading to a `NODE`,
+    // but not the `NODE` itself.
+    let pat = Pattern::parse("@cap((WRAPPED>UNWRAP)*)>NODE").unwrap();
+    let (paths, captures) = pat.paths_with_captures(&env);
+    // Pattern matches the `WRAPPED` elements leading to the `NODE`,
+    // and the `NODE` itself.
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
+            fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+                8955db5e NODE "Alice" [ "knows": "Bob" ]
+    "#}.trim();
+    assert_actual_expected!(format_paths(&paths), expected);
+    let caps = captures.get("cap").unwrap();
+    assert_eq!(caps.len(), 1);
+    // The capture contains the `WRAPPED` elements leading to the `NODE`, but
+    // not the `NODE` itself.
+    //
+    // This is the expected behavior, but it is failing because the `NODE` is
+    // being included in the capture.
+    #[rustfmt::skip]
+    let expected_cap = indoc! {r#"
+        3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
+            fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
+    "#}.trim();
+    assert_actual_expected!(format_paths(caps), expected_cap);
 }

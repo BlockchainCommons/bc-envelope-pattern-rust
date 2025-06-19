@@ -1,9 +1,9 @@
-use bc_envelope_pattern::{Pattern, parse_pattern};
+use bc_envelope_pattern::Pattern;
 
 #[test]
 fn parse_any() {
     let src = "ANY";
-    let p = parse_pattern(src).unwrap();
+    let p = Pattern::parse(src).unwrap();
     assert_eq!(p, Pattern::any());
     assert_eq!(p.to_string(), src);
 }
@@ -11,7 +11,7 @@ fn parse_any() {
 #[test]
 fn parse_none() {
     let src = "NONE";
-    let p = parse_pattern(src).unwrap();
+    let p = Pattern::parse(src).unwrap();
     assert_eq!(p, Pattern::none());
     assert_eq!(p.to_string(), src);
 }

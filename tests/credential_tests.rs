@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, parse_pattern};
+use bc_envelope_pattern::{Matcher, Pattern};
 use indoc::indoc;
 
 use crate::common::{
@@ -98,7 +98,7 @@ fn test_credential() {
 #[test]
 fn test_parsed_search_text_or_number() {
     let env = credential();
-    let pattern = parse_pattern("SEARCH(ASSERTOBJ(TEXT|NUMBER))").unwrap();
+    let pattern = Pattern::parse("SEARCH(ASSERTOBJ(TEXT|NUMBER))").unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 11);
 }
@@ -108,7 +108,7 @@ fn test_parsed_firstname_capture() {
     let env = credential();
     let pattern_str =
         r#"SEARCH(ASSERTPRED(TEXT("firstName"))>OBJ(TEXT("James")))"#;
-    let pattern = parse_pattern(pattern_str).unwrap();
+    let pattern = Pattern::parse(pattern_str).unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
 }
@@ -118,7 +118,7 @@ fn test_search_capture_propagation() {
     let env = credential();
     let pattern_str =
         r#"SEARCH(@cap(ASSERTPRED(TEXT("firstName"))>OBJ(TEXT("James"))))"#;
-    let pattern = parse_pattern(pattern_str).unwrap();
+    let pattern = Pattern::parse(pattern_str).unwrap();
     let (paths, caps) = pattern.paths_with_captures(&env);
     assert_eq!(paths.len(), 1);
     assert_eq!(caps.get("cap").unwrap().len(), 1);
@@ -127,7 +127,7 @@ fn test_search_capture_propagation() {
 #[test]
 fn test_parsed_node_structure() {
     let env = credential();
-    let pat = parse_pattern("SEARCH(NODE({13}))").unwrap();
+    let pat = Pattern::parse("SEARCH(NODE({13}))").unwrap();
     let paths = pat.paths(&env);
     assert_eq!(paths.len(), 1);
 }
@@ -137,7 +137,7 @@ fn test_digest_and_not() {
     let env = credential();
     let digest = env.short_id(bc_envelope::DigestDisplayFormat::Short);
     let pattern_str = format!("DIGEST({})&(!OBSCURED)", digest);
-    let pat = parse_pattern(&pattern_str).unwrap();
+    let pat = Pattern::parse(&pattern_str).unwrap();
     assert!(pat.matches(&env));
 }
 
@@ -149,7 +149,7 @@ fn test_wrapped_repeat() {
 
     // A pattern that matches zero or more `WRAPPED` elements leading to a
     // `NODE`.
-    let pat = parse_pattern("(WRAPPED)*>NODE").unwrap();
+    let pat = Pattern::parse("(WRAPPED)*>NODE").unwrap();
     let paths = pat.paths(&env);
 
     // The pattern should match both the outer node and its unwrapped subject
@@ -174,7 +174,7 @@ fn test_search_wrapped_repeat() {
     let env = credential();
     // A pattern that searches every element in the tree for those
     // that start a path of zero or more `WRAPPED` elements leading to a `NODE`.
-    let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
+    let pat = Pattern::parse("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
     // Every `NODE` in the tree should match the pattern, including the inner
     // `8122ffa9 NODE`. Consequently there are two matching paths: one that
@@ -264,7 +264,7 @@ fn test_redacted_credential() {
 #[test]
 fn test_search_elided() {
     let env = redacted_credential();
-    let pat = parse_pattern("SEARCH(ELIDED)").unwrap();
+    let pat = Pattern::parse("SEARCH(ELIDED)").unwrap();
     let paths = pat.paths(&env);
     assert_eq!(paths.len(), 7);
 }
