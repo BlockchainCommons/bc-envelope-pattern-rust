@@ -16,8 +16,19 @@ fn parse_node_patterns() {
 #[test]
 fn parse_wrapped_pattern() {
     let p = parse_pattern("WRAPPED").unwrap();
-    assert_eq!(p, Pattern::wrapped_new());
+    assert_eq!(p, Pattern::wrapped());
     assert_eq!(p.to_string(), "WRAPPED");
+}
+
+#[test]
+fn parse_unwrap_pattern() {
+    let p = parse_pattern("UNWRAP").unwrap();
+    assert_eq!(p, Pattern::unwrap());
+    assert_eq!(p.to_string(), "UNWRAP");
+
+    let p = parse_pattern("UNWRAP(NODE)").unwrap();
+    assert_eq!(p, Pattern::unwrap_matching(Pattern::any_node()));
+    assert_eq!(p.to_string(), "UNWRAP(NODE)");
 }
 
 #[test]
@@ -26,9 +37,9 @@ fn parse_subject_patterns() {
     assert_eq!(p, Pattern::any_subject());
     assert_eq!(p.to_string(), "SUBJECT");
 
-    let p = parse_pattern("SUBJECT(TEXT(\"hi\"))").unwrap();
+    let p = parse_pattern(r#"SUBJECT(TEXT("hi"))"#).unwrap();
     assert_eq!(p, Pattern::subject(Pattern::text("hi")));
-    assert_eq!(p.to_string(), "SUBJECT(TEXT(\"hi\"))");
+    assert_eq!(p.to_string(), r#"SUBJECT(TEXT("hi"))"#);
 }
 
 #[test]
@@ -37,17 +48,17 @@ fn parse_assert_patterns() {
     assert_eq!(p, Pattern::any_assertion());
     assert_eq!(p.to_string(), "ASSERT");
 
-    let p = parse_pattern("ASSERTPRED(TEXT(\"hi\"))").unwrap();
+    let p = parse_pattern(r#"ASSERTPRED(TEXT("hi"))"#).unwrap();
     assert_eq!(p, Pattern::assertion_with_predicate(Pattern::text("hi")));
-    assert_eq!(p.to_string(), "ASSERTPRED(TEXT(\"hi\"))");
+    assert_eq!(p.to_string(), r#"ASSERTPRED(TEXT("hi"))"#);
 
-    let spaced = "ASSERTPRED ( TEXT(\"hi\") )";
+    let spaced = r#"ASSERTPRED ( TEXT("hi") )"#;
     let p_spaced = parse_pattern(spaced).unwrap();
     assert_eq!(
         p_spaced,
         Pattern::assertion_with_predicate(Pattern::text("hi"))
     );
-    assert_eq!(p_spaced.to_string(), "ASSERTPRED(TEXT(\"hi\"))");
+    assert_eq!(p_spaced.to_string(), r#"ASSERTPRED(TEXT("hi"))"#);
 
     let p = parse_pattern("ASSERTOBJ(NUMBER(1))").unwrap();
     assert_eq!(p, Pattern::assertion_with_object(Pattern::number(1)));
@@ -60,14 +71,14 @@ fn parse_object_patterns() {
     assert_eq!(p, Pattern::any_object());
     assert_eq!(p.to_string(), "OBJECT");
 
-    let p = parse_pattern("OBJ(TEXT(\"hi\"))").unwrap();
+    let p = parse_pattern(r#"OBJ(TEXT("hi"))"#).unwrap();
     assert_eq!(p, Pattern::object(Pattern::text("hi")));
-    assert_eq!(p.to_string(), "OBJECT(TEXT(\"hi\"))");
+    assert_eq!(p.to_string(), r#"OBJECT(TEXT("hi"))"#);
 
-    let spaced = "OBJ ( TEXT(\"hi\") )";
+    let spaced = r#"OBJ ( TEXT("hi") )"#;
     let p_spaced = parse_pattern(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::object(Pattern::text("hi")));
-    assert_eq!(p_spaced.to_string(), "OBJECT(TEXT(\"hi\"))");
+    assert_eq!(p_spaced.to_string(), r#"OBJECT(TEXT("hi"))"#);
 }
 
 #[test]

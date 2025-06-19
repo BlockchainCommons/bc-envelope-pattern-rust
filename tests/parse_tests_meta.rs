@@ -83,9 +83,10 @@ fn parse_operator_precedence() {
 
 #[test]
 fn parse_not_patterns() {
-    let p = parse_pattern("!TEXT(\"hi\")").unwrap();
+    let p = parse_pattern(r#"!TEXT("hi")"#).unwrap();
     assert_eq!(p, Pattern::not_matching(Pattern::text("hi")));
-    assert_eq!(p.to_string(), "!TEXT(\"hi\")");
+    assert_eq!(p.to_string(), r#"!TEXT("hi")"#);
+
 
     let expr = "!ANY & NONE";
     let p = parse_pattern(expr).unwrap();
@@ -109,7 +110,7 @@ fn parse_repeat_patterns() {
     let p = parse_pattern("(WRAPPED)*").unwrap();
     assert_eq!(
         p,
-        Pattern::repeat(Pattern::wrapped_new(), 0.., Reluctance::Greedy)
+        Pattern::repeat(Pattern::wrapped(), 0.., Reluctance::Greedy)
     );
     assert_eq!(p.to_string(), "(WRAPPED)*");
 
@@ -143,7 +144,7 @@ fn parse_capture_patterns() {
 
 #[test]
 fn parse_nested_capture_patterns() {
-    let src = "@outer(@inner(TEXT(\"hi\")))";
+    let src = r#"@outer(@inner(TEXT("hi")))"#;
     let p = parse_pattern(src).unwrap();
     assert_eq!(
         p,

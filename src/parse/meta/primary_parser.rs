@@ -41,6 +41,7 @@ pub(crate) fn parse_primary(
         Token::Compressed => structure::parse_compressed(lexer),
         Token::Pred => structure::parse_predicate(lexer),
         Token::Wrapped => structure::parse_wrapped(lexer),
+        Token::Unwrap => structure::parse_unwrap(lexer),
         Token::Subject => structure::parse_subject(lexer),
         Token::None => Ok(Pattern::none()),
         Token::Null => leaf::parse_null(lexer),

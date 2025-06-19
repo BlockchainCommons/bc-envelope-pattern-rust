@@ -163,8 +163,9 @@ fn test_wrapped_sequence() {
     .trim();
     assert_actual_expected!(wrapped_4.format_flat(), expected);
 
-    // A pattern that matches a single wrapped envelope.
-    let wrapped_1_pattern = Pattern::sequence(vec![Pattern::wrapped_new()]);
+    // A pattern that matches the contents of a single wrapped envelope.
+    let wrapped_1_pattern =
+        Pattern::sequence(vec![Pattern::wrapped(), Pattern::unwrap()]);
     let paths = wrapped_1_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
@@ -177,7 +178,7 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches two wrapped envelopes in sequence.
     let wrapped_2_pattern =
-        Pattern::sequence(vec![Pattern::wrapped_new(), Pattern::wrapped_new()]);
+        Pattern::sequence(vec![Pattern::unwrap(), Pattern::unwrap()]);
     let paths = wrapped_2_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
@@ -191,9 +192,9 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches three wrapped envelopes in sequence.
     let wrapped_3_pattern = Pattern::sequence(vec![
-        Pattern::wrapped_new(),
-        Pattern::wrapped_new(),
-        Pattern::wrapped_new(),
+        Pattern::unwrap(),
+        Pattern::unwrap(),
+        Pattern::unwrap(),
     ]);
     let paths = wrapped_3_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
@@ -209,10 +210,10 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches four wrapped envelopes in sequence.
     let wrapped_4_pattern = Pattern::sequence(vec![
-        Pattern::wrapped_new(),
-        Pattern::wrapped_new(),
-        Pattern::wrapped_new(),
-        Pattern::wrapped_new(),
+        Pattern::unwrap(),
+        Pattern::unwrap(),
+        Pattern::unwrap(),
+        Pattern::unwrap(),
     ]);
     let paths = wrapped_4_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
@@ -229,7 +230,7 @@ fn test_wrapped_sequence() {
 
     assert_eq!(
         format!("{}", wrapped_4_pattern),
-        r#"WRAPPED>WRAPPED>WRAPPED>WRAPPED"#
+        r#"UNWRAP>UNWRAP>UNWRAP>UNWRAP"#
     );
 }
 
@@ -237,12 +238,12 @@ fn test_wrapped_sequence() {
 fn optional_wrapped_pattern() {
     // A pattern that matches an envelope that may or may not be wrapped.
     let optional_wrapped_pattern = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped_new(), 0..=1, Reluctance::Greedy),
+        Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Greedy),
         Pattern::any_number(),
     ]);
     assert_eq!(
         format!("{}", optional_wrapped_pattern),
-        r#"(WRAPPED)?>NUMBER"#
+        r#"(UNWRAP)?>NUMBER"#
     );
 
     let inner = Envelope::new(42);
@@ -401,7 +402,7 @@ fn test_search_pattern_nested() {
     // Carol envelope -> "Carol"
     let carol_subject_path = carol_paths
         .iter()
-        .find(|path| path.last().unwrap().format_flat() == "\"Carol\"")
+        .find(|path| path.last().unwrap().format_flat() == r#""Carol""#)
         .unwrap();
     assert_eq!(carol_subject_path.len(), 4);
 }

@@ -26,4 +26,4 @@ pub(crate) use object_parser::parse_object;
 pub(crate) use obscured_parser::parse_obscured;
 pub(crate) use predicate_parser::parse_predicate;
 pub(crate) use subject_parser::parse_subject;
-pub(crate) use wrapped_parser::parse_wrapped;
+pub(crate) use wrapped_parser::{parse_unwrap, parse_wrapped};

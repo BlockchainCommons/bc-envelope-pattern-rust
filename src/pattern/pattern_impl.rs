@@ -674,23 +674,21 @@ impl Pattern {
     /// Creates a new `Pattern` that matches any wrapped envelope without
     /// descending. Renamed from `wrapped()` to break tests so they can be
     /// fixed.
-    pub fn wrapped_new() -> Self {
+    pub fn wrapped() -> Self {
         Pattern::Structure(StructurePattern::Wrapped(WrappedPattern::new()))
     }
 
     /// Creates a new `Pattern` that matches a wrapped envelope and also matches
     /// on its unwrapped content.
-    pub fn unwrap(pattern: Pattern) -> Self {
-        Pattern::Structure(StructurePattern::Wrapped(WrappedPattern::unwrap(
-            pattern,
-        )))
+    pub fn unwrap_matching(pattern: Pattern) -> Self {
+        Pattern::Structure(StructurePattern::Wrapped(
+            WrappedPattern::unwrap_matching(pattern),
+        ))
     }
 
     /// Creates a new `Pattern` that matches any wrapped envelope and descends
     /// into it.
-    pub fn unwrap_any() -> Self {
-        Pattern::Structure(StructurePattern::Wrapped(
-            WrappedPattern::unwrap_any(),
-        ))
+    pub fn unwrap() -> Self {
+        Pattern::Structure(StructurePattern::Wrapped(WrappedPattern::unwrap()))
     }
 }

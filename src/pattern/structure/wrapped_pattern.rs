@@ -25,13 +25,13 @@ impl WrappedPattern {
 
     /// Creates a new `WrappedPattern` that matches a wrapped envelope and also
     /// matches on its unwrapped content.
-    pub fn unwrap(pattern: Pattern) -> Self {
+    pub fn unwrap_matching(pattern: Pattern) -> Self {
         WrappedPattern::Unwrap(Box::new(pattern))
     }
 
     /// Creates a new `WrappedPattern` that matches any wrapped envelope and
     /// descends into it.
-    pub fn unwrap_any() -> Self { Self::unwrap(Pattern::any()) }
+    pub fn unwrap() -> Self { Self::unwrap_matching(Pattern::any()) }
 }
 
 impl Default for WrappedPattern {
@@ -106,7 +106,13 @@ impl std::fmt::Display for WrappedPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             WrappedPattern::Any => write!(f, "WRAPPED"),
-            WrappedPattern::Unwrap(pattern) => write!(f, "UNWRAP({})", pattern),
+            WrappedPattern::Unwrap(pattern) => {
+                if **pattern == Pattern::any() {
+                    write!(f, "UNWRAP")
+                } else {
+                    write!(f, "UNWRAP({})", pattern)
+                }
+            }
         }
     }
 }

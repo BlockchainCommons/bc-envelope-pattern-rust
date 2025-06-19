@@ -88,6 +88,9 @@ pub enum Token {
     #[token("WRAPPED")]
     Wrapped,
 
+    #[token("UNWRAP")]
+    Unwrap,
+
     #[token("SEARCH")]
     Search,
 
@@ -336,6 +339,8 @@ mod tests {
         assert_eq!(Token::lexer("ASSERT").next(), Some(Ok(Token::Assertion)));
         assert_eq!(Token::lexer("NODE").next(), Some(Ok(Token::Node)));
         assert_eq!(Token::lexer("SUBJECT").next(), Some(Ok(Token::Subject)));
+        assert_eq!(Token::lexer("WRAPPED").next(), Some(Ok(Token::Wrapped)));
+        assert_eq!(Token::lexer("UNWRAP").next(), Some(Ok(Token::Unwrap)));
 
         // Test leaf pattern keywords
         assert_eq!(Token::lexer("ARRAY").next(), Some(Ok(Token::Array)));

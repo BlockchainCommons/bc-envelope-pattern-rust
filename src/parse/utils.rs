@@ -38,7 +38,7 @@ pub(crate) fn parse_string_literal(src: &str) -> Result<(String, usize)> {
         }
         if b == b'"' {
             let inner = &src[start..pos - 1];
-            let value = inner.replace("\\\"", "\"").replace("\\\\", "\\");
+            let value = inner.replace(r#"\""#, r#"""#).replace(r#"\\"#, r#"\"#);
             skip_ws(src, &mut pos);
             return Ok((value, pos));
         }
