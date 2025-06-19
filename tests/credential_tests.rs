@@ -4,7 +4,7 @@ use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Matcher, parse_pattern};
 use indoc::indoc;
 
-use crate::common::{pattern_utils::format_paths_opt, test_data::{credential, redacted_credential}};
+use crate::common::{pattern_utils::{format_paths_opt, FormatPathOpts}, test_data::{credential, redacted_credential}};
 
 #[test]
 fn test_credential() {
@@ -143,7 +143,7 @@ fn test_wrapped_repeat() {
     let env = credential();
     let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
-    println!("{}", format_paths_opt(&paths, Some(80)));
+    println!("{}", format_paths_opt(&paths, FormatPathOpts::default().max_length(80)));
     assert!(paths.iter().any(|p| p.last().unwrap().is_node()));
 }
 
