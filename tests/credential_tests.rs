@@ -151,11 +151,12 @@ fn test_wrapped_repeat() {
     let pat = parse_pattern("(WRAPPED)*>NODE").unwrap();
     let paths = pat.paths(&env);
 
-    // This expectation is correct, because the search starts at the root
-    // `0b721f78 NODE`, which *by itself* is a 1-element path that consists of
-    // zero or more `WRAPPED` nodes leading to a `NODE`.
+    // The pattern should match both the outer node and its unwrapped subject
+    // node since the `WRAPPED` repetition can consume the wrapper around the
+    // subject.
     let expected = indoc! {r#"
         0b721f78 NODE
+            8122ffa9 NODE
     "#}
     .trim();
 
@@ -173,12 +174,13 @@ fn test_search_wrapped_repeat() {
     // that start a path of zero or more `WRAPPED` elements leading to a `NODE`.
     let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
-    // The expectation below is NOT correct, because every `NODE` in the tree
-    // should match the pattern, including the inner `8122ffa9 NODE`. This means
-    // there should also be a path that includes the singular `8122ffa9 NODE`
-    // element:
+    // Every `NODE` in the tree should match the pattern, including the inner
+    // `8122ffa9 NODE`. Consequently there are two matching paths: one that
+    // descends through the wrapper and another that matches the inner node
+    // directly.
     let expected = indoc! {r#"
         0b721f78 NODE
+            8122ffa9 NODE
         0b721f78 NODE
             397a2d4c WRAPPED
                 8122ffa9 NODE
