@@ -567,7 +567,15 @@ fn run_thread(
                     if th.capture_stack.len() > id {
                         if let Some(start_idx) = th.capture_stack[id].pop() {
                             if th.captures.len() > id {
-                                let cap = th.path[start_idx..].to_vec();
+                                let mut end = th.path.len();
+                                if let Some(Instr::ExtendSequence) =
+                                    prog.code.get(th.pc + 1)
+                                {
+                                    if end > 0 {
+                                        end -= 1;
+                                    }
+                                }
+                                let cap = th.path[start_idx..end].to_vec();
                                 th.captures[id].push(cap);
                             }
                         }
