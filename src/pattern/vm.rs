@@ -314,10 +314,12 @@ fn run_thread(
                         produced = true;
                         for found_path in found_paths {
                             let mut result_path = th.path.clone();
-                            if !(found_path.len() == 1
-                                && found_path[0] == th.env)
-                            {
-                                result_path.extend(found_path);
+                            if let Some(first) = found_path.first() {
+                                if first == &th.env {
+                                    result_path.extend(found_path.into_iter().skip(1));
+                                } else {
+                                    result_path.extend(found_path);
+                                }
                             }
 
                             let mut result_caps = th.captures.clone();
