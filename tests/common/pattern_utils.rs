@@ -9,6 +9,8 @@ pub struct FormatPathOpts {
     /// Maximum length of each line's content (after indentation).
     /// If None, no truncation is applied.
     max_length: Option<usize>,
+
+    summary: bool,
 }
 
 impl FormatPathOpts {
@@ -21,6 +23,12 @@ impl FormatPathOpts {
         self.max_length = Some(max_length);
         self
     }
+
+    /// Sets whether to format the path as a summary.
+    pub fn summary(mut self, summary: bool) -> Self {
+        self.summary = summary;
+        self
+    }
 }
 
 impl AsRef<FormatPathOpts> for FormatPathOpts {
@@ -29,16 +37,24 @@ impl AsRef<FormatPathOpts> for FormatPathOpts {
 
 // Format each path element on its own line, each line successively indented by
 // 4 spaces. Options can be provided to customize the formatting.
-pub fn format_path_opt(path: &Path, opts: impl AsRef<FormatPathOpts>) -> String {
+pub fn format_path_opt(
+    path: &Path,
+    opts: impl AsRef<FormatPathOpts>,
+) -> String {
     let opts = opts.as_ref();
     let mut lines = Vec::new();
     for (i, element) in path.iter().enumerate() {
         let indent = " ".repeat(i * 4);
-        let content = format!(
-            "{} {}",
-            element.short_id(DigestDisplayFormat::Short),
-            element.format_flat()
-        );
+        let id = element.short_id(DigestDisplayFormat::Short);
+        let content = if opts.summary {
+            let summary = with_format_context!(|ctx| {
+                let max_length = opts.max_length.unwrap_or(usize::MAX);
+                element.summary(max_length, ctx)
+            });
+            format!("{} {}", id, summary)
+        } else {
+            format!("{} {}", id, element.format_flat())
+        };
 
         let content = if let Some(max_len) = opts.max_length {
             if content.len() > max_len {
@@ -67,7 +83,10 @@ pub fn format_path(path: &Path) -> String {
 }
 
 // Format multiple paths with custom formatting options.
-pub fn format_paths_opt(paths: &[Path], opts: impl AsRef<FormatPathOpts>) -> String {
+pub fn format_paths_opt(
+    paths: &[Path],
+    opts: impl AsRef<FormatPathOpts>,
+) -> String {
     let opts = opts.as_ref();
     paths
         .iter()
