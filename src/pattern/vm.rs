@@ -162,25 +162,6 @@ fn repeat_paths(
     path: &Path,
     quantifier: Quantifier,
 ) -> Vec<(Envelope, Path)> {
-    // Special case: For (WRAPPED)* and (WRAPPED)? patterns when applied to root
-    // is NODE, this should match with zero repetitions (returning the
-    // current envelope) This handles test_wrapped_repeat test case
-    // specifically
-    if quantifier.min() == 0
-        && env.is_node()
-        && (matches!(
-            pat,
-            Pattern::Structure(
-                crate::pattern::structure::StructurePattern::Wrapped(_)
-            )
-        ))
-    {
-        // For test_wrapped_repeat, we need to return only this result and not
-        // match any other paths
-        if matches!(quantifier.max(), Some(0)) {
-            return vec![(env.clone(), path.clone())];
-        }
-    }
 
     // Build states for all possible repetition counts
     let mut states: Vec<Vec<(Envelope, Path)>> =
@@ -257,22 +238,6 @@ fn repeat_paths(
         }
     };
 
-    // Special pattern handling for test_wrapped_repeat
-    if env.is_node()
-        && matches!(
-            pat,
-            Pattern::Structure(
-                crate::pattern::structure::StructurePattern::Wrapped(_)
-            )
-        )
-        && quantifier.min() == 0
-        && matches!(quantifier.reluctance(), Reluctance::Greedy)
-    {
-        // For (WRAPPED)* with greedy matching on a NODE, prioritize the
-        // zero-repetition case This specifically handles
-        // test_wrapped_repeat expectations
-        return zero_rep_result;
-    }
 
     // Collect results based on the counts determined above
     let mut out = Vec::new();
