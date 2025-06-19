@@ -179,11 +179,9 @@ fn test_search_wrapped_repeat() {
     // `8122ffa9 NODE` element:
     let expected = indoc! {r#"
         0b721f78 NODE
-        --- here
         0b721f78 NODE
             397a2d4c WRAPPED
                 8122ffa9 NODE
-        --- or here
     "#}
     .trim();
 
