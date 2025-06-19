@@ -119,6 +119,7 @@ struct Thread {
     saved_paths: Vec<Path>,
     captures: Vec<Vec<Path>>,
     capture_stack: Vec<Vec<usize>>,
+    seen: std::collections::HashSet<Vec<bc_components::Digest>>,
 }
 
 /// Match atomic patterns without recursion into the VM.
@@ -328,8 +329,13 @@ fn run_thread(
                                     result_caps[*idx].extend(pths.clone());
                                 }
                             }
-
-                            out.push((result_path, result_caps));
+                            let digests: Vec<_> = result_path
+                                .iter()
+                                .map(|e| e.digest().into_owned())
+                                .collect();
+                            if th.seen.insert(digests) {
+                                out.push((result_path, result_caps));
+                            }
                         }
                     }
 
@@ -524,6 +530,7 @@ pub fn run(
         saved_paths: Vec::new(),
         captures: vec![Vec::new(); prog.capture_names.len()],
         capture_stack: vec![Vec::new(); prog.capture_names.len()],
+        seen: std::collections::HashSet::new(),
     };
     run_thread(prog, start, &mut out);
     out.into_iter()
