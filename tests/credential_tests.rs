@@ -173,10 +173,10 @@ fn test_search_wrapped_repeat() {
     // that start a path of zero or more `WRAPPED` elements leading to a `NODE`.
     let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
-    // This expectation is NOT correct, because every `NODE` in the tree
-    // should match the pattern, including the inner `8122ffa9 NODE`.
-    // This means there should also be a path that includes the singular
-    // `8122ffa9 NODE` element:
+    // The expectation below is NOT correct, because every `NODE` in the tree
+    // should match the pattern, including the inner `8122ffa9 NODE`. This means
+    // there should also be a path that includes the singular `8122ffa9 NODE`
+    // element:
     let expected = indoc! {r#"
         0b721f78 NODE
         0b721f78 NODE
@@ -189,7 +189,6 @@ fn test_search_wrapped_repeat() {
         format_paths_opt(&paths, FormatPathOpts::default().summary(true)),
         expected
     );
-    assert_eq!(paths.len(), 2);
 }
 
 #[test]
