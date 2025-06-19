@@ -4,7 +4,10 @@ use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Matcher, parse_pattern};
 use indoc::indoc;
 
-use crate::common::{pattern_utils::{format_paths_opt, FormatPathOpts}, test_data::{credential, redacted_credential}};
+use crate::common::{
+    pattern_utils::{FormatPathOpts, format_paths_opt},
+    test_data::{credential, redacted_credential},
+};
 
 #[test]
 fn test_credential() {
@@ -143,7 +146,8 @@ fn test_wrapped_repeat() {
     // See above for the full tree structure of the credential.
     let env = credential();
 
-    // A pattern that matches zero or more `WRAPPED` nodes leading to a `NODE`.
+    // A pattern that matches zero or more `WRAPPED` elements leading to a
+    // `NODE`.
     let pat = parse_pattern("(WRAPPED)*>NODE").unwrap();
     let paths = pat.paths(&env);
 
@@ -164,15 +168,23 @@ fn test_wrapped_repeat() {
 #[test]
 #[ignore]
 fn test_search_wrapped_repeat() {
+    // See above for the full tree structure of the credential.
     let env = credential();
+    // A pattern that searches every element in the tree for those
+    // that start a path of zero or more `WRAPPED` elements leading to a `NODE`.
     let pat = parse_pattern("SEARCH((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
+    // This expectation is NOT correct, because every `NODE` in the tree
+    // should match the pattern, including the inner `8122ffa9 NODE`.
+    // This means there should also be a path that includes the singular
+    // `8122ffa9 NODE` element:
     let expected = indoc! {r#"
         0b721f78 NODE
-            8122ffa9 NODE
+        --- here
         0b721f78 NODE
             397a2d4c WRAPPED
                 8122ffa9 NODE
+        --- or here
     "#}
     .trim();
 
