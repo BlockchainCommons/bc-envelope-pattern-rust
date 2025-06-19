@@ -164,7 +164,7 @@ fn test_wrapped_sequence() {
     assert_actual_expected!(wrapped_4.format_flat(), expected);
 
     // A pattern that matches a single wrapped envelope.
-    let wrapped_1_pattern = Pattern::sequence(vec![Pattern::wrapped()]);
+    let wrapped_1_pattern = Pattern::sequence(vec![Pattern::wrapped_new()]);
     let paths = wrapped_1_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
@@ -177,7 +177,7 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches two wrapped envelopes in sequence.
     let wrapped_2_pattern =
-        Pattern::sequence(vec![Pattern::wrapped(), Pattern::wrapped()]);
+        Pattern::sequence(vec![Pattern::wrapped_new(), Pattern::wrapped_new()]);
     let paths = wrapped_2_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
@@ -191,9 +191,9 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches three wrapped envelopes in sequence.
     let wrapped_3_pattern = Pattern::sequence(vec![
-        Pattern::wrapped(),
-        Pattern::wrapped(),
-        Pattern::wrapped(),
+        Pattern::wrapped_new(),
+        Pattern::wrapped_new(),
+        Pattern::wrapped_new(),
     ]);
     let paths = wrapped_3_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
@@ -209,10 +209,10 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches four wrapped envelopes in sequence.
     let wrapped_4_pattern = Pattern::sequence(vec![
-        Pattern::wrapped(),
-        Pattern::wrapped(),
-        Pattern::wrapped(),
-        Pattern::wrapped(),
+        Pattern::wrapped_new(),
+        Pattern::wrapped_new(),
+        Pattern::wrapped_new(),
+        Pattern::wrapped_new(),
     ]);
     let paths = wrapped_4_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
@@ -237,7 +237,7 @@ fn test_wrapped_sequence() {
 fn optional_wrapped_pattern() {
     // A pattern that matches an envelope that may or may not be wrapped.
     let optional_wrapped_pattern = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Greedy),
+        Pattern::repeat(Pattern::wrapped_new(), 0..=1, Reluctance::Greedy),
         Pattern::any_number(),
     ]);
     assert_eq!(

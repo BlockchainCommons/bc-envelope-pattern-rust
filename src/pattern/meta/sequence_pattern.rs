@@ -102,8 +102,8 @@ mod tests {
 
     #[test]
     fn test_sequence_pattern_display() {
-        let pattern1 = Pattern::wrapped();
-        let pattern2 = Pattern::wrapped();
+        let pattern1 = Pattern::wrapped_new();
+        let pattern2 = Pattern::wrapped_new();
         let sequence_pattern = SequencePattern::new(vec![pattern1, pattern2]);
         assert_eq!(sequence_pattern.to_string(), "WRAPPED>WRAPPED");
     }

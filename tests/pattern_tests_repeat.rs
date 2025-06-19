@@ -194,7 +194,7 @@ fn wrap_n(mut env: Envelope, n: usize) -> Envelope {
 #[test]
 fn repeat_any_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), .., Reluctance::Greedy),
+        Pattern::repeat(Pattern::wrapped_new(), .., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
 
@@ -215,7 +215,7 @@ fn repeat_any_greedy() {
 fn repeat_any_lazy() {
     let env = wrap_n(Envelope::new(42), 4);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), .., Reluctance::Lazy),
+        Pattern::repeat(Pattern::wrapped_new(), .., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -234,7 +234,7 @@ fn repeat_any_lazy() {
 fn repeat_any_possessive() {
     let env = wrap_n(Envelope::new(42), 4);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), .., Reluctance::Possessive),
+        Pattern::repeat(Pattern::wrapped_new(), .., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -253,7 +253,7 @@ fn repeat_any_possessive() {
 fn repeat_some_greedy() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 1.., Reluctance::Greedy),
+        Pattern::repeat(Pattern::wrapped_new(), 1.., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -271,7 +271,7 @@ fn repeat_some_greedy() {
 fn repeat_some_lazy() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 1.., Reluctance::Lazy),
+        Pattern::repeat(Pattern::wrapped_new(), 1.., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -289,7 +289,7 @@ fn repeat_some_lazy() {
 fn repeat_some_possessive() {
     let env = wrap_n(Envelope::new(42), 3);
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 1.., Reluctance::Possessive),
+        Pattern::repeat(Pattern::wrapped_new(), 1.., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
@@ -306,7 +306,7 @@ fn repeat_some_possessive() {
 #[test]
 fn repeat_optional_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Greedy),
+        Pattern::repeat(Pattern::wrapped_new(), 0..=1, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -328,7 +328,7 @@ fn repeat_optional_greedy() {
 #[test]
 fn repeat_optional_lazy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Lazy),
+        Pattern::repeat(Pattern::wrapped_new(), 0..=1, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -349,7 +349,7 @@ fn repeat_optional_lazy() {
 #[test]
 fn repeat_optional_possessive() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 0..=1, Reluctance::Possessive),
+        Pattern::repeat(Pattern::wrapped_new(), 0..=1, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
@@ -370,7 +370,7 @@ fn repeat_optional_possessive() {
 #[test]
 fn repeat_range_greedy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 2..=3, Reluctance::Greedy),
+        Pattern::repeat(Pattern::wrapped_new(), 2..=3, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -389,7 +389,7 @@ fn repeat_range_greedy() {
 #[test]
 fn repeat_range_lazy() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 2..=3, Reluctance::Lazy),
+        Pattern::repeat(Pattern::wrapped_new(), 2..=3, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -407,7 +407,7 @@ fn repeat_range_lazy() {
 #[test]
 fn repeat_range_possessive() {
     let pat = Pattern::sequence(vec![
-        Pattern::repeat(Pattern::wrapped(), 2..=3, Reluctance::Possessive),
+        Pattern::repeat(Pattern::wrapped_new(), 2..=3, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
     let env = wrap_n(Envelope::new(42), 3);
@@ -428,8 +428,8 @@ fn repeat_any_modes() {
 
     let pat = |mode| {
         Pattern::sequence(vec![
-            Pattern::repeat(Pattern::wrapped(), 0.., mode),
-            Pattern::wrapped(),
+            Pattern::repeat(Pattern::wrapped_new(), 0.., mode),
+            Pattern::wrapped_new(),
             Pattern::text("data"),
         ])
     };
@@ -456,7 +456,7 @@ fn repeat_optional_modes() {
 
     let pat = |mode| {
         Pattern::sequence(vec![
-            Pattern::repeat(Pattern::wrapped(), 0..=1, mode),
+            Pattern::repeat(Pattern::wrapped_new(), 0..=1, mode),
             Pattern::number(42),
         ])
     };
@@ -500,7 +500,7 @@ fn repeat_some_order() {
 
     let pat = |mode| {
         Pattern::sequence(vec![
-            Pattern::repeat(Pattern::wrapped(), 1.., mode),
+            Pattern::repeat(Pattern::wrapped_new(), 1.., mode),
             Pattern::any_subject(),
         ])
     };
@@ -538,7 +538,7 @@ fn repeat_range_order() {
 
     let pat = |mode| {
         Pattern::sequence(vec![
-            Pattern::repeat(Pattern::wrapped(), 2..=3, mode),
+            Pattern::repeat(Pattern::wrapped_new(), 2..=3, mode),
             Pattern::any_subject(),
         ])
     };

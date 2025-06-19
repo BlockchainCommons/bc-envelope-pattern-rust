@@ -16,7 +16,7 @@ fn parse_node_patterns() {
 #[test]
 fn parse_wrapped_pattern() {
     let p = parse_pattern("WRAPPED").unwrap();
-    assert_eq!(p, Pattern::wrapped());
+    assert_eq!(p, Pattern::wrapped_new());
     assert_eq!(p.to_string(), "WRAPPED");
 }
 

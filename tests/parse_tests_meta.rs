@@ -109,7 +109,7 @@ fn parse_repeat_patterns() {
     let p = parse_pattern("(WRAPPED)*").unwrap();
     assert_eq!(
         p,
-        Pattern::repeat(Pattern::wrapped(), 0.., Reluctance::Greedy)
+        Pattern::repeat(Pattern::wrapped_new(), 0.., Reluctance::Greedy)
     );
     assert_eq!(p.to_string(), "(WRAPPED)*");
 

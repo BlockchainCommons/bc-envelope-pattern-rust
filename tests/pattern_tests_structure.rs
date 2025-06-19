@@ -45,11 +45,11 @@ fn test_subject_pattern() {
 fn test_wrapped_pattern() {
     // Does not match non-wrapped subjects.
     let envelope = Envelope::new(42);
-    assert!(!Pattern::wrapped().matches(&envelope));
+    assert!(!Pattern::wrapped_new().matches(&envelope));
 
     // Matches a wrapped envelope with any subject.
     let wrapped_envelope = envelope.wrap_envelope();
-    let paths = Pattern::wrapped().paths(&wrapped_envelope);
+    let paths = Pattern::wrapped_new().paths(&wrapped_envelope);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
@@ -61,7 +61,7 @@ fn test_wrapped_pattern() {
     // The matched paths include the assertion.
     let wrapped_envelope_with_assertion =
         wrapped_envelope.add_assertion("an", "assertion");
-    let paths = Pattern::wrapped().paths(&wrapped_envelope_with_assertion);
+    let paths = Pattern::wrapped_new().paths(&wrapped_envelope_with_assertion);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
         169aba00 NODE { 42 } [ "an": "assertion" ]
@@ -74,7 +74,7 @@ fn test_wrapped_pattern() {
     // Matching a wrapped envelope with assertions returns a path where the
     // first element is the original wrapped envelope including assertions,
     // and the second element is the still-wrapped subject.
-    let paths = Pattern::wrapped().paths(&wrapped_twice);
+    let paths = Pattern::wrapped_new().paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         52d47c15 WRAPPED { { 42 } [ "an": "assertion" ] }
@@ -83,7 +83,7 @@ fn test_wrapped_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
 
     let wrapped_twice_pattern =
-        Pattern::sequence(vec![Pattern::wrapped(), Pattern::wrapped()]);
+        Pattern::sequence(vec![Pattern::wrapped_new(), Pattern::wrapped_new()]);
     let paths = wrapped_twice_pattern.paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"

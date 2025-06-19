@@ -4,5 +4,5 @@ use crate::{Pattern, Result};
 pub(crate) fn parse_wrapped(
     _lexer: &mut logos::Lexer<Token>,
 ) -> Result<Pattern> {
-    Ok(Pattern::wrapped())
+    Ok(Pattern::wrapped_new())
 }
