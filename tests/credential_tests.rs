@@ -12,9 +12,8 @@ use crate::common::{
 #[test]
 fn test_credential() {
     let env = credential();
-    assert_actual_expected!(
-        env.format(),
-        indoc! {r#"
+    #[rustfmt::skip]
+    assert_actual_expected!(env.format(), indoc! {r#"
         {
             ARID(4676635a) [
                 'isA': "Certificate of Completion"
@@ -35,15 +34,16 @@ fn test_credential() {
             'note': "Signed by Example Electrical Engineering Board"
             'signed': Signature
         ]
-    "#}
-        .trim()
-    );
-    assert_actual_expected!(
-        env.tree_format(),
-        indoc! {r#"
+    "#}.trim());
+    #[rustfmt::skip]
+    assert_actual_expected!(env.format_flat(), indoc! {r#"
+        { ARID(4676635a) [ 'isA': "Certificate of Completion", "certificateNumber": "123-456-789", "continuingEducationUnits": 1, "expirationDate": 2028-01-01, "firstName": "James", "issueDate": 2020-01-01, "lastName": "Maxwell", "photo": "This is James Maxwell's photo.", "professionalDevelopmentHours": 15, "subject": "RF and Microwave Engineering", "topics": ["Subject 1", "Subject 2"], 'controller': "Example Electrical Engineering Board", 'issuer': "Example Electrical Engineering Board" ] } [ 'note': "Signed by Example Electrical Engineering Board", 'signed': Signature ]
+    "#}.trim());
+    #[rustfmt::skip]
+    assert_actual_expected!(env.tree_format(), indoc! {r#"
         0b721f78 NODE
             397a2d4c subj WRAPPED
-                8122ffa9 subj NODE
+                8122ffa9 cont NODE
                     10d3de01 subj ARID(4676635a)
                     1f9ff098 ASSERTION
                         9e3bff3a pred "certificateNumber"
@@ -90,9 +90,7 @@ fn test_credential() {
             e6d7fca0 ASSERTION
                 0fcd6a39 pred 'note'
                 f106bad1 obj "Signed by Example Electrical Engineering…"
-    "#}
-        .trim()
-    );
+    "#}.trim());
 }
 
 #[test]
@@ -155,6 +153,7 @@ fn test_wrapped_repeat() {
     // The pattern should match both the outer node and its unwrapped subject
     // node since the `WRAPPED` repetition can consume the wrapper around the
     // subject.
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
             8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
@@ -180,6 +179,7 @@ fn test_search_wrapped_repeat() {
     // `8122ffa9 NODE`. Consequently there are two matching paths: one that
     // descends through the wrapper and another that matches the inner node
     // directly.
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
             8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
@@ -198,9 +198,8 @@ fn test_search_wrapped_repeat() {
 #[test]
 fn test_redacted_credential() {
     let env = redacted_credential();
-    assert_actual_expected!(
-        env.format(),
-        indoc! {r#"
+    #[rustfmt::skip]
+    assert_actual_expected!(env.format(), indoc! {r#"
         {
             ARID(4676635a) [
                 'isA': "Certificate of Completion"
@@ -215,15 +214,12 @@ fn test_redacted_credential() {
             'note': "Signed by Example Electrical Engineering Board"
             'signed': Signature
         ]
-    "#}
-        .trim()
-    );
-    assert_actual_expected!(
-        env.tree_format(),
-        indoc! {r#"
+    "#}.trim());
+    #[rustfmt::skip]
+    assert_actual_expected!(env.tree_format(), indoc! {r#"
         0b721f78 NODE
             397a2d4c subj WRAPPED
-                8122ffa9 subj NODE
+                8122ffa9 cont NODE
                     10d3de01 subj ARID(4676635a)
                     1f9ff098 ELIDED
                     36c254d0 ASSERTION
@@ -256,9 +252,7 @@ fn test_redacted_credential() {
             e6d7fca0 ASSERTION
                 0fcd6a39 pred 'note'
                 f106bad1 obj "Signed by Example Electrical Engineering…"
-    "#}
-        .trim()
-    );
+    "#}.trim());
 }
 
 #[test]

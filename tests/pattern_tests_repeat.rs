@@ -186,7 +186,7 @@ fn transpose(path: impl AsRef<Path>) -> String {
 
 fn wrap_n(mut env: Envelope, n: usize) -> Envelope {
     for _ in 0..n {
-        env = env.wrap_envelope();
+        env = env.wrap();
     }
     env
 }
@@ -493,8 +493,8 @@ fn repeat_some_order() {
 
     let expected = indoc! {r#"
         06bb2465 WRAPPED
-            70b5f17d subj WRAPPED
-                5e85370e subj "x"
+            70b5f17d cont WRAPPED
+                5e85370e cont "x"
     "#}
     .trim();
     assert_actual_expected!(env.tree_format(), expected);
@@ -593,7 +593,7 @@ fn test_repeat() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    let wrapped_env = env.wrap_envelope();
+    let wrapped_env = env.wrap();
     let paths = pat.paths(&wrapped_env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -625,7 +625,7 @@ fn test_repeat() {
     "#}.trim();
     assert_actual_expected!(format_paths(caps), expected_cap);
 
-    let wrapped_env = wrapped_env.wrap_envelope();
+    let wrapped_env = wrapped_env.wrap();
     let pat = Pattern::parse("@cap((WRAPPED>UNWRAP)*)>NODE").unwrap();
     let (paths, captures) = pat.paths_with_captures(&wrapped_env);
     #[rustfmt::skip]
@@ -649,13 +649,13 @@ fn test_repeat() {
 fn test_capture() {
     let env = Envelope::new("Alice")
         .add_assertion("knows", "Bob")
-        .wrap_envelope()
-        .wrap_envelope();
+        .wrap()
+        .wrap();
 
     let expected = indoc! {r#"
         3defda74 WRAPPED
-            fd881a24 subj WRAPPED
-                8955db5e subj NODE
+            fd881a24 cont WRAPPED
+                8955db5e cont NODE
                     13941b48 subj "Alice"
                     78d666eb ASSERTION
                         db7dd21c pred "knows"
@@ -681,9 +681,6 @@ fn test_capture() {
     assert_eq!(caps.len(), 1);
     // The capture contains the `WRAPPED` elements leading to the `NODE`, but
     // not the `NODE` itself.
-    //
-    // This is the expected behavior, but it is failing because the `NODE` is
-    // being included in the capture.
     #[rustfmt::skip]
     let expected_cap = indoc! {r#"
         3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }

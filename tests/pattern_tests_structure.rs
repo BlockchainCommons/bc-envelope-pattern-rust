@@ -48,7 +48,7 @@ fn test_wrapped_pattern() {
     assert!(!Pattern::wrapped().matches(&envelope));
 
     // Matches a wrapped envelope with any subject.
-    let wrapped_envelope = envelope.wrap_envelope();
+    let wrapped_envelope = envelope.wrap();
     let paths = Pattern::unwrap().paths(&wrapped_envelope);
     // println!("{}", format_paths(&paths));
     let expected = indoc! {r#"
@@ -70,7 +70,7 @@ fn test_wrapped_pattern() {
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    let wrapped_twice = wrapped_envelope_with_assertion.wrap_envelope();
+    let wrapped_twice = wrapped_envelope_with_assertion.wrap();
     // Matching a wrapped envelope with assertions returns a path where the
     // first element is the original wrapped envelope including assertions,
     // and the second element is the still-wrapped subject.

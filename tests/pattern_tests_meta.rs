@@ -140,18 +140,18 @@ fn test_one_element_sequence_pattern() {
 #[test]
 fn test_wrapped_sequence() {
     let env_1 = Envelope::new("data");
-    let wrapped_1 = env_1.wrap_envelope();
-    let wrapped_2 = wrapped_1.wrap_envelope();
-    let wrapped_3 = wrapped_2.wrap_envelope();
-    let wrapped_4 = wrapped_3.wrap_envelope();
+    let wrapped_1 = env_1.wrap();
+    let wrapped_2 = wrapped_1.wrap();
+    let wrapped_3 = wrapped_2.wrap();
+    let wrapped_4 = wrapped_3.wrap();
 
     // println!("{}", wrapped_4.tree_format());
     let expected = indoc! {r#"
         25cb582c WRAPPED
-            c1426a18 subj WRAPPED
-                ee8cade0 subj WRAPPED
-                    febc1555 subj WRAPPED
-                        e909da9a subj "data"
+            c1426a18 cont WRAPPED
+                ee8cade0 cont WRAPPED
+                    febc1555 cont WRAPPED
+                        e909da9a cont "data"
     "#}
     .trim();
     assert_actual_expected!(wrapped_4.tree_format(), expected);
@@ -247,7 +247,7 @@ fn optional_wrapped_pattern() {
     );
 
     let inner = Envelope::new(42);
-    let wrapped = inner.wrap_envelope();
+    let wrapped = inner.wrap();
 
     let inner_paths = optional_wrapped_pattern.paths(&inner);
     #[rustfmt::skip]
@@ -418,8 +418,7 @@ fn test_search_pattern_with_wrapped() {
 
     let inner =
         Envelope::new("secret").add_assertion("classification", "top-secret");
-    let envelope =
-        Envelope::new("Alice").add_assertion("data", inner.wrap_envelope());
+    let envelope = Envelope::new("Alice").add_assertion("data", inner.wrap());
 
     let secret_text_search_paths = secret_text_search_pattern.paths(&envelope);
     // println!("{}", format_paths(&paths));
@@ -481,7 +480,7 @@ fn test_search_pattern_credential() {
     let expected = indoc! {r#"
         0b721f78 NODE
             397a2d4c subj WRAPPED
-                8122ffa9 subj NODE
+                8122ffa9 cont NODE
                     10d3de01 subj ARID(4676635a)
                     1f9ff098 ASSERTION
                         9e3bff3a pred "certificateNumber"

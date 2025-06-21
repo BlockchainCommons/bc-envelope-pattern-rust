@@ -43,15 +43,15 @@ impl Axis {
             (Axis::Wrapped, Node { subject, .. }) => {
                 if subject.is_wrapped() {
                     vec![(
-                        subject.unwrap_envelope().unwrap(),
-                        EdgeType::Wrapped,
+                        subject.try_unwrap().unwrap(),
+                        EdgeType::Content,
                     )]
                 } else {
                     vec![]
                 }
             }
             (Axis::Wrapped, Wrapped { envelope, .. }) => {
-                vec![(envelope.clone(), EdgeType::Wrapped)]
+                vec![(envelope.clone(), EdgeType::Content)]
             }
             _ => Vec::new(),
         }
@@ -162,7 +162,6 @@ fn repeat_paths(
     path: &Path,
     quantifier: Quantifier,
 ) -> Vec<(Envelope, Path)> {
-
     // Build states for all possible repetition counts
     let mut states: Vec<Vec<(Envelope, Path)>> =
         vec![vec![(env.clone(), path.clone())]];
@@ -237,7 +236,6 @@ fn repeat_paths(
             }
         }
     };
-
 
     // Collect results based on the counts determined above
     let mut out = Vec::new();
@@ -571,9 +569,7 @@ fn run_thread(
                                 if let Some(Instr::ExtendSequence) =
                                     prog.code.get(th.pc + 1)
                                 {
-                                    if end > 0 {
-                                        end -= 1;
-                                    }
+                                    end = end.saturating_sub(1);
                                 }
                                 let cap = th.path[start_idx..end].to_vec();
                                 th.captures[id].push(cap);

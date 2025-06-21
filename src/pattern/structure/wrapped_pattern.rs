@@ -49,7 +49,7 @@ impl Matcher for WrappedPattern {
                 }
                 WrappedPattern::Unwrap(pattern) => {
                     // Match the content of the wrapped envelope
-                    if let Ok(unwrapped) = subject.unwrap_envelope() {
+                    if let Ok(unwrapped) = subject.try_unwrap() {
                         pattern
                             .paths(&unwrapped)
                             .into_iter()
