@@ -11,7 +11,15 @@ pub(crate) fn parse_primary(
 ) -> Result<Pattern> {
     let token = match lexer.next() {
         Some(Ok(tok)) => tok,
-        Some(Err(e)) => return Err(e),
+        Some(Err(e)) => {
+            // Convert Unknown errors to UnrecognizedToken with span information
+            match e {
+                Error::Unknown => {
+                    return Err(Error::UnrecognizedToken(lexer.span()));
+                }
+                _ => return Err(e),
+            }
+        }
         None => return Err(Error::UnexpectedEndOfInput),
     };
 

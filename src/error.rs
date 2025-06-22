@@ -18,7 +18,7 @@ pub enum Error {
     #[error("Unexpected token {0:?}")]
     UnexpectedToken(Box<Token>, Span),
 
-    #[error("Unrecognized token")]
+    #[error("Unrecognized token at position {0:?}")]
     UnrecognizedToken(Span),
 
     #[error("Invalid regex pattern at {0:?}")]

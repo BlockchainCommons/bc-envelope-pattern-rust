@@ -13,7 +13,16 @@ impl Pattern {
         match lexer.next() {
             None => Ok(pattern),
             Some(Ok(_)) => Err(Error::ExtraData(lexer.span())),
-            Some(Err(e)) => Err(e),
+            Some(Err(e)) => {
+                // If we get an Unknown error from the lexer, convert it to
+                // UnrecognizedToken with span information
+                match e {
+                    Error::Unknown => {
+                        Err(Error::UnrecognizedToken(lexer.span()))
+                    }
+                    _ => Err(e),
+                }
+            }
         }
     }
 }
