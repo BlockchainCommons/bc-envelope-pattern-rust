@@ -27,6 +27,11 @@ pub struct FormatPathsOpts {
     /// Format for each path element.
     /// Default is `PathElementFormat::Summary`.
     element_format: PathElementFormat,
+
+    /// If true, only the last element of each path will be formatted.
+    /// This is useful for displaying only the final destination of a path.
+    /// If false, all elements will be formatted.
+    last_element_only: bool,
 }
 
 impl Default for FormatPathsOpts {
@@ -38,6 +43,7 @@ impl Default for FormatPathsOpts {
             max_length: None,
             indent: true,
             element_format: PathElementFormat::default(),
+            last_element_only: false,
         }
     }
 }
@@ -64,6 +70,14 @@ impl FormatPathsOpts {
     /// Default is `PathElementFormat::Summary`.
     pub fn element_format(mut self, format: PathElementFormat) -> Self {
         self.element_format = format;
+        self
+    }
+
+    /// Sets whether to format only the last element of each path.
+    /// If true, only the last element will be formatted.
+    /// If false, all elements will be formatted.
+    pub fn last_element_only(mut self, last_element_only: bool) -> Self {
+        self.last_element_only = last_element_only;
         self
     }
 }
@@ -130,26 +144,44 @@ pub fn format_path_opt(
     opts: impl AsRef<FormatPathsOpts>,
 ) -> String {
     let opts = opts.as_ref();
-    let mut lines = Vec::new();
-    for (index, element) in path.iter().enumerate() {
-        let indent = if opts.indent {
-            " ".repeat(index * 4)
+
+    if opts.last_element_only {
+        // Only format the last element, no indentation.
+        if let Some(element) = path.iter().last() {
+            match opts.element_format {
+                PathElementFormat::Summary => {
+                    let summary = envelope_summary(element);
+                    truncate_with_ellipsis(&summary, opts.max_length)
+                }
+                PathElementFormat::EnvelopeUR => element.ur_string(),
+                PathElementFormat::DigestUR => element.digest().ur_string(),
+            }
         } else {
             String::new()
-        };
+        }
+    } else {
+        // Format all elements, with optional indentation.
+        let mut lines = Vec::new();
+        for (index, element) in path.iter().enumerate() {
+            let indent = if opts.indent {
+                " ".repeat(index * 4)
+            } else {
+                String::new()
+            };
 
-        let content = match opts.element_format {
-            PathElementFormat::Summary => {
-                let summary = envelope_summary(element);
-                truncate_with_ellipsis(&summary, opts.max_length)
-            }
-            PathElementFormat::EnvelopeUR => element.ur_string(),
-            PathElementFormat::DigestUR => element.digest().ur_string(),
-        };
+            let content = match opts.element_format {
+                PathElementFormat::Summary => {
+                    let summary = envelope_summary(element);
+                    truncate_with_ellipsis(&summary, opts.max_length)
+                }
+                PathElementFormat::EnvelopeUR => element.ur_string(),
+                PathElementFormat::DigestUR => element.digest().ur_string(),
+            };
 
-        lines.push(format!("{}{}", indent, content));
+            lines.push(format!("{}{}", indent, content));
+        }
+        lines.join("\n")
     }
-    lines.join("\n")
 }
 
 // Format each path element on its own line, each line successively indented by
