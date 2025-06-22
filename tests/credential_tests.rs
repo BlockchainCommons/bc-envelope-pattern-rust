@@ -5,7 +5,7 @@ use bc_envelope_pattern::{Matcher, Pattern};
 use indoc::indoc;
 
 use crate::common::{
-    pattern_utils::{format_paths_opt, FormatPathOpts},
+    pattern_utils::{FormatPathsOpts, format_paths_opt},
     test_data::{credential, redacted_credential},
 };
 
@@ -161,7 +161,7 @@ fn test_wrapped_repeat() {
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathOpts::default().max_length(80)),
+        format_paths_opt(&paths, FormatPathsOpts::default().max_length(80)),
         expected
     );
 }
@@ -190,7 +190,7 @@ fn test_search_wrapped_repeat() {
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathOpts::default().max_length(80)),
+        format_paths_opt(&paths, FormatPathsOpts::default().max_length(80)),
         expected
     );
 }
