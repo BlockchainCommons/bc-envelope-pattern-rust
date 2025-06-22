@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{format_paths_opt, FormatPathsOpts, Matcher, Pattern};
+use bc_envelope_pattern::{format_paths_opt, FormatPathsOpts, Matcher, PathElementFormat, Pattern};
 use indoc::indoc;
 
 use crate::common::{
@@ -160,7 +160,7 @@ fn test_wrapped_repeat() {
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathsOpts::default().max_length(80)),
+        format_paths_opt(&paths, FormatPathsOpts::default().element_format(PathElementFormat::Summary(Some(80)))),
         expected
     );
 }
@@ -189,7 +189,7 @@ fn test_search_wrapped_repeat() {
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathsOpts::default().max_length(80)),
+        format_paths_opt(&paths, FormatPathsOpts::default().element_format(PathElementFormat::Summary(Some(80)))),
         expected
     );
 }

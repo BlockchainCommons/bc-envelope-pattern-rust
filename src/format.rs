@@ -5,27 +5,30 @@ use bc_envelope::{
 };
 use crate::Path;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+/// Format options for each path element.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PathElementFormat {
-    #[default]
-    Summary,
+    /// Summary format, with optional maximum length for truncation.
+    Summary(Option<usize>),
     EnvelopeUR,
     DigestUR,
+}
+
+impl Default for PathElementFormat {
+    fn default() -> Self {
+        PathElementFormat::Summary(None)
+    }
 }
 
 /// Options for formatting paths.
 #[derive(Debug, Clone)]
 pub struct FormatPathsOpts {
-    /// Maximum length of each line's content (after indentation).
-    /// If None, no truncation is applied.
-    max_length: Option<usize>,
-
     /// Whether to indent each path element.
     /// If true, each element will be indented by 4 spaces per level.
     indent: bool,
 
     /// Format for each path element.
-    /// Default is `PathElementFormat::Summary`.
+    /// Default is `PathElementFormat::Summary(None)`.
     element_format: PathElementFormat,
 
     /// If true, only the last element of each path will be formatted.
@@ -36,11 +39,11 @@ pub struct FormatPathsOpts {
 
 impl Default for FormatPathsOpts {
     /// Returns the default formatting options:
-    /// - `max_length`: None (no truncation)
     /// - `indent`: true
+    /// - `element_format`: PathElementFormat::Summary(None)
+    /// - `last_element_only`: false
     fn default() -> Self {
         Self {
-            max_length: None,
             indent: true,
             element_format: PathElementFormat::default(),
             last_element_only: false,
@@ -52,13 +55,6 @@ impl FormatPathsOpts {
     /// Creates a new FormatPathsOpts with default values.
     pub fn new() -> Self { Self::default() }
 
-    /// Sets the maximum length of each line's content (after indentation).
-    /// If set, content longer than this will be truncated with an ellipsis.
-    pub fn max_length(mut self, max_length: usize) -> Self {
-        self.max_length = Some(max_length);
-        self
-    }
-
     /// Sets whether to indent each path element.
     /// If true, each element will be indented by 4 spaces per level.
     pub fn indent(mut self, indent: bool) -> Self {
@@ -67,7 +63,7 @@ impl FormatPathsOpts {
     }
 
     /// Sets the format for each path element.
-    /// Default is `PathElementFormat::Summary`.
+    /// Default is `PathElementFormat::Summary(None)`.
     pub fn element_format(mut self, format: PathElementFormat) -> Self {
         self.element_format = format;
         self
@@ -149,9 +145,9 @@ pub fn format_path_opt(
         // Only format the last element, no indentation.
         if let Some(element) = path.iter().last() {
             match opts.element_format {
-                PathElementFormat::Summary => {
+                PathElementFormat::Summary(max_length) => {
                     let summary = envelope_summary(element);
-                    truncate_with_ellipsis(&summary, opts.max_length)
+                    truncate_with_ellipsis(&summary, max_length)
                 }
                 PathElementFormat::EnvelopeUR => element.ur_string(),
                 PathElementFormat::DigestUR => element.digest().ur_string(),
@@ -170,9 +166,9 @@ pub fn format_path_opt(
             };
 
             let content = match opts.element_format {
-                PathElementFormat::Summary => {
+                PathElementFormat::Summary(max_length) => {
                     let summary = envelope_summary(element);
-                    truncate_with_ellipsis(&summary, opts.max_length)
+                    truncate_with_ellipsis(&summary, max_length)
                 }
                 PathElementFormat::EnvelopeUR => element.ur_string(),
                 PathElementFormat::DigestUR => element.digest().ur_string(),
