@@ -1,6 +1,6 @@
 # `bc-envelope-pattern` Crate Documentation
 
-This file contains general information for contributors to the `bc-envelope-pattern` crate, which provides a pattern matcher and text syntax pattern parser for Gordian Envelope. A general description of this crate and the specs for its pattern expression syntax are in README.md. Make sure to read that before starting on any tasks.
+This file contains general information for contributors to the `bc-envelope-pattern` crate, which provides a pattern matcher and text syntax pattern parser for Gordian Envelope. A general description of this crate and its use are in `README.md`. Further documentation including the pattern expression syntax can be found in the `docs/` directory. Make sure to read those before starting on any tasks.
 
 ## General Guidance
 
