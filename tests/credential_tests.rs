@@ -1,11 +1,10 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern};
+use bc_envelope_pattern::{format_paths_opt, FormatPathsOpts, Matcher, Pattern};
 use indoc::indoc;
 
 use crate::common::{
-    pattern_utils::{FormatPathsOpts, format_paths_opt},
     test_data::{credential, redacted_credential},
 };
 

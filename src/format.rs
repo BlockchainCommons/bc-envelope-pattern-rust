@@ -3,7 +3,7 @@
 use bc_envelope::{
     base::envelope::EnvelopeCase, format::EnvelopeSummary, prelude::*,
 };
-use bc_envelope_pattern::Path;
+use crate::Path;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum PathElementFormat {

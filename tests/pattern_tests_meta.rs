@@ -1,10 +1,8 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern, Reluctance};
+use bc_envelope_pattern::{format_paths, Matcher, Pattern, Reluctance};
 use indoc::indoc;
-
-use crate::common::pattern_utils::*;
 
 #[test]
 fn test_empty_sequence_pattern() {

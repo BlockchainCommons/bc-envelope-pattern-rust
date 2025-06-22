@@ -1,10 +1,8 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Path, Pattern, Reluctance};
+use bc_envelope_pattern::{format_paths, Matcher, Path, Pattern, Reluctance};
 use indoc::indoc;
-
-use crate::common::pattern_utils::format_paths;
 
 fn fold(string: &str) -> Envelope {
     let chars: Vec<String> = string.chars().map(|c| c.to_string()).collect();

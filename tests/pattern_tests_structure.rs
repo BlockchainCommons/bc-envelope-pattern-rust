@@ -1,10 +1,8 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern};
+use bc_envelope_pattern::{format_paths, Matcher, Pattern};
 use indoc::indoc;
-
-use crate::common::pattern_utils::*;
 
 #[test]
 fn test_subject_pattern() {
