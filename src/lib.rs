@@ -8,7 +8,8 @@ mod reluctance;
 
 pub use error::{Error, Result};
 pub use format::{
-    FormatPathsOpts, PathElementFormat, format_paths, format_paths_opt,
+    FormatPathsOpts, PathElementFormat, format_path, format_path_opt,
+    format_paths, format_paths_opt,
 };
 pub use interval::Interval;
 pub use pattern::{Matcher, Path, Pattern};

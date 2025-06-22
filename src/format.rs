@@ -3,9 +3,10 @@
 use bc_envelope::{
     base::envelope::EnvelopeCase, format::EnvelopeSummary, prelude::*,
 };
+
 use crate::Path;
 
-/// Format options for each path element.
+/// A builder that provides formatting options for each path element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PathElementFormat {
     /// Summary format, with optional maximum length for truncation.
@@ -15,9 +16,7 @@ pub enum PathElementFormat {
 }
 
 impl Default for PathElementFormat {
-    fn default() -> Self {
-        PathElementFormat::Summary(None)
-    }
+    fn default() -> Self { PathElementFormat::Summary(None) }
 }
 
 /// Options for formatting paths.
@@ -133,8 +132,8 @@ fn truncate_with_ellipsis(s: &str, max_length: Option<usize>) -> String {
     }
 }
 
-// Format each path element on its own line, each line successively indented by
-// 4 spaces. Options can be provided to customize the formatting.
+/// Format each path element on its own line, each line successively indented by
+/// 4 spaces. Options can be provided to customize the formatting.
 pub fn format_path_opt(
     path: &Path,
     opts: impl AsRef<FormatPathsOpts>,
@@ -180,13 +179,13 @@ pub fn format_path_opt(
     }
 }
 
-// Format each path element on its own line, each line successively indented by
-// 4 spaces.
+/// Format each path element on its own line, each line successively indented by
+/// 4 spaces.
 pub fn format_path(path: &Path) -> String {
     format_path_opt(path, FormatPathsOpts::default())
 }
 
-// Format multiple paths with custom formatting options.
+/// Format multiple paths with custom formatting options.
 pub fn format_paths_opt(
     paths: &[Path],
     opts: impl AsRef<FormatPathsOpts>,
@@ -199,7 +198,7 @@ pub fn format_paths_opt(
         .join("\n")
 }
 
-// Format multiple paths with default options.
+/// Format multiple paths with default options.
 pub fn format_paths(paths: &[Path]) -> String {
     format_paths_opt(paths, FormatPathsOpts::default())
 }

@@ -33,7 +33,7 @@ Unlike regular expressions which match sequential characters in strings, Gordian
 
 This crate provides two APIs for creating `Pattern` objects:
 
-- **Programmatic**: The `Pattern` type has many functions for creating various kinds of patterns. For example, the `Pattern::text()` function creates a pattern that matches any text value, while the `Pattern::cbor()` function creates a pattern that matches a given CBOR value.
+- **Programmatic**: The `Pattern` type has many functions for creating various kinds of patterns. For example, the `Pattern::any_text()` function creates a pattern that matches any text value, while the `Pattern::cbor()` function creates a pattern that matches a given CBOR value.
 - **Pattern Expression Syntax**: Allows you to write patterns in a human-readable format that can be parsed into `Pattern` objects using `Pattern::parse()`, which takes a string containing the pattern and returns a `Pattern` object or an error if the pattern is invalid.
 
 Once you have a `Pattern` object, you can use it to match against Gordian Envelope structures.

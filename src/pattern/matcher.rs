@@ -4,8 +4,10 @@ use bc_envelope::Envelope;
 
 use crate::pattern::{Pattern, vm::Instr};
 
+/// A sequence of envelopes that match a pattern, starting from the root of the envelope.
 pub type Path = Vec<Envelope>;
 
+#[doc(hidden)]
 pub trait Matcher: std::fmt::Debug + std::fmt::Display + Clone {
     /// Return all matching paths along with any named captures.
     fn paths_with_captures(
