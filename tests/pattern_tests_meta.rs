@@ -463,7 +463,6 @@ fn test_search_pattern_with_wrapped() {
     assert_actual_expected!(format_paths(&secret_regex_search_paths), expected);
 }
 
-#[cfg(feature = "signature")]
 #[test]
 fn test_search_pattern_credential() {
     use bc_envelope_pattern::Path;

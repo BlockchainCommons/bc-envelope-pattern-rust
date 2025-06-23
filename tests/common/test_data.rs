@@ -11,7 +11,6 @@ use hex_literal::hex;
 pub const PLAINTEXT_HELLO: &str = "Hello.";
 
 pub fn hello_envelope() -> Envelope { Envelope::new(PLAINTEXT_HELLO) }
-#[cfg(feature = "known_value")]
 pub fn known_value_envelope() -> Envelope { Envelope::new(known_values::NOTE) }
 pub fn assertion_envelope() -> Envelope {
     Envelope::new_assertion("knows", "Bob")
@@ -83,7 +82,6 @@ pub fn fake_nonce() -> Nonce {
     Nonce::from_data(hex!("4d785658f36c22fb5aed3ac0"))
 }
 
-#[cfg(feature = "signature")]
 pub fn credential() -> Envelope {
     use std::{cell::RefCell, rc::Rc};
 

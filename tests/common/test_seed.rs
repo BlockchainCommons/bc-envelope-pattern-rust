@@ -1,5 +1,3 @@
-#![cfg(feature = "types")]
-
 use bc_components::tags;
 use bc_envelope::prelude::*;
 

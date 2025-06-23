@@ -420,7 +420,6 @@ fn test_obscured_pattern() {
     let paths = Pattern::elided().paths(&original_envelope);
     assert!(paths.is_empty());
 
-    #[cfg(feature = "encrypt")]
     {
         use bc_components::SymmetricKey;
 
@@ -434,7 +433,6 @@ fn test_obscured_pattern() {
         assert!(!Pattern::compressed().matches(&encrypted_envelope));
     }
 
-    #[cfg(feature = "compress")]
     {
         // Test with compressed envelope
         let compressed_envelope = original_envelope.compress().unwrap();

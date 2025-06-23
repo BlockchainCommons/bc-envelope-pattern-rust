@@ -227,7 +227,6 @@ fn test_date_pattern() {
     assert!(Pattern::date_regex(regex).matches(&envelope_with_time));
 }
 
-#[cfg(feature = "known_value")]
 #[test]
 fn test_known_value_pattern() {
     use known_values;
@@ -292,7 +291,6 @@ fn test_known_value_pattern() {
     assert!(!Pattern::known_value_named("unknown_name").matches(&envelope));
 }
 
-#[cfg(feature = "known_value")]
 #[test]
 fn test_known_value_regex_pattern() {
     use regex::Regex;
