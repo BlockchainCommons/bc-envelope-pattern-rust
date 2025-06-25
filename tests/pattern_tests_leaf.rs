@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{format_paths, Matcher, Pattern};
+use bc_envelope_pattern::{Matcher, Pattern, format_paths};
 use indoc::indoc;
 
 #[test]
@@ -703,10 +703,10 @@ fn test_tag_pattern_named() {
     // Test paths for matched envelope
     let paths = Pattern::tagged_with_name("date").paths(&envelope);
     // println!("{}", format_paths(&paths));
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         3854ff69 LEAF 2023-12-25
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(paths.len(), 1);
     assert_eq!(paths[0].len(), 1);
