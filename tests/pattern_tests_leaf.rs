@@ -37,11 +37,11 @@ fn test_bool_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a boolean and the subject in a sequence returns a path
+    // Matching a boolean and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_bool(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_bool(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -88,11 +88,11 @@ fn test_number_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a number and the subject in a sequence returns a path
+    // Matching a number and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_number(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_number(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -134,11 +134,11 @@ fn test_text_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a text and the subject in a sequence returns a path
+    // Matching a text and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_text(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_text(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -200,11 +200,11 @@ fn test_date_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a date and the subject in a sequence returns a path
+    // Matching a date and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::any_date(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_date(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -272,10 +272,10 @@ fn test_known_value_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a known value and the subject in a sequence returns a path
+    // Matching a known value and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
-    let paths = Pattern::sequence(vec![
+    let paths = Pattern::traverse(vec![
         Pattern::any_known_value(),
         Pattern::any_subject(),
     ])
@@ -332,9 +332,9 @@ fn test_known_value_regex_pattern() {
     let regex = Regex::new(r".*").unwrap();
     assert!(!Pattern::known_value_regex(regex).matches(&text_envelope));
 
-    // Test regex pattern in sequence patterns
+    // Test regex pattern in traversal patterns
     let regex = Regex::new(r".*te$").unwrap();
-    let paths = Pattern::sequence(vec![
+    let paths = Pattern::traverse(vec![
         Pattern::known_value_regex(regex),
         Pattern::any_subject(),
     ])
@@ -398,10 +398,10 @@ fn test_byte_string_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a byte string and the subject in a sequence returns a path
+    // Matching a byte string and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
-    let paths = Pattern::sequence(vec![
+    let paths = Pattern::traverse(vec![
         Pattern::any_byte_string(),
         Pattern::any_subject(),
     ])
@@ -500,9 +500,9 @@ fn test_array_pattern() {
     assert!(Pattern::array_with_count(0).matches(&empty_envelope));
     assert!(!Pattern::array_with_count(1).matches(&empty_envelope));
 
-    // Test sequence patterns
+    // Test traversal patterns
     let paths =
-        Pattern::sequence(vec![Pattern::any_array(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_array(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -561,9 +561,9 @@ fn test_map_pattern() {
     assert!(Pattern::map_with_count(0).matches(&empty_envelope));
     assert!(!Pattern::map_with_count(1).matches(&empty_envelope));
 
-    // Test sequence patterns
+    // Test traversal patterns
     let paths =
-        Pattern::sequence(vec![Pattern::any_map(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_map(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -598,11 +598,11 @@ fn test_null_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Matching a null and the subject in a sequence returns a path
+    // Matching a null and the subject in a traversal returns a path
     // where the first element is the original envelope and the second
     // element is the subject.
     let paths =
-        Pattern::sequence(vec![Pattern::null(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::null(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -655,9 +655,9 @@ fn test_tag_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // Test sequence patterns
+    // Test traversal patterns
     let paths =
-        Pattern::sequence(vec![Pattern::any_tag(), Pattern::any_subject()])
+        Pattern::traverse(vec![Pattern::any_tag(), Pattern::any_subject()])
             .paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -712,8 +712,8 @@ fn test_tag_pattern_named() {
     assert_eq!(paths[0].len(), 1);
     assert_eq!(paths[0][0], envelope);
 
-    // Test in sequence pattern
-    let paths = Pattern::sequence(vec![
+    // Test in traversal pattern
+    let paths = Pattern::traverse(vec![
         Pattern::tagged_with_name("date"),
         Pattern::any_subject(),
     ])
@@ -768,9 +768,9 @@ fn test_tag_pattern_regex() {
     assert_eq!(paths[0].len(), 1);
     assert_eq!(paths[0][0], envelope);
 
-    // Test in sequence pattern
+    // Test in traversal pattern
     let regex = regex::Regex::new(r".*te$").unwrap();
-    let paths = Pattern::sequence(vec![
+    let paths = Pattern::traverse(vec![
         Pattern::tagged_with_regex(regex),
         Pattern::any_subject(),
     ])

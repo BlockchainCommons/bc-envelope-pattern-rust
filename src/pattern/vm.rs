@@ -80,10 +80,10 @@ pub enum Instr {
         pat_idx: usize,
         capture_map: Vec<(String, usize)>,
     },
-    /// Save current path and start new sequence from last envelope
-    ExtendSequence,
+    /// Save current path and start new traversal from last envelope
+    ExtendTraversal,
     /// Combine saved path with current path for final result
-    CombineSequence,
+    CombineTraversal,
     /// Navigate to subject of current envelope
     NavigateSubject,
     /// Match only if pattern at `pat_idx` does not match
@@ -112,7 +112,7 @@ struct Thread {
     pc: usize,
     env: Envelope,
     path: Path,
-    /// Stack of saved paths for nested sequence patterns
+    /// Stack of saved paths for nested traversal patterns
     saved_paths: Vec<Path>,
     captures: Vec<Vec<Path>>,
     capture_stack: Vec<Vec<usize>>,
@@ -440,9 +440,9 @@ fn run_thread(
                     // didn't
                     break;
                 }
-                ExtendSequence => {
+                ExtendTraversal => {
                     // Save the current path and switch to the last envelope for
-                    // the rest of the sequence
+                    // the rest of the traversal
                     if let Some(last_env) = th.path.last().cloned() {
                         th.saved_paths.push(th.path.clone());
                         th.env = last_env.clone();
@@ -450,7 +450,7 @@ fn run_thread(
                     }
                     th.pc += 1;
                 }
-                CombineSequence => {
+                CombineTraversal => {
                     // Combine saved path with current path, extending the saved
                     // path
                     if let Some(saved_path) = th.saved_paths.pop() {
@@ -563,7 +563,7 @@ fn run_thread(
                         if let Some(start_idx) = th.capture_stack[id].pop() {
                             if th.captures.len() > id {
                                 let mut end = th.path.len();
-                                if let Some(Instr::ExtendSequence) =
+                                if let Some(Instr::ExtendTraversal) =
                                     prog.code.get(th.pc + 1)
                                 {
                                     end = end.saturating_sub(1);

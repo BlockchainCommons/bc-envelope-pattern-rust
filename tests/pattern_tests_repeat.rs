@@ -94,12 +94,12 @@ fn repeat_test() {
     let s = "hello";
     let env = fold(s);
 
-    let pattern = Pattern::sequence(vec![Pattern::any_assertion()]);
+    let pattern = Pattern::traverse(vec![Pattern::any_assertion()]);
     assert_eq!(format!("{}", pattern), "ASSERT");
     let paths = pattern.paths(&env);
     assert_eq!(unfold(paths[0].last().unwrap()), s);
 
-    let assertion_object_pattern = Pattern::sequence(vec![
+    let assertion_object_pattern = Pattern::traverse(vec![
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
@@ -121,26 +121,26 @@ fn test_repeat_2() {
     let str = "AabBbabB";
     let env = fold(str);
 
-    let seq_a = Pattern::sequence(vec![
+    let seq_a = Pattern::traverse(vec![
         Pattern::assertion_with_object(Pattern::text("A")),
         Pattern::any_object(),
     ]);
     assert_eq!(format!("{}", seq_a), r#"ASSERTOBJ(TEXT("A"))>OBJECT"#);
 
-    let seq_any = Pattern::sequence(vec![
+    let seq_any = Pattern::traverse(vec![
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
     assert_eq!(format!("{}", seq_any), r#"ASSERT>OBJECT"#);
 
-    let seq_b = Pattern::sequence(vec![
+    let seq_b = Pattern::traverse(vec![
         Pattern::assertion_with_object(Pattern::text("B")),
         Pattern::any_object(),
     ]);
     assert_eq!(format!("{}", seq_b), r#"ASSERTOBJ(TEXT("B"))>OBJECT"#);
 
     let pat = |mode| {
-        Pattern::sequence(vec![
+        Pattern::traverse(vec![
             seq_a.clone(),
             Pattern::repeat(seq_any.clone(), .., mode),
             seq_b.clone(),
@@ -191,7 +191,7 @@ fn wrap_n(mut env: Envelope, n: usize) -> Envelope {
 
 #[test]
 fn repeat_any_greedy() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), .., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
@@ -212,7 +212,7 @@ fn repeat_any_greedy() {
 #[test]
 fn repeat_any_lazy() {
     let env = wrap_n(Envelope::new(42), 4);
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), .., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
@@ -231,7 +231,7 @@ fn repeat_any_lazy() {
 #[test]
 fn repeat_any_possessive() {
     let env = wrap_n(Envelope::new(42), 4);
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), .., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
@@ -250,7 +250,7 @@ fn repeat_any_possessive() {
 #[test]
 fn repeat_some_greedy() {
     let env = wrap_n(Envelope::new(42), 3);
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 1.., Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
@@ -268,7 +268,7 @@ fn repeat_some_greedy() {
 #[test]
 fn repeat_some_lazy() {
     let env = wrap_n(Envelope::new(42), 3);
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 1.., Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
@@ -286,7 +286,7 @@ fn repeat_some_lazy() {
 #[test]
 fn repeat_some_possessive() {
     let env = wrap_n(Envelope::new(42), 3);
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 1.., Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
@@ -303,7 +303,7 @@ fn repeat_some_possessive() {
 
 #[test]
 fn repeat_optional_greedy() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
@@ -325,7 +325,7 @@ fn repeat_optional_greedy() {
 
 #[test]
 fn repeat_optional_lazy() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
@@ -346,7 +346,7 @@ fn repeat_optional_lazy() {
 
 #[test]
 fn repeat_optional_possessive() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
@@ -367,7 +367,7 @@ fn repeat_optional_possessive() {
 
 #[test]
 fn repeat_range_greedy() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 2..=3, Reluctance::Greedy),
         Pattern::any_cbor(),
     ]);
@@ -386,7 +386,7 @@ fn repeat_range_greedy() {
 
 #[test]
 fn repeat_range_lazy() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 2..=3, Reluctance::Lazy),
         Pattern::any_cbor(),
     ]);
@@ -404,7 +404,7 @@ fn repeat_range_lazy() {
 
 #[test]
 fn repeat_range_possessive() {
-    let pat = Pattern::sequence(vec![
+    let pat = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 2..=3, Reluctance::Possessive),
         Pattern::any_cbor(),
     ]);
@@ -425,7 +425,7 @@ fn repeat_any_modes() {
     let env = wrap_n(Envelope::new("data"), 2);
 
     let pat = |mode| {
-        Pattern::sequence(vec![
+        Pattern::traverse(vec![
             Pattern::repeat(Pattern::unwrap(), 0.., mode),
             Pattern::wrapped(),
             Pattern::unwrap(),
@@ -454,7 +454,7 @@ fn repeat_optional_modes() {
     let env = wrap_n(Envelope::new(42), 1);
 
     let pat = |mode| {
-        Pattern::sequence(vec![
+        Pattern::traverse(vec![
             Pattern::repeat(Pattern::unwrap(), 0..=1, mode),
             Pattern::number(42),
         ])
@@ -498,7 +498,7 @@ fn repeat_some_order() {
     assert_actual_expected!(env.tree_format(), expected);
 
     let pat = |mode| {
-        Pattern::sequence(vec![
+        Pattern::traverse(vec![
             Pattern::repeat(Pattern::unwrap(), 1.., mode),
             Pattern::any_subject(),
         ])
@@ -536,7 +536,7 @@ fn repeat_range_order() {
     let env = wrap_n(Envelope::new("x"), 4);
 
     let pat = |mode| {
-        Pattern::sequence(vec![
+        Pattern::traverse(vec![
             Pattern::repeat(Pattern::unwrap(), 2..=3, mode),
             Pattern::any_subject(),
         ])

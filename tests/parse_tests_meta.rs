@@ -39,12 +39,12 @@ fn parse_bool_and() {
 }
 
 #[test]
-fn parse_bool_sequence() {
+fn parse_bool_traversal() {
     let src = "BOOL(true)>BOOL(false)";
     let p = Pattern::parse(src).unwrap();
     assert_eq!(
         p,
-        Pattern::sequence(vec![Pattern::bool(true), Pattern::bool(false)])
+        Pattern::traverse(vec![Pattern::bool(true), Pattern::bool(false)])
     );
     assert_eq!(p.to_string(), src);
 
@@ -52,7 +52,7 @@ fn parse_bool_sequence() {
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
-        Pattern::sequence(vec![Pattern::bool(true), Pattern::bool(false)])
+        Pattern::traverse(vec![Pattern::bool(true), Pattern::bool(false)])
     );
     assert_eq!(p_spaced.to_string(), src);
 }
@@ -62,12 +62,12 @@ fn parse_operator_precedence() {
     let expr = "ANY > BOOL(true) & BOOL(false) > NONE | ANY > BOOL(true) & BOOL(false) > ANY";
     let p = Pattern::parse(expr).unwrap();
 
-    let left_seq = Pattern::sequence(vec![
+    let left_seq = Pattern::traverse(vec![
         Pattern::any(),
         Pattern::and(vec![Pattern::bool(true), Pattern::bool(false)]),
         Pattern::none(),
     ]);
-    let right_seq = Pattern::sequence(vec![
+    let right_seq = Pattern::traverse(vec![
         Pattern::any(),
         Pattern::and(vec![Pattern::bool(true), Pattern::bool(false)]),
         Pattern::any(),

@@ -48,12 +48,12 @@ impl Matcher for SubjectPattern {
                 // includes the starting envelope and its subject.
                 code.push(Instr::NavigateSubject);
                 // Save the path and run the inner pattern relative to the
-                // subject. This mirrors the behaviour of SequencePattern so
+                // subject. This mirrors the behaviour of TraversalPattern so
                 // that any paths produced by `pattern` are appended to the
                 // subject path rather than replacing it.
-                code.push(Instr::ExtendSequence);
+                code.push(Instr::ExtendTraversal);
                 pattern.compile(code, literals, captures);
-                code.push(Instr::CombineSequence);
+                code.push(Instr::CombineTraversal);
             }
         }
     }

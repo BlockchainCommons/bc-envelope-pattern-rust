@@ -39,7 +39,7 @@ This crate provides two APIs for creating `Pattern` objects:
 Once you have a `Pattern` object, you can use it to match against Gordian Envelope structures.
 
 - `Pattern::match()` function takes an `Envelope` and returns a simple boolean indicating whether the pattern matches the envelope.
-- `Pattern::paths()` returns a `Vec<Path>` containing the paths that match the pattern within the envelope. Each `Path` is a `Vec<Envelope>` representing a sequence of envelopes that match the pattern, starting from the root of the envelope.
+- `Pattern::paths()` returns a `Vec<Path>` containing the paths that match the pattern within the envelope. Each `Path` is a `Vec<Envelope>` representing a sequential traversal of envelopes that match the pattern, starting from the root of the envelope.
 - `Pattern::paths_with_captures()` returns the same `Vec<Path>` but also another set of paths for each named capture in the pattern. This allows you to extract specific parts of the envelope that match named captures in the pattern.
 
 The `format_paths()` and `format_paths_opt()` functions allow you to format paths in various ways, such as as URs, summaries, or just the last element of each path. This is useful for displaying the results of pattern matching in a human-readable format.

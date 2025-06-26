@@ -81,7 +81,7 @@ fn test_wrapped_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
 
     let wrapped_twice_pattern =
-        Pattern::sequence(vec![Pattern::unwrap(), Pattern::unwrap()]);
+        Pattern::traverse(vec![Pattern::unwrap(), Pattern::unwrap()]);
     let paths = wrapped_twice_pattern.paths(&wrapped_twice);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -131,7 +131,7 @@ fn test_assertion_predicate_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    let pattern = Pattern::sequence(vec![
+    let pattern = Pattern::traverse(vec![
         Pattern::assertion_with_predicate(Pattern::text("knows")),
         Pattern::any_object(),
     ]);

@@ -5,11 +5,11 @@ use bc_envelope_pattern::{Matcher, Pattern, Reluctance, format_paths};
 use indoc::indoc;
 
 #[test]
-fn test_empty_sequence_pattern() {
+fn test_empty_traversal_pattern() {
     let envelope = Envelope::new(42);
 
-    // An empty sequence pattern never matches.
-    let pattern = Pattern::sequence(vec![]);
+    // An empty traversal pattern never matches.
+    let pattern = Pattern::traverse(vec![]);
     let paths = pattern.paths(&envelope);
     assert!(paths.is_empty());
 }
@@ -48,10 +48,10 @@ fn test_and_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // A sequence pattern that includes the number range pattern and then
+    // A traversal pattern that includes the number range pattern and then
     // extracts the subject.
     let number_range_with_subject_pattern =
-        Pattern::sequence(vec![number_range_pattern, Pattern::any_subject()]);
+        Pattern::traverse(vec![number_range_pattern, Pattern::any_subject()]);
     let paths = number_range_with_subject_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -97,7 +97,7 @@ fn test_or_pattern() {
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    let foo_or_greater_than_40_with_subject_pattern = Pattern::sequence(vec![
+    let foo_or_greater_than_40_with_subject_pattern = Pattern::traverse(vec![
         foo_or_greater_than_40_pattern,
         Pattern::any_subject(),
     ]);
@@ -115,7 +115,7 @@ fn test_or_pattern() {
 }
 
 #[test]
-fn test_one_element_sequence_pattern() {
+fn test_one_element_traversal_pattern() {
     // A pattern that matches a the number 42.
     let number_pattern = Pattern::number(42);
     assert_eq!(format!("{}", number_pattern), r#"NUMBER(42)"#);
@@ -128,15 +128,15 @@ fn test_one_element_sequence_pattern() {
     let paths = number_pattern.paths(&envelope);
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // A sequence of one pattern gives the same result as the single pattern.
-    let pattern = Pattern::sequence(vec![number_pattern]);
+    // A traversal of one pattern gives the same result as the single pattern.
+    let pattern = Pattern::traverse(vec![number_pattern]);
     let paths = pattern.paths(&envelope);
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(format!("{}", pattern), r#"NUMBER(42)"#);
 }
 
 #[test]
-fn test_wrapped_sequence() {
+fn test_wrapped_traversal() {
     let env_1 = Envelope::new("data");
     let wrapped_1 = env_1.wrap();
     let wrapped_2 = wrapped_1.wrap();
@@ -163,7 +163,7 @@ fn test_wrapped_sequence() {
 
     // A pattern that matches the contents of a single wrapped envelope.
     let wrapped_1_pattern =
-        Pattern::sequence(vec![Pattern::wrapped(), Pattern::unwrap()]);
+        Pattern::traverse(vec![Pattern::wrapped(), Pattern::unwrap()]);
     let paths = wrapped_1_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
@@ -174,9 +174,9 @@ fn test_wrapped_sequence() {
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // A pattern that matches two wrapped envelopes in sequence.
+    // A pattern that matches two wrapped envelopes in a traversal path.
     let wrapped_2_pattern =
-        Pattern::sequence(vec![Pattern::unwrap(), Pattern::unwrap()]);
+        Pattern::traverse(vec![Pattern::unwrap(), Pattern::unwrap()]);
     let paths = wrapped_2_pattern.paths(&wrapped_4);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
@@ -188,8 +188,8 @@ fn test_wrapped_sequence() {
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // A pattern that matches three wrapped envelopes in sequence.
-    let wrapped_3_pattern = Pattern::sequence(vec![
+    // A pattern that matches three wrapped envelopes in a traversal path.
+    let wrapped_3_pattern = Pattern::traverse(vec![
         Pattern::unwrap(),
         Pattern::unwrap(),
         Pattern::unwrap(),
@@ -206,8 +206,8 @@ fn test_wrapped_sequence() {
     .trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
-    // A pattern that matches four wrapped envelopes in sequence.
-    let wrapped_4_pattern = Pattern::sequence(vec![
+    // A pattern that matches four wrapped envelopes in a traversal path.
+    let wrapped_4_pattern = Pattern::traverse(vec![
         Pattern::unwrap(),
         Pattern::unwrap(),
         Pattern::unwrap(),
@@ -235,7 +235,7 @@ fn test_wrapped_sequence() {
 #[test]
 fn optional_wrapped_pattern() {
     // A pattern that matches an envelope that may or may not be wrapped.
-    let optional_wrapped_pattern = Pattern::sequence(vec![
+    let optional_wrapped_pattern = Pattern::traverse(vec![
         Pattern::repeat(Pattern::unwrap(), 0..=1, Reluctance::Greedy),
         Pattern::any_number(),
     ]);
@@ -760,10 +760,10 @@ fn test_capture_in_and_failure() {
 }
 
 #[test]
-fn test_capture_in_sequence_failure() {
+fn test_capture_in_traversal_failure() {
     let envelope = Envelope::new(42).add_assertion("an", "assertion");
 
-    let pattern = Pattern::sequence(vec![
+    let pattern = Pattern::traverse(vec![
         Pattern::capture("num", Pattern::subject(Pattern::number(42))),
         Pattern::bool(true),
     ]);

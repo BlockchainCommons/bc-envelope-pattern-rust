@@ -9,7 +9,7 @@ mod not_pattern;
 mod or_pattern;
 mod repeat_pattern;
 mod search_pattern;
-mod sequence_pattern;
+mod traverse_pattern;
 
 pub(crate) use and_pattern::AndPattern;
 pub(crate) use any_pattern::AnyPattern;
@@ -20,4 +20,4 @@ pub(crate) use not_pattern::NotPattern;
 pub(crate) use or_pattern::OrPattern;
 pub(crate) use repeat_pattern::GroupPattern;
 pub(crate) use search_pattern::SearchPattern;
-pub(crate) use sequence_pattern::SequencePattern;
+pub(crate) use traverse_pattern::TraversePattern;

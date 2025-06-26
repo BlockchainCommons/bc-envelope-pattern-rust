@@ -7,6 +7,6 @@ mod not_parser;
 mod or_parser;
 mod primary_parser;
 mod search_parser;
-mod sequence_parser;
+mod traverse_parser;
 
 pub(crate) use or_parser::parse_or;

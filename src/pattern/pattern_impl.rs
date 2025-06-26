@@ -71,7 +71,7 @@ use super::{
     },
     meta::{
         AndPattern, CapturePattern, GroupPattern, MetaPattern, NotPattern,
-        OrPattern, SearchPattern, SequencePattern,
+        OrPattern, SearchPattern, TraversePattern,
     },
     structure::{
         AssertionsPattern, DigestPattern, NodePattern, ObjectPattern,
@@ -522,9 +522,9 @@ impl Pattern {
 }
 
 impl Pattern {
-    /// Creates a new `Pattern` that matches a sequence of patterns in order.
-    pub fn sequence(patterns: Vec<Pattern>) -> Self {
-        Pattern::Meta(MetaPattern::Sequence(SequencePattern::new(patterns)))
+    /// Creates a new `Pattern` that matches a traversal order of patterns.
+    pub fn traverse(patterns: Vec<Pattern>) -> Self {
+        Pattern::Meta(MetaPattern::Traverse(TraversePattern::new(patterns)))
     }
 }
 

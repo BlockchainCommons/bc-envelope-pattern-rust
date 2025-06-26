@@ -41,14 +41,14 @@ fn test_mixed_patterns_with_search() {
 }
 
 #[test]
-fn test_node_pattern_with_sequence() {
+fn test_node_pattern_with_traversal() {
     // Create envelope with exactly 2 assertions
     let envelope = Envelope::new("Person")
         .add_assertion("name", "Alice")
         .add_assertion("age", 25);
 
-    // Test sequence matching node with 2 assertions then extracting subject
-    let paths = Pattern::sequence(vec![
+    // Test traversal matching node with 2 assertions then extracting subject
+    let paths = Pattern::traverse(vec![
         Pattern::node_with_assertions_count(2),
         Pattern::any_subject(),
     ])

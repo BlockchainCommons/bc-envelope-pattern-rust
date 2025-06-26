@@ -178,7 +178,7 @@ Structure patterns match parts of Gordian Envelope structures.
 
 The following meta patterns are available to combine or modify other patterns.
 
-Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, and then Or. Parentheses can be used to group patterns and change precedence.
+Precedence: Repeat has the highest precedence, followed by And, Not, Traversal, and then Or. Parentheses can be used to group patterns and change precedence.
 
 - And
     - `pattern & pattern & pattern`…
@@ -218,6 +218,6 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Sequence, a
 - Search
     - `SEARCH ( pattern )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.
-- Sequence
+- Traversal
     - `pattern > pattern > pattern`
-        - Matches if the specified patterns match in sequence, with no other nodes in between.
+        - Matches if the specified patterns match a traversal path, with no other nodes in between.
