@@ -61,7 +61,7 @@ fn test_and_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", number_range_with_subject_pattern),
-        r#"NUMBER(>40)&NUMBER(<50)>SUBJECT"#,
+        r#"NUMBER(>40)&NUMBER(<50)->SUBJECT"#,
     );
 }
 
@@ -110,7 +110,7 @@ fn test_or_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", foo_or_greater_than_40_with_subject_pattern),
-        r#"TEXT("foo")|NUMBER(>40)>SUBJECT"#
+        r#"TEXT("foo")|NUMBER(>40)->SUBJECT"#
     );
 }
 
@@ -228,7 +228,7 @@ fn test_wrapped_traversal() {
 
     assert_eq!(
         format!("{}", wrapped_4_pattern),
-        r#"UNWRAP>UNWRAP>UNWRAP>UNWRAP"#
+        r#"UNWRAP->UNWRAP->UNWRAP->UNWRAP"#
     );
 }
 
@@ -241,7 +241,7 @@ fn optional_wrapped_pattern() {
     ]);
     assert_eq!(
         format!("{}", optional_wrapped_pattern),
-        r#"(UNWRAP)?>NUMBER"#
+        r#"(UNWRAP)?->NUMBER"#
     );
 
     let inner = Envelope::new(42);

@@ -40,7 +40,7 @@ fn parse_bool_and() {
 
 #[test]
 fn parse_bool_traversal() {
-    let src = "BOOL(true)>BOOL(false)";
+    let src = "BOOL(true)->BOOL(false)";
     let p = Pattern::parse(src).unwrap();
     assert_eq!(
         p,
@@ -48,7 +48,7 @@ fn parse_bool_traversal() {
     );
     assert_eq!(p.to_string(), src);
 
-    let spaced = "BOOL(true) > BOOL(false)";
+    let spaced = "BOOL(true) -> BOOL(false)";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
@@ -59,7 +59,7 @@ fn parse_bool_traversal() {
 
 #[test]
 fn parse_operator_precedence() {
-    let expr = "ANY > BOOL(true) & BOOL(false) > NONE | ANY > BOOL(true) & BOOL(false) > ANY";
+    let expr = "ANY -> BOOL(true) & BOOL(false) -> NONE | ANY -> BOOL(true) & BOOL(false) -> ANY";
     let p = Pattern::parse(expr).unwrap();
 
     let left_seq = Pattern::traverse(vec![
@@ -77,7 +77,7 @@ fn parse_operator_precedence() {
     assert_eq!(p, expected);
     assert_eq!(
         p.to_string(),
-        "ANY>BOOL(true)&BOOL(false)>NONE|ANY>BOOL(true)&BOOL(false)>ANY"
+        "ANY->BOOL(true)&BOOL(false)->NONE|ANY->BOOL(true)&BOOL(false)->ANY"
     );
 }
 

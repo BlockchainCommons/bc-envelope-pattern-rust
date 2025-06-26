@@ -219,5 +219,5 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Traversal, 
     - `SEARCH ( pattern )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.
 - Traversal
-    - `pattern > pattern > pattern`
+    - `pattern -> pattern -> pattern`
         - Matches if the specified patterns match a traversal path, with no other nodes in between.

@@ -103,11 +103,11 @@ fn repeat_test() {
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", assertion_object_pattern), "ASSERT>OBJECT");
+    assert_eq!(format!("{}", assertion_object_pattern), "ASSERT->OBJECT");
 
     let pattern =
         Pattern::repeat(assertion_object_pattern, 3..=3, Reluctance::Greedy);
-    assert_eq!(format!("{}", pattern), "(ASSERT>OBJECT){3}");
+    assert_eq!(format!("{}", pattern), "(ASSERT->OBJECT){3}");
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
 
@@ -125,19 +125,19 @@ fn test_repeat_2() {
         Pattern::assertion_with_object(Pattern::text("A")),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", seq_a), r#"ASSERTOBJ(TEXT("A"))>OBJECT"#);
+    assert_eq!(format!("{}", seq_a), r#"ASSERTOBJ(TEXT("A"))->OBJECT"#);
 
     let seq_any = Pattern::traverse(vec![
         Pattern::any_assertion(),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", seq_any), r#"ASSERT>OBJECT"#);
+    assert_eq!(format!("{}", seq_any), r#"ASSERT->OBJECT"#);
 
     let seq_b = Pattern::traverse(vec![
         Pattern::assertion_with_object(Pattern::text("B")),
         Pattern::any_object(),
     ]);
-    assert_eq!(format!("{}", seq_b), r#"ASSERTOBJ(TEXT("B"))>OBJECT"#);
+    assert_eq!(format!("{}", seq_b), r#"ASSERTOBJ(TEXT("B"))->OBJECT"#);
 
     let pat = |mode| {
         Pattern::traverse(vec![
@@ -150,7 +150,7 @@ fn test_repeat_2() {
     let pattern = pat(Reluctance::Greedy);
     assert_eq!(
         format!("{}", pattern),
-        r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*>ASSERTOBJ(TEXT("B"))>OBJECT"#
+        r#"ASSERTOBJ(TEXT("A"))->OBJECT->(ASSERT->OBJECT)*->ASSERTOBJ(TEXT("B"))->OBJECT"#
     );
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
@@ -159,7 +159,7 @@ fn test_repeat_2() {
     let pattern = pat(Reluctance::Lazy);
     assert_eq!(
         format!("{}", pattern),
-        r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*?>ASSERTOBJ(TEXT("B"))>OBJECT"#
+        r#"ASSERTOBJ(TEXT("A"))->OBJECT->(ASSERT->OBJECT)*?->ASSERTOBJ(TEXT("B"))->OBJECT"#
     );
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
@@ -168,7 +168,7 @@ fn test_repeat_2() {
     let pattern = pat(Reluctance::Possessive);
     assert_eq!(
         format!("{}", pattern),
-        r#"ASSERTOBJ(TEXT("A"))>OBJECT>(ASSERT>OBJECT)*+>ASSERTOBJ(TEXT("B"))>OBJECT"#
+        r#"ASSERTOBJ(TEXT("A"))->OBJECT->(ASSERT->OBJECT)*+->ASSERTOBJ(TEXT("B"))->OBJECT"#
     );
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 0);
@@ -664,7 +664,7 @@ fn test_capture() {
 
     // Pattern only captures `WRAPPED` elements leading to a `NODE`,
     // but not the `NODE` itself.
-    let pat = Pattern::parse("@cap((WRAPPED>UNWRAP)*)>NODE").unwrap();
+    let pat = Pattern::parse("@cap((WRAPPED->UNWRAP)*)->NODE").unwrap();
     let (paths, captures) = pat.paths_with_captures(&env);
     // Pattern matches the `WRAPPED` elements leading to the `NODE`,
     // and the `NODE` itself.

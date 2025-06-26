@@ -91,7 +91,7 @@ impl std::fmt::Display for TraversePattern {
                 .iter()
                 .map(|p| p.to_string())
                 .collect::<Vec<_>>()
-                .join(">")
+                .join("->")
         )
     }
 }
@@ -105,6 +105,6 @@ mod tests {
         let pattern1 = Pattern::wrapped();
         let pattern2 = Pattern::wrapped();
         let traversal_pattern = TraversePattern::new(vec![pattern1, pattern2]);
-        assert_eq!(traversal_pattern.to_string(), "WRAPPED>WRAPPED");
+        assert_eq!(traversal_pattern.to_string(), "WRAPPED->WRAPPED");
     }
 }

@@ -18,7 +18,7 @@ pub enum Token {
     #[token("!")]
     Not,
 
-    #[token(">", priority = 2)]
+    #[token("->", priority = 2)]
     Traverse,
 
     #[token("*")]
@@ -330,7 +330,7 @@ mod tests {
         assert_eq!(Token::lexer("&").next(), Some(Ok(Token::And)));
         assert_eq!(Token::lexer("|").next(), Some(Ok(Token::Or)));
         assert_eq!(Token::lexer("!").next(), Some(Ok(Token::Not)));
-        assert_eq!(Token::lexer(">").next(), Some(Ok(Token::Traverse)));
+        assert_eq!(Token::lexer("->").next(), Some(Ok(Token::Traverse)));
         assert_eq!(Token::lexer("*").next(), Some(Ok(Token::RepeatZeroOrMore)));
         assert_eq!(Token::lexer("+").next(), Some(Ok(Token::RepeatOneOrMore)));
         assert_eq!(Token::lexer("?").next(), Some(Ok(Token::RepeatZeroOrOne)));
