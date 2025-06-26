@@ -87,7 +87,6 @@ fn parse_not_patterns() {
     assert_eq!(p, Pattern::not_matching(Pattern::text("hi")));
     assert_eq!(p.to_string(), r#"!TEXT("hi")"#);
 
-
     let expr = "!ANY & NONE";
     let p = Pattern::parse(expr).unwrap();
     let expected = Pattern::not_matching(Pattern::and(vec![

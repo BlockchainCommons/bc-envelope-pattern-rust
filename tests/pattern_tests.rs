@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{format_paths, Matcher, Pattern};
+use bc_envelope_pattern::{Matcher, Pattern, format_paths};
 use indoc::indoc;
 
 use crate::common::test_data::*;

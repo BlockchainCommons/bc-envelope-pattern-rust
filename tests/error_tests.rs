@@ -1,4 +1,4 @@
-use bc_envelope_pattern::{Pattern, Error};
+use bc_envelope_pattern::{Error, Pattern};
 
 #[test]
 fn test_unrecognized_token_error() {
@@ -49,5 +49,9 @@ fn test_unexpected_end_of_input() {
 #[test]
 fn test_valid_pattern_still_works() {
     let result = Pattern::parse("TEXT(\"hello\")");
-    assert!(result.is_ok(), "Valid pattern should parse successfully: {:?}", result);
+    assert!(
+        result.is_ok(),
+        "Valid pattern should parse successfully: {:?}",
+        result
+    );
 }

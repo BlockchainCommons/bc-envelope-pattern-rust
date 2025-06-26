@@ -42,10 +42,7 @@ impl Axis {
             }
             (Axis::Wrapped, Node { subject, .. }) => {
                 if subject.is_wrapped() {
-                    vec![(
-                        subject.try_unwrap().unwrap(),
-                        EdgeType::Content,
-                    )]
+                    vec![(subject.try_unwrap().unwrap(), EdgeType::Content)]
                 } else {
                     vec![]
                 }

@@ -2,7 +2,8 @@ use std::ops::RangeBounds;
 
 use crate::{Interval, Reluctance};
 
-/// Defines how many times a pattern may or must match, with an interval and a reluctance.
+/// Defines how many times a pattern may or must match, with an interval and a
+/// reluctance.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Quantifier {
     interval: Interval,

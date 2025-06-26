@@ -157,35 +157,35 @@ pub fn format_path_opt(
     } else {
         match opts.element_format {
             PathElementFormat::Summary(max_length) => {
-            // Multi-line output with indentation for summaries.
-            let mut lines = Vec::new();
-            for (index, element) in path.iter().enumerate() {
-                let indent = if opts.indent {
-                " ".repeat(index * 4)
-                } else {
-                String::new()
-                };
+                // Multi-line output with indentation for summaries.
+                let mut lines = Vec::new();
+                for (index, element) in path.iter().enumerate() {
+                    let indent = if opts.indent {
+                        " ".repeat(index * 4)
+                    } else {
+                        String::new()
+                    };
 
-                let summary = envelope_summary(element);
-                let content = truncate_with_ellipsis(&summary, max_length);
+                    let summary = envelope_summary(element);
+                    let content = truncate_with_ellipsis(&summary, max_length);
 
-                lines.push(format!("{}{}", indent, content));
-            }
-            lines.join("\n")
+                    lines.push(format!("{}{}", indent, content));
+                }
+                lines.join("\n")
             }
             PathElementFormat::EnvelopeUR => {
-            // Single-line, space-separated envelope URs.
-            path.iter()
-                .map(|element| element.ur_string())
-                .collect::<Vec<_>>()
-                .join(" ")
+                // Single-line, space-separated envelope URs.
+                path.iter()
+                    .map(|element| element.ur_string())
+                    .collect::<Vec<_>>()
+                    .join(" ")
             }
             PathElementFormat::DigestUR => {
-            // Single-line, space-separated digest URs.
-            path.iter()
-                .map(|element| element.digest().ur_string())
-                .collect::<Vec<_>>()
-                .join(" ")
+                // Single-line, space-separated digest URs.
+                path.iter()
+                    .map(|element| element.digest().ur_string())
+                    .collect::<Vec<_>>()
+                    .join(" ")
             }
         }
     }

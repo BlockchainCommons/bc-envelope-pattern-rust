@@ -1,12 +1,12 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{format_paths_opt, FormatPathsOpts, Matcher, PathElementFormat, Pattern};
+use bc_envelope_pattern::{
+    FormatPathsOpts, Matcher, PathElementFormat, Pattern, format_paths_opt,
+};
 use indoc::indoc;
 
-use crate::common::{
-    test_data::{credential, redacted_credential},
-};
+use crate::common::test_data::{credential, redacted_credential};
 
 #[test]
 fn test_credential() {
@@ -160,7 +160,11 @@ fn test_wrapped_repeat() {
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathsOpts::default().element_format(PathElementFormat::Summary(Some(80)))),
+        format_paths_opt(
+            &paths,
+            FormatPathsOpts::default()
+                .element_format(PathElementFormat::Summary(Some(80)))
+        ),
         expected
     );
 }
@@ -189,7 +193,11 @@ fn test_search_wrapped_repeat() {
     .trim();
 
     assert_actual_expected!(
-        format_paths_opt(&paths, FormatPathsOpts::default().element_format(PathElementFormat::Summary(Some(80)))),
+        format_paths_opt(
+            &paths,
+            FormatPathsOpts::default()
+                .element_format(PathElementFormat::Summary(Some(80)))
+        ),
         expected
     );
 }

@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{format_paths, Matcher, Path, Pattern, Reluctance};
+use bc_envelope_pattern::{Matcher, Path, Pattern, Reluctance, format_paths};
 use indoc::indoc;
 
 fn fold(string: &str) -> Envelope {

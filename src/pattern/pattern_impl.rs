@@ -48,7 +48,8 @@
 //!
 //! ### References
 //!
-//! - <https://docs.rs/regex/latest/regex/bytes/index.html> "regex::bytes - Rust"
+//! - <https://docs.rs/regex/latest/regex/bytes/index.html> "regex::bytes -
+//!   Rust"
 //! - <https://docs.rs/regex/latest/regex/> "regex - Rust"
 
 use std::{
