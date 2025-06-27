@@ -96,9 +96,10 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - ✅ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern` - **COMPLETED**
 - ⏳ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern` - **NEXT**
-- ⏳ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern`
 - ⏳ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern`
 - ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern`
+
+- Checkpoint: Have we successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`? If so, we can proceed to the next phase.
 
 #### 1.2 Leverage Existing as_leaf() Method
 **Goal**: Use the existing `as_leaf()` method from `bc-envelope` for envelope-to-CBOR conversion.
