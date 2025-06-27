@@ -37,6 +37,12 @@ This crate is now in preview release. You are likely to be asked for bug fixes, 
   - Maintained existing API surface for backwards compatibility
   - Added comprehensive test coverage for dcbor-pattern integration
   - All existing tests continue to pass
+- **Phase 1.1 - NumberPattern Integration**: Successfully integrated `NumberPattern` as a wrapper around `dcbor_pattern::NumberPattern`
+  - Replaced enum-based implementation with struct wrapper
+  - Implemented delegation to dcbor-pattern for CBOR matching using `as_leaf()` method
+  - Maintained existing API surface for backwards compatibility (any, exact, range, greater_than, greater_than_or_equal, less_than, less_than_or_equal, nan)
+  - Added comprehensive test coverage for dcbor-pattern integration
+  - All existing tests continue to pass
 
 ## Development Plan: Deep Integration of `dcbor-pattern`
 
@@ -63,10 +69,17 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
   - Added comprehensive test coverage including dcbor-pattern integration tests
   - All existing functionality preserved and tests pass
 
+- ✅ **COMPLETED**: `src/pattern/leaf/number_pattern.rs` - Successfully converted to wrapper around `dcbor_pattern::NumberPattern`
+  - Changed from enum-based to struct-based wrapper implementation
+  - Implemented proper delegation using `envelope.subject().as_leaf()`
+  - Added comprehensive test coverage including dcbor-pattern integration tests
+  - All existing functionality preserved and tests pass
+  - Maintained all existing API methods (any, exact, range, greater_than, greater_than_or_equal, less_than, less_than_or_equal, nan)
+
 **Files to Modify**:
 - ✅ `src/pattern/leaf/text_pattern.rs` - wrap `dcbor_pattern::TextPattern` - **COMPLETED**
-- ⏳ `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern` - **NEXT**
-- ⏳ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern`
+- ✅ `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern` - **COMPLETED**
+- ⏳ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern` - **NEXT**
 - ⏳ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern`
 - ⏳ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern`
 - ⏳ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern`

@@ -1,4 +1,4 @@
-use std::ops::RangeInclusive;
+use std::collections::HashMap;
 
 use bc_envelope::Envelope;
 
@@ -7,108 +7,34 @@ use crate::{
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
-/// Pattern for matching number values.
+/// Pattern for matching number values. This is a wrapper around
+/// dcbor_pattern::NumberPattern that provides envelope-specific integration.
 #[derive(Debug, Clone)]
-pub enum NumberPattern {
-    /// Matches any number.
-    Any,
-    /// Matches the specific number.
-    Exact(f64),
-    /// Matches numbers within a range, inclusive (..=).
-    Range(RangeInclusive<f64>),
-    /// Matches numbers that are greater than the specified value.
-    GreaterThan(f64),
-    /// Matches numbers that are greater than or equal to the specified value.
-    GreaterThanOrEqual(f64),
-    /// Matches numbers that are less than the specified value.
-    LessThan(f64),
-    /// Matches numbers that are less than or equal to the specified value.
-    LessThanOrEqual(f64),
-    /// Matches numbers that are NaN (Not a Number).
-    NaN,
+pub struct NumberPattern {
+    inner: dcbor_pattern::NumberPattern,
 }
 
-impl std::hash::Hash for NumberPattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            NumberPattern::Any => 0u8.hash(state),
-            NumberPattern::Exact(value) => {
-                1u8.hash(state);
-                value.to_bits().hash(state);
-            }
-            NumberPattern::Range(range) => {
-                2u8.hash(state);
-                range.start().to_bits().hash(state);
-                range.end().to_bits().hash(state);
-            }
-            NumberPattern::GreaterThan(value) => {
-                3u8.hash(state);
-                value.to_bits().hash(state);
-            }
-            NumberPattern::GreaterThanOrEqual(value) => {
-                4u8.hash(state);
-                value.to_bits().hash(state);
-            }
-            NumberPattern::LessThan(value) => {
-                5u8.hash(state);
-                value.to_bits().hash(state);
-            }
-            NumberPattern::LessThanOrEqual(value) => {
-                6u8.hash(state);
-                value.to_bits().hash(state);
-            }
-            NumberPattern::NaN => 7u8.hash(state),
-        }
-    }
-}
-
-impl PartialEq for NumberPattern {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (NumberPattern::Any, NumberPattern::Any) => true,
-            (NumberPattern::Exact(a), NumberPattern::Exact(b)) => a == b,
-            (NumberPattern::Range(a), NumberPattern::Range(b)) => a == b,
-            (NumberPattern::GreaterThan(a), NumberPattern::GreaterThan(b)) => {
-                a == b
-            }
-            (
-                NumberPattern::GreaterThanOrEqual(a),
-                NumberPattern::GreaterThanOrEqual(b),
-            ) => a == b,
-            (NumberPattern::LessThan(a), NumberPattern::LessThan(b)) => a == b,
-            (
-                NumberPattern::LessThanOrEqual(a),
-                NumberPattern::LessThanOrEqual(b),
-            ) => a == b,
-            (NumberPattern::NaN, NumberPattern::NaN) => true,
-            _ => false,
-        }
-    }
-}
-
-impl Eq for NumberPattern {}
-
+// Re-export the dcbor-pattern NumberPattern methods through associated
+// functions
 impl NumberPattern {
     /// Creates a new `NumberPattern` that matches any number.
-    pub fn any() -> Self { NumberPattern::Any }
+    pub fn any() -> Self { Self { inner: dcbor_pattern::NumberPattern::any() } }
 
     /// Creates a new `NumberPattern` that matches the exact number.
     pub fn exact<T>(value: T) -> Self
     where
         T: Into<f64>,
     {
-        NumberPattern::Exact(value.into())
+        Self { inner: dcbor_pattern::NumberPattern::exact(value) }
     }
 
     /// Creates a new `NumberPattern` that matches numbers within the specified
     /// range.
-    pub fn range<A>(range: RangeInclusive<A>) -> Self
+    pub fn range<A>(range: std::ops::RangeInclusive<A>) -> Self
     where
         A: Into<f64> + Copy,
     {
-        let start = (*range.start()).into();
-        let end = (*range.end()).into();
-        NumberPattern::Range(RangeInclusive::new(start, end))
+        Self { inner: dcbor_pattern::NumberPattern::range(range) }
     }
 
     /// Creates a new `NumberPattern` that matches numbers greater than the
@@ -117,7 +43,9 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        NumberPattern::GreaterThan(value.into())
+        Self {
+            inner: dcbor_pattern::NumberPattern::greater_than(value),
+        }
     }
 
     /// Creates a new `NumberPattern` that matches numbers greater than or
@@ -126,7 +54,9 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        NumberPattern::GreaterThanOrEqual(value.into())
+        Self {
+            inner: dcbor_pattern::NumberPattern::greater_than_or_equal(value),
+        }
     }
 
     /// Creates a new `NumberPattern` that matches numbers less than the
@@ -135,7 +65,9 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        NumberPattern::LessThan(value.into())
+        Self {
+            inner: dcbor_pattern::NumberPattern::less_than(value),
+        }
     }
 
     /// Creates a new `NumberPattern` that matches numbers less than or equal
@@ -144,44 +76,56 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        NumberPattern::LessThanOrEqual(value.into())
+        Self {
+            inner: dcbor_pattern::NumberPattern::less_than_or_equal(value),
+        }
     }
 
     /// Creates a new `NumberPattern` that matches NaN values.
-    pub fn nan() -> Self { NumberPattern::NaN }
+    pub fn nan() -> Self { Self { inner: dcbor_pattern::NumberPattern::nan() } }
+}
+
+impl PartialEq for NumberPattern {
+    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+}
+
+impl Eq for NumberPattern {}
+
+impl std::hash::Hash for NumberPattern {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.inner.hash(state);
+    }
 }
 
 impl Matcher for NumberPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let subject = envelope.subject();
-        let is_hit = match self {
-            NumberPattern::Any => subject.is_number(),
-            NumberPattern::Exact(want) => {
-                subject.extract_subject().ok() == Some(*want)
-            }
-            NumberPattern::Range(want) => {
-                subject.extract_subject().is_ok_and(|n| want.contains(&n))
-            }
-            NumberPattern::GreaterThan(want) => {
-                subject.extract_subject().is_ok_and(|n: f64| n > *want)
-            }
-            NumberPattern::GreaterThanOrEqual(want) => {
-                subject.extract_subject().is_ok_and(|n: f64| n >= *want)
-            }
-            NumberPattern::LessThan(want) => {
-                subject.extract_subject().is_ok_and(|n: f64| n < *want)
-            }
-            NumberPattern::LessThanOrEqual(want) => {
-                subject.extract_subject().is_ok_and(|n: f64| n <= *want)
-            }
-            NumberPattern::NaN => subject.is_nan(),
-        };
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        // Try to extract CBOR from the envelope using the existing as_leaf()
+        // method
+        if let Some(cbor) = envelope.subject().as_leaf() {
+            // Delegate to dcbor-pattern for CBOR matching using paths() method
+            // NumberPattern doesn't support captures, so we only get paths
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
 
-        if is_hit {
-            vec![vec![envelope.clone()]]
+            // For simple leaf patterns, if dcbor-pattern found matches, return
+            // the envelope
+            if !dcbor_paths.is_empty() {
+                let envelope_paths = vec![vec![envelope.clone()]];
+                let envelope_captures = HashMap::new(); // No captures for simple number patterns
+                (envelope_paths, envelope_captures)
+            } else {
+                (vec![], HashMap::new())
+            }
         } else {
-            vec![]
+            // Not a leaf envelope, no match
+            (vec![], HashMap::new())
         }
+    }
+
+    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
+        self.paths_with_captures(envelope).0
     }
 
     fn compile(
@@ -190,10 +134,6 @@ impl Matcher for NumberPattern {
         literals: &mut Vec<Pattern>,
         captures: &mut Vec<String>,
     ) {
-        // A NumberPattern is a *leaf* predicate; it never changes
-        // the current envelope pointer, so the default atomic helper
-        // is perfect.  We must wrap `self` back into the outer
-        // `Pattern::Leaf` variant so it can be stored in `literals`.
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::Number(self.clone())),
             code,
@@ -205,29 +145,15 @@ impl Matcher for NumberPattern {
 
 impl std::fmt::Display for NumberPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            NumberPattern::Any => write!(f, "NUMBER"),
-            NumberPattern::Exact(value) => write!(f, "NUMBER({})", value),
-            NumberPattern::Range(range) => {
-                write!(f, "NUMBER({}...{})", range.start(), range.end())
-            }
-            NumberPattern::GreaterThan(value) => {
-                write!(f, "NUMBER(>{})", value)
-            }
-            NumberPattern::GreaterThanOrEqual(value) => {
-                write!(f, "NUMBER(>={})", value)
-            }
-            NumberPattern::LessThan(value) => write!(f, "NUMBER(<{})", value),
-            NumberPattern::LessThanOrEqual(value) => {
-                write!(f, "NUMBER(<={})", value)
-            }
-            NumberPattern::NaN => write!(f, "NUMBER(NaN)"),
-        }
+        write!(f, "{}", self.inner)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use bc_envelope::Envelope;
+    use dcbor_parse::parse_dcbor_item;
+
     use super::*;
 
     #[test]
@@ -249,5 +175,122 @@ mod tests {
             "NUMBER(<=5)"
         );
         assert_eq!(NumberPattern::nan().to_string(), "NUMBER(NaN)");
+    }
+
+    #[test]
+    fn test_number_pattern_dcbor_integration() {
+        // Test that the dcbor-pattern integration works correctly
+        let number_42_envelope = Envelope::new(42);
+        let number_100_envelope = Envelope::new(100);
+        let text_envelope = Envelope::new("hello");
+        let float_envelope = Envelope::new(3.14);
+        let nan_envelope = Envelope::new(f64::NAN);
+
+        // Test any pattern
+        let any_pattern = NumberPattern::any();
+        assert!(any_pattern.matches(&number_42_envelope));
+        assert!(any_pattern.matches(&number_100_envelope));
+        assert!(any_pattern.matches(&float_envelope));
+        assert!(any_pattern.matches(&nan_envelope));
+        assert!(!any_pattern.matches(&text_envelope)); // Should not match text
+
+        // Test exact value pattern
+        let exact_42_pattern = NumberPattern::exact(42);
+        assert!(exact_42_pattern.matches(&number_42_envelope));
+        assert!(!exact_42_pattern.matches(&number_100_envelope));
+        assert!(!exact_42_pattern.matches(&text_envelope));
+
+        // Test range pattern
+        let range_pattern = NumberPattern::range(40..=50);
+        assert!(range_pattern.matches(&number_42_envelope));
+        assert!(!range_pattern.matches(&number_100_envelope));
+        assert!(!range_pattern.matches(&text_envelope));
+
+        // Test greater than pattern
+        let gt_pattern = NumberPattern::greater_than(41);
+        assert!(gt_pattern.matches(&number_42_envelope));
+        assert!(gt_pattern.matches(&number_100_envelope));
+        assert!(!gt_pattern.matches(&text_envelope));
+
+        // Test greater than or equal pattern
+        let gte_pattern = NumberPattern::greater_than_or_equal(42);
+        assert!(gte_pattern.matches(&number_42_envelope));
+        assert!(gte_pattern.matches(&number_100_envelope));
+        assert!(!gte_pattern.matches(&text_envelope));
+
+        // Test less than pattern
+        let lt_pattern = NumberPattern::less_than(50);
+        assert!(lt_pattern.matches(&number_42_envelope));
+        assert!(!lt_pattern.matches(&number_100_envelope));
+        assert!(!lt_pattern.matches(&text_envelope));
+
+        // Test less than or equal pattern
+        let lte_pattern = NumberPattern::less_than_or_equal(42);
+        assert!(lte_pattern.matches(&number_42_envelope));
+        assert!(!lte_pattern.matches(&number_100_envelope));
+        assert!(!lte_pattern.matches(&text_envelope));
+
+        // Test NaN pattern
+        let nan_pattern = NumberPattern::nan();
+        assert!(nan_pattern.matches(&nan_envelope));
+        assert!(!nan_pattern.matches(&number_42_envelope));
+        assert!(!nan_pattern.matches(&text_envelope));
+
+        // Test paths
+        let paths = exact_42_pattern.paths(&number_42_envelope);
+        assert_eq!(paths.len(), 1);
+        assert_eq!(paths[0], vec![number_42_envelope.clone()]);
+
+        let no_paths = exact_42_pattern.paths(&number_100_envelope);
+        assert_eq!(no_paths.len(), 0);
+    }
+
+    #[test]
+    fn test_number_pattern_paths_with_captures() {
+        let number_envelope = Envelope::new(42);
+        let pattern = NumberPattern::exact(42);
+
+        let (paths, captures) = pattern.paths_with_captures(&number_envelope);
+        assert_eq!(paths.len(), 1);
+        assert_eq!(paths[0], vec![number_envelope.clone()]);
+        assert_eq!(captures.len(), 0); // No captures for simple number patterns
+    }
+
+    #[test]
+    fn test_number_pattern_with_non_number_envelope() {
+        // Test with envelope that doesn't contain a number
+        let envelope = Envelope::new_assertion("key", "value");
+        let pattern = NumberPattern::any();
+
+        let paths = pattern.paths(&envelope);
+        assert_eq!(paths.len(), 0); // Should not match non-number envelopes
+    }
+
+    #[test]
+    fn test_number_pattern_with_direct_cbor_values() {
+        // Test that our pattern works with various CBOR number types
+        let int_cbor = parse_dcbor_item("42").unwrap();
+        let float_cbor = parse_dcbor_item("3.14").unwrap();
+        let negative_cbor = parse_dcbor_item("-10").unwrap();
+
+        let int_envelope = Envelope::new(int_cbor);
+        let float_envelope = Envelope::new(float_cbor);
+        let negative_envelope = Envelope::new(negative_cbor);
+
+        let any_pattern = NumberPattern::any();
+        assert!(any_pattern.matches(&int_envelope));
+        assert!(any_pattern.matches(&float_envelope));
+        assert!(any_pattern.matches(&negative_envelope));
+
+        let range_pattern = NumberPattern::range(-20..=50);
+        assert!(range_pattern.matches(&int_envelope));
+        assert!(range_pattern.matches(&float_envelope)); // 3.14 is within [-20, 50]
+        assert!(range_pattern.matches(&negative_envelope));
+
+        // Test a more restrictive range
+        let narrow_range_pattern = NumberPattern::range(40..=45);
+        assert!(narrow_range_pattern.matches(&int_envelope)); // 42 is in [40, 45]
+        assert!(!narrow_range_pattern.matches(&float_envelope)); // 3.14 is not in [40, 45]
+        assert!(!narrow_range_pattern.matches(&negative_envelope)); // -10 is not in [40, 45]
     }
 }
