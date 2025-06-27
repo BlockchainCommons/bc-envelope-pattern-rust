@@ -37,10 +37,10 @@ This crate is now in preview release. You are likely to be asked for bug fixes, 
   - Maintained existing API surface for backwards compatibility
   - Added comprehensive test coverage for dcbor-pattern integration
   - All existing tests continue to pass
-- **Phase 1.1 - NumberPattern Integration**: Successfully integrated `NumberPattern` as a wrapper around `dcbor_pattern::NumberPattern`
+- **Phase 1.1 - BoolPattern Integration**: Successfully integrated `BoolPattern` as a wrapper around `dcbor_pattern::BoolPattern`
   - Replaced enum-based implementation with struct wrapper
   - Implemented delegation to dcbor-pattern for CBOR matching using `as_leaf()` method
-  - Maintained existing API surface for backwards compatibility (any, exact, range, greater_than, greater_than_or_equal, less_than, less_than_or_equal, nan)
+  - Maintained existing API surface for backwards compatibility (any, value)
   - Added comprehensive test coverage for dcbor-pattern integration
   - All existing tests continue to pass
 
@@ -76,11 +76,26 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
   - All existing functionality preserved and tests pass
   - Maintained all existing API methods (any, exact, range, greater_than, greater_than_or_equal, less_than, less_than_or_equal, nan)
 
+- ✅ **COMPLETED**: `src/pattern/leaf/bool_pattern.rs` - Successfully converted to wrapper around `dcbor_pattern::BoolPattern`
+  - Changed from enum-based to struct-based wrapper implementation
+  - Implemented proper delegation using `envelope.subject().as_leaf()`
+  - Added comprehensive test coverage including dcbor-pattern integration tests
+  - All existing functionality preserved and tests pass
+  - Maintained all existing API methods (any, value)
+
+- ✅ **COMPLETED**: `src/pattern/leaf/byte_string_pattern.rs` - Successfully converted to wrapper around `dcbor_pattern::ByteStringPattern`
+  - Changed from enum-based to struct-based wrapper implementation
+  - Implemented proper delegation using `envelope.subject().as_leaf()`
+  - Added comprehensive test coverage including dcbor-pattern integration tests
+  - All existing functionality preserved and tests pass
+  - Maintained all existing API methods (any, value, regex)
+
 **Files to Modify**:
 - ✅ `src/pattern/leaf/text_pattern.rs` - wrap `dcbor_pattern::TextPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern` - **COMPLETED**
-- ⏳ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern` - **NEXT**
-- ⏳ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern`
+- ✅ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern` - **COMPLETED**
+- ✅ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern` - **COMPLETED**
+- ⏳ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern` - **NEXT**
 - ⏳ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern`
 - ⏳ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern`
 - ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern`
