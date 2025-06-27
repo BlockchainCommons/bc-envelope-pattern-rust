@@ -1,5 +1,5 @@
 use bc_envelope::Envelope;
-use dcbor_pattern::{NullPattern as DcborNullPattern, Matcher as DcborMatcher};
+use dcbor_pattern::{Matcher as DcborMatcher, NullPattern as DcborNullPattern};
 
 use crate::{
     Pattern,
@@ -7,7 +7,7 @@ use crate::{
 };
 
 /// Pattern for matching null values.
-/// 
+///
 /// This is a wrapper around `dcbor_pattern::NullPattern` that provides
 /// envelope-specific functionality while delegating core matching logic
 /// to the underlying CBOR pattern matcher.
@@ -18,11 +18,7 @@ pub struct NullPattern {
 
 impl NullPattern {
     /// Creates a new `NullPattern` that matches any null value.
-    pub fn new() -> Self { 
-        NullPattern {
-            inner: DcborNullPattern::new()
-        }
-    }
+    pub fn new() -> Self { NullPattern { inner: DcborNullPattern::new() } }
 }
 
 impl Default for NullPattern {
@@ -103,24 +99,25 @@ mod tests {
         let null_envelope = Envelope::null().add_assertion("test", "value");
         let pattern = NullPattern::new();
         let paths = pattern.paths(&null_envelope);
-        assert_eq!(paths.len(), 1); 
+        assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![null_envelope.clone()]);
     }
 
     #[test]
     fn test_null_pattern_delegated_matching() {
         let pattern = NullPattern::new();
-        
-        // Test that the pattern correctly delegates to dcbor_pattern::NullPattern
+
+        // Test that the pattern correctly delegates to
+        // dcbor_pattern::NullPattern
         let null_cbor = CBOR::null();
         assert!(pattern.inner.matches(&null_cbor));
-        
+
         let text_cbor = "test".to_cbor();
         assert!(!pattern.inner.matches(&text_cbor));
-        
+
         let number_cbor = 42.to_cbor();
         assert!(!pattern.inner.matches(&number_cbor));
-        
+
         let bool_cbor = true.to_cbor();
         assert!(!pattern.inner.matches(&bool_cbor));
     }
@@ -128,7 +125,7 @@ mod tests {
     #[test]
     fn test_null_pattern_envelope_as_leaf() {
         let pattern = NullPattern::new();
-        
+
         // Test with envelope containing null value
         let null_envelope = Envelope::null();
         if let Some(cbor) = null_envelope.subject().as_leaf() {
@@ -136,7 +133,7 @@ mod tests {
         } else {
             panic!("Expected null envelope to have leaf subject");
         }
-        
+
         // Test with envelope containing non-null value
         let text_envelope = Envelope::new("test");
         if let Some(cbor) = text_envelope.subject().as_leaf() {
