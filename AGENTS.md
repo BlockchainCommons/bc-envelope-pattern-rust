@@ -97,15 +97,21 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
   - All existing functionality preserved and tests pass
   - Maintained all existing API methods (any, value, range, earliest, latest, iso8601, regex)
 
+- ✅ **COMPLETED**: `src/pattern/leaf/null_pattern.rs` - Successfully converted to wrapper around `dcbor_pattern::NullPattern`
+  - Changed from unit struct to struct-based wrapper implementation
+  - Implemented proper delegation using `envelope.subject().as_leaf()`
+  - Added comprehensive test coverage including dcbor-pattern integration tests
+  - All existing functionality preserved and tests pass
+  - Maintained existing API method (new) and proper Display formatting
+
 **Files to Modify**:
 - ✅ `src/pattern/leaf/text_pattern.rs` - wrap `dcbor_pattern::TextPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern` - **COMPLETED**
-- ⏳ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern` - **NEXT**
-- ⏳ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern`
-- ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern`
+- ✅ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern` - **COMPLETED**
+- ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern` - **NEXT**
 
 - Checkpoint: Have we successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`? If so, we can proceed to the next phase.
 
