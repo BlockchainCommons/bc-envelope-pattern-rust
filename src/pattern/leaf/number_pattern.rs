@@ -183,7 +183,7 @@ mod tests {
         let number_42_envelope = Envelope::new(42);
         let number_100_envelope = Envelope::new(100);
         let text_envelope = Envelope::new("hello");
-        let float_envelope = Envelope::new(3.14);
+        let float_envelope = Envelope::new(3.2222);
         let nan_envelope = Envelope::new(f64::NAN);
 
         // Test any pattern
