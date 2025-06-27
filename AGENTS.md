@@ -31,6 +31,12 @@ This crate is now in preview release. You are likely to be asked for bug fixes, 
 
 - This crate now uses `dcbor-pattern`'s implementations of `Interval`, `Reluctance`, and `Quantifier`.
 - This crate now has a new error type, `DcborPatternError`, and implements automatic conversion from `dcbor_pattern::Error`.
+- **Phase 1.1 - TextPattern Integration**: Successfully integrated `TextPattern` as a wrapper around `dcbor_pattern::TextPattern`
+  - Replaced enum-based implementation with struct wrapper
+  - Implemented delegation to dcbor-pattern for CBOR matching using `as_leaf()` method
+  - Maintained existing API surface for backwards compatibility
+  - Added comprehensive test coverage for dcbor-pattern integration
+  - All existing tests continue to pass
 
 ## Development Plan: Deep Integration of `dcbor-pattern`
 
@@ -38,7 +44,7 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 
 ### Phase 1: Core Pattern Type Integration
 
-#### 1.1 Replace Individual Leaf Pattern Types
+#### 1.1 Replace Individual Leaf Pattern Types - IN PROGRESS
 **Current State**: `bc-envelope-pattern` has its own implementations for leaf patterns like `NumberPattern`, `TextPattern`, `BoolPattern`, etc.
 
 **Goal**: Replace these with wrapper types that delegate to `dcbor-pattern` equivalents.
@@ -50,14 +56,21 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - **Maintain separation of concerns**: Let dcbor-pattern handle CBOR value matching, bc-envelope-pattern handle envelope structure matching
 - **No VM changes needed**: Integration happens at the `Matcher::paths_with_captures()` level, not at the VM level
 
+**Progress**:
+- ✅ **COMPLETED**: `src/pattern/leaf/text_pattern.rs` - Successfully converted to wrapper around `dcbor_pattern::TextPattern`
+  - Changed from enum-based to struct-based wrapper implementation
+  - Implemented proper delegation using `envelope.subject().as_leaf()`
+  - Added comprehensive test coverage including dcbor-pattern integration tests
+  - All existing functionality preserved and tests pass
+
 **Files to Modify**:
-- `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern`
-- `src/pattern/leaf/text_pattern.rs` - wrap `dcbor_pattern::TextPattern`
-- `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern`
-- `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern`
-- `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern`
-- `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern`
-- `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern`
+- ✅ `src/pattern/leaf/text_pattern.rs` - wrap `dcbor_pattern::TextPattern` - **COMPLETED**
+- ⏳ `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern` - **NEXT**
+- ⏳ `src/pattern/leaf/bool_pattern.rs` - wrap `dcbor_pattern::BoolPattern`
+- ⏳ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern`
+- ⏳ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern`
+- ⏳ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern`
+- ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern`
 
 #### 1.2 Leverage Existing as_leaf() Method
 **Goal**: Use the existing `as_leaf()` method from `bc-envelope` for envelope-to-CBOR conversion.
