@@ -104,6 +104,14 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
   - All existing functionality preserved and tests pass
   - Maintained existing API method (new) and proper Display formatting
 
+- ✅ **COMPLETED**: `src/pattern/leaf/known_value_pattern.rs` - Successfully converted to wrapper around `dcbor_pattern::KnownValuePattern`
+  - Changed from enum-based to struct-based wrapper implementation
+  - Implemented proper delegation using `envelope.subject().as_known_value()` and `known_value.to_cbor()`
+  - Added comprehensive test coverage including dcbor-pattern integration tests
+  - All existing functionality preserved and tests pass
+  - Maintained all existing API methods (any, value, named, regex)
+  - Properly handles KnownValue envelopes using special case logic similar to CBORPattern
+
 **Files to Modify**:
 - ✅ `src/pattern/leaf/text_pattern.rs` - wrap `dcbor_pattern::TextPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/number_pattern.rs` - wrap `dcbor_pattern::NumberPattern` - **COMPLETED**
@@ -111,9 +119,9 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - ✅ `src/pattern/leaf/byte_string_pattern.rs` - wrap `dcbor_pattern::ByteStringPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern` - **COMPLETED**
-- ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern` - **NEXT**
+- ✅ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern` - **COMPLETED**
 
-- Checkpoint: Have we successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`? If so, we can proceed to the next phase. If not, then document the remaining patterns that need to be converted.
+- ✅ **Checkpoint REACHED**: Successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`. All existing tests pass and new dcbor-pattern integration tests have been added. Ready to proceed to Phase 1.2.
 
 #### 1.2 Leverage Existing as_leaf() Method
 **Goal**: Use the existing `as_leaf()` method from `bc-envelope` for envelope-to-CBOR conversion.

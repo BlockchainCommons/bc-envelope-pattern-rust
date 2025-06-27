@@ -1,131 +1,102 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
-use known_values::{KNOWN_VALUES, KnownValue};
+use dcbor::prelude::*;
+use known_values::KnownValue;
 
 use crate::{
     Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
-/// Pattern for matching known values.
+/// Pattern for matching known values. This is a wrapper around
+/// dcbor_pattern::KnownValuePattern that provides envelope-specific
+/// integration.
 #[derive(Debug, Clone)]
-pub enum KnownValuePattern {
-    /// Matches any known value.
-    Any,
-    /// Matches the specific known value.
-    Value(KnownValue),
-    /// Matches the name of a known value.
-    Named(String),
-    /// Matches the regex for a known value name.
-    Regex(regex::Regex),
+pub struct KnownValuePattern {
+    inner: dcbor_pattern::KnownValuePattern,
+}
+
+// Re-export the dcbor-pattern KnownValuePattern methods through associated
+// functions
+impl KnownValuePattern {
+    /// Creates a new `KnownValuePattern` that matches any known value.
+    pub fn any() -> Self {
+        Self { inner: dcbor_pattern::KnownValuePattern::any() }
+    }
+
+    /// Creates a new `KnownValuePattern` that matches a specific known value.
+    pub fn value(value: KnownValue) -> Self {
+        Self {
+            inner: dcbor_pattern::KnownValuePattern::value(value),
+        }
+    }
+
+    /// Creates a new `KnownValuePattern` that matches a known value by name.
+    pub fn named(name: impl Into<String>) -> Self {
+        Self {
+            inner: dcbor_pattern::KnownValuePattern::named(name),
+        }
+    }
+
+    /// Creates a new `KnownValuePattern` that matches the regex for a known
+    /// value name.
+    pub fn regex(regex: regex::Regex) -> Self {
+        Self {
+            inner: dcbor_pattern::KnownValuePattern::regex(regex),
+        }
+    }
 }
 
 impl PartialEq for KnownValuePattern {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (KnownValuePattern::Any, KnownValuePattern::Any) => true,
-            (KnownValuePattern::Value(a), KnownValuePattern::Value(b)) => {
-                a == b
-            }
-            (KnownValuePattern::Named(a), KnownValuePattern::Named(b)) => {
-                a == b
-            }
-            (KnownValuePattern::Regex(a), KnownValuePattern::Regex(b)) => {
-                a.as_str() == b.as_str()
-            }
-            _ => false,
-        }
-    }
+    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
 }
 
 impl Eq for KnownValuePattern {}
 
 impl std::hash::Hash for KnownValuePattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            KnownValuePattern::Any => {
-                0u8.hash(state);
-            }
-            KnownValuePattern::Value(s) => {
-                1u8.hash(state);
-                s.hash(state);
-            }
-            KnownValuePattern::Named(name) => {
-                2u8.hash(state);
-                name.hash(state);
-            }
-            KnownValuePattern::Regex(regex) => {
-                3u8.hash(state);
-                // Regex does not implement Hash, so we hash its pattern string.
-                regex.as_str().hash(state);
-            }
-        }
-    }
-}
-
-impl KnownValuePattern {
-    /// Creates a new `KnownValuePattern` that matches any known value.
-    pub fn any() -> Self { KnownValuePattern::Any }
-
-    /// Creates a new `KnownValuePattern` that matches a specific known value.
-    pub fn value(value: KnownValue) -> Self { KnownValuePattern::Value(value) }
-
-    /// Creates a new `KnownValuePattern` that matches a known value by name.
-    pub fn named(name: impl Into<String>) -> Self {
-        KnownValuePattern::Named(name.into())
-    }
-
-    /// Creates a new `KnownValuePattern` that matches the regex for a known
-    /// value name.
-    pub fn regex(regex: regex::Regex) -> Self {
-        KnownValuePattern::Regex(regex)
+        self.inner.hash(state);
     }
 }
 
 impl Matcher for KnownValuePattern {
     fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        if let Ok(value) = envelope.extract_subject::<KnownValue>() {
-            match self {
-                KnownValuePattern::Any => vec![vec![envelope.clone()]],
-                KnownValuePattern::Value(expected) => {
-                    if value == *expected {
-                        vec![vec![envelope.clone()]]
-                    } else {
-                        vec![]
-                    }
-                }
-                KnownValuePattern::Named(name) => {
-                    // Look up the known value by name in the global registry
-                    let binding = KNOWN_VALUES.get();
-                    if let Some(known_values_store) = binding.as_ref() {
-                        if let Some(expected_value) =
-                            known_values_store.known_value_named(name)
-                        {
-                            if value == *expected_value {
-                                vec![vec![envelope.clone()]]
-                            } else {
-                                vec![]
-                            }
-                        } else {
-                            // Name not found in registry, no match
-                            vec![]
-                        }
-                    } else {
-                        // Registry not initialized, no match
-                        vec![]
-                    }
-                }
-                KnownValuePattern::Regex(regex) => {
-                    // Check if the known value's name matches the regex
-                    if regex.is_match(&value.name()) {
-                        vec![vec![envelope.clone()]]
-                    } else {
-                        vec![]
-                    }
-                }
-            }
+        let subject = envelope.subject();
+
+        // Special case for KnownValue - use as_known_value() instead of
+        // as_leaf()
+        if let Some(known_value) = subject.as_known_value() {
+            // Convert the KnownValue to its CBOR representation
+            let known_value_cbor = known_value.to_cbor();
+
+            // Delegate to dcbor-pattern for CBOR matching
+            let dcbor_paths =
+                dcbor_pattern::Matcher::paths(&self.inner, &known_value_cbor);
+
+            // Convert dcbor paths to envelope paths
+            // For KnownValue patterns, the dcbor pattern matches directly
+            // against the CBOR, so we just need to map successful
+            // matches back to the envelope
+            dcbor_paths
+                .into_iter()
+                .map(|_dcbor_path| {
+                    // For leaf patterns like KnownValue, we just return the
+                    // envelope itself
+                    vec![envelope.clone()]
+                })
+                .collect()
         } else {
             vec![]
         }
+    }
+
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        // For now, delegate to the base implementation
+        (self.paths(envelope), HashMap::new())
     }
 
     fn compile(
@@ -145,16 +116,8 @@ impl Matcher for KnownValuePattern {
 
 impl std::fmt::Display for KnownValuePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            KnownValuePattern::Any => write!(f, "KNOWN"),
-            KnownValuePattern::Value(value) => {
-                write!(f, "KNOWN('{}')", value.name())
-            }
-            KnownValuePattern::Named(name) => write!(f, "KNOWN('{}')", name),
-            KnownValuePattern::Regex(regex) => {
-                write!(f, "KNOWN(/{}/)", regex.as_str())
-            }
-        }
+        // Delegate to the inner pattern's Display implementation
+        self.inner.fmt(f)
     }
 }
 
@@ -270,5 +233,46 @@ mod tests {
         let regex = regex::Regex::new(r"^da.*").unwrap();
         let pattern = KnownValuePattern::regex(regex);
         assert_eq!(pattern.to_string(), "KNOWN(/^da.*/)");
+    }
+
+    #[test]
+    fn test_known_value_pattern_dcbor_integration() {
+        // Test that the dcbor-pattern integration works correctly
+        let date_envelope = Envelope::new(known_values::DATE);
+        let language_envelope = Envelope::new(known_values::LANGUAGE);
+        let text_envelope = Envelope::new("test");
+
+        // Test any pattern
+        let any_pattern = KnownValuePattern::any();
+        assert!(any_pattern.matches(&date_envelope));
+        assert!(any_pattern.matches(&language_envelope));
+        assert!(!any_pattern.matches(&text_envelope)); // Should not match text
+
+        // Test exact value pattern
+        let date_pattern = KnownValuePattern::value(known_values::DATE);
+        assert!(date_pattern.matches(&date_envelope));
+        assert!(!date_pattern.matches(&language_envelope));
+        assert!(!date_pattern.matches(&text_envelope));
+
+        // Test named pattern
+        let named_date_pattern = KnownValuePattern::named("date");
+        assert!(named_date_pattern.matches(&date_envelope));
+        assert!(!named_date_pattern.matches(&language_envelope));
+        assert!(!named_date_pattern.matches(&text_envelope));
+
+        // Test regex pattern
+        let date_regex = regex::Regex::new(r"^da.*").unwrap();
+        let regex_pattern = KnownValuePattern::regex(date_regex);
+        assert!(regex_pattern.matches(&date_envelope));
+        assert!(!regex_pattern.matches(&language_envelope));
+        assert!(!regex_pattern.matches(&text_envelope));
+
+        // Test paths
+        let paths = date_pattern.paths(&date_envelope);
+        assert_eq!(paths.len(), 1);
+        assert_eq!(paths[0], vec![date_envelope.clone()]);
+
+        let no_paths = date_pattern.paths(&language_envelope);
+        assert_eq!(no_paths.len(), 0);
     }
 }
