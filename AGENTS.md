@@ -113,7 +113,7 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - ✅ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern` - **COMPLETED**
 - ⏳ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern` - **NEXT**
 
-- Checkpoint: Have we successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`? If so, we can proceed to the next phase.
+- Checkpoint: Have we successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`? If so, we can proceed to the next phase. If not, then document the remaining patterns that need to be converted.
 
 #### 1.2 Leverage Existing as_leaf() Method
 **Goal**: Use the existing `as_leaf()` method from `bc-envelope` for envelope-to-CBOR conversion.
