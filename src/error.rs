@@ -61,6 +61,9 @@ pub enum Error {
     #[error("Invalid capture group name")]
     InvalidCaptureGroupName(String, Span),
 
+    #[error("Invalid pattern at {0:?}")]
+    InvalidPattern(Span),
+
     #[error("Unknown error")]
     #[default]
     Unknown,

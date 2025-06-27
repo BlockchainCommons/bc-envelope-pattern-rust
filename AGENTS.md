@@ -120,9 +120,9 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - ✅ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern` - **COMPLETED**
-- 🔄 `src/pattern/leaf/cbor_pattern.rs` - augment with `dcbor_pattern::Pattern` - **NEXT**
+- ✅ `src/pattern/leaf/cbor_pattern.rs` - augment with `dcbor_pattern::Pattern` - **COMPLETED**
 
-- ✅ **Checkpoint REACHED**: Successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`. All existing tests pass and new dcbor-pattern integration tests have been added. Ready to proceed to Phase 1.3.
+- ✅ **Phase 1 COMPLETED**: Successfully integrated all leaf pattern types with dcbor-pattern. All existing tests pass and new dcbor-pattern integration features have been added. Ready to proceed to Phase 2.
 
 #### 1.2 Leverage Existing as_leaf() Method ✅ **COMPLETED**
 **Goal**: Use the existing `as_leaf()` method from `bc-envelope` for envelope-to-CBOR conversion.
@@ -139,7 +139,7 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - ✅ All leaf pattern implementations consistently use `as_leaf()` where appropriate
 - ✅ `KnownValuePattern` uses special case handling as required
 
-#### 1.3 Augment CBORPattern with dcbor-pattern Integration
+#### 1.3 Augment CBORPattern with dcbor-pattern Integration ✅ **COMPLETED**
 **Goal**: Extend the existing `CBORPattern` enum to support `dcbor-pattern` pattern expressions while preserving current functionality.
 
 **Current State**: `CBORPattern` supports:
@@ -153,6 +153,16 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - **New syntax**: Add `CBOR(/patex/)` syntax following the established pattern used in `TEXT(/regex/)`, `BSTR(/regex/)`, etc.
 - **Enhanced capabilities**: Enable complex CBOR structure matching with quantifiers, captures, and advanced patterns
 - **Delegation approach**: Use the same successful pattern established with other leaf patterns
+
+**Implementation Notes**:
+- ✅ Extended CBORPattern enum with Pattern(DcborPattern) variant
+- ✅ Added CBORPattern::pattern() constructor method
+- ✅ Implemented custom Hash trait since DcborPattern doesn't implement Hash
+- ✅ Updated Matcher trait implementation to delegate to dcbor-pattern for Pattern variant
+- ✅ Added comprehensive test coverage including dcbor-pattern integration tests
+- ✅ Updated Display trait to show CBOR(/pattern/) format for Pattern variant
+- ✅ All existing tests continue to pass, ensuring backward compatibility
+- ✅ Phase 2 preparation: Added TODO comments for path extension and capture conversion
 
 **Benefits**:
 - Full backward compatibility with existing `CBOR()` patterns
@@ -171,7 +181,7 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 **Goal**: Use CBOR-to-Envelope conversion to create unified envelope paths that include both envelope context and CBOR match details.
 
 **Implementation Strategy**:
-- **Leverage `.into()` conversion**: CBOR implements `EnvelopeEncodable`, so `cbor.into()` creates `Envelope::Leaf` containing the CBOR value
+- **Leverage `.into()` conversion**: CBOR implements `EnvelopeEncodable`, so `cbor.into()` creates a leaf envelope containing the CBOR value
 - **Extend envelope paths**: When dcbor-pattern matches within a leaf, convert `dcbor_pattern::Path` elements to envelopes and extend the envelope path
 - **Composite paths**: Result shows envelope context (with hash prefixes) followed by nested CBOR elements as envelope leaves
 - **Example**: Envelope path `[envelope_root]` + dcbor path `[cbor1, cbor2]` becomes `[envelope_root, envelope_leaf1, envelope_leaf2]`

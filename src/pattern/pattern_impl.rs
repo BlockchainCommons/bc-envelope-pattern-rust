@@ -151,6 +151,11 @@ impl Pattern {
     pub fn cbor(cbor: impl CBOREncodable) -> Self {
         Pattern::Leaf(LeafPattern::Cbor(CBORPattern::value(cbor)))
     }
+
+    /// Creates a new `Pattern` that matches CBOR values using dcbor-pattern expressions.
+    pub fn cbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
+        Pattern::Leaf(LeafPattern::Cbor(CBORPattern::pattern(pattern)))
+    }
 }
 
 impl Pattern {
