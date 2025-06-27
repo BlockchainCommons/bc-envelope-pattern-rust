@@ -17,7 +17,7 @@ fn test_cbor_pattern_dcbor_pattern_integration() {
             assert!(pattern.matches(&envelope), "At least exact matches should work");
         }
     }
-    
+
     // Test dcbor-pattern with array - this might not work yet
     match Pattern::parse(r#"CBOR(/[1, 2, 3]/)"#) {
         Ok(pattern) => {
@@ -36,7 +36,7 @@ fn test_cbor_pattern_dcbor_pattern_integration() {
 #[test]
 fn test_cbor_pattern_any() {
     let envelope = Envelope::new(123);
-    
+
     // Test CBOR pattern
     let any_pattern = Pattern::parse("CBOR").unwrap();
     assert!(any_pattern.matches(&envelope), "CBOR should match any CBOR value");
@@ -67,7 +67,7 @@ fn test_cbor_pattern_complex_structures() {
     map.insert("name", "Alice");
     map.insert("age", 42);
     let envelope = Envelope::new(map);
-    
+
     // Match with exact diagnostic notation
     let pattern2 = Pattern::parse(r#"CBOR({"name": "Alice", "age": 42})"#).unwrap();
     assert!(pattern2.matches(&envelope), "Diagnostic notation should match map");
@@ -79,26 +79,26 @@ fn test_cbor_pattern_parsing_errors() {
     let invalid_pattern = Pattern::parse(r#"CBOR(/invalid syntax here/)"#);
     assert!(invalid_pattern.is_err(), "Invalid dcbor-pattern should fail to parse");
 
-    // Test invalid diagnostic notation  
+    // Test invalid diagnostic notation
     let invalid_diag = Pattern::parse(r#"CBOR({invalid: syntax)"#);
     assert!(invalid_diag.is_err(), "Invalid diagnostic notation should fail to parse");
 }
 
-#[test] 
+#[test]
 fn test_cbor_pattern_debug_parser() {
     // Let's test what the parser actually supports
     println!("Testing basic CBOR parsing...");
-    
+
     // Test basic CBOR patterns that should work
     assert!(Pattern::parse("CBOR").is_ok());
     assert!(Pattern::parse("CBOR(42)").is_ok());
     assert!(Pattern::parse(r#"CBOR("hello")"#).is_ok());
     assert!(Pattern::parse("CBOR([1, 2, 3])").is_ok());
-    
+
     // Test dcbor-pattern syntax
     let dcbor_result = Pattern::parse(r#"CBOR(/uint/)"#);
     println!("CBOR(/uint/) parse result: {:?}", dcbor_result);
-    
+
     let dcbor_array_result = Pattern::parse(r#"CBOR(/[1, 2, 3]/)"#);
     println!("CBOR(/[1, 2, 3]/) parse result: {:?}", dcbor_array_result);
 }

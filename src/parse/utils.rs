@@ -263,13 +263,13 @@ pub(crate) fn parse_date_inner(src: &str) -> Result<(Pattern, usize)> {
 pub(crate) fn parse_cbor_inner(src: &str) -> Result<(Pattern, usize)> {
     let mut pos = 0;
     skip_ws(src, &mut pos);
-    
+
     // Check if this is a dcbor-pattern expression (/patex/)
     if src[pos..].starts_with('/') {
         pos += 1; // skip opening '/'
         let start = pos;
         let mut escape = false;
-        
+
         // Find the closing '/'
         while pos < src.len() {
             let b = src.as_bytes()[pos];
@@ -284,28 +284,29 @@ pub(crate) fn parse_cbor_inner(src: &str) -> Result<(Pattern, usize)> {
             }
             if b == b'/' {
                 let pattern_str = &src[start..pos - 1];
-                
+
                 // Parse the dcbor-pattern expression
                 let dcbor_pattern = dcbor_pattern::Pattern::parse(pattern_str)
                     .map_err(|_| Error::InvalidPattern(start..pos - 1))?;
-                
+
                 skip_ws(src, &mut pos);
                 return Ok((Pattern::cbor_pattern(dcbor_pattern), pos));
             }
         }
         return Err(Error::UnterminatedRegex(start - 1..pos));
     }
-    
+
     // Check if this is a UR (ur:type/value)
     if src[pos..].starts_with("ur:") {
         // Parse as UR and convert to CBOR
         let (cbor_v20, consumed) = parse_dcbor_item_partial(&src[pos..])
             .map_err(|_| Error::Unknown)?;
         let bytes = cbor_v20.to_cbor_data();
-        let cbor = dcbor::CBOR::try_from_data(bytes).map_err(|_| Error::Unknown)?;
+        let cbor =
+            dcbor::CBOR::try_from_data(bytes).map_err(|_| Error::Unknown)?;
         return Ok((Pattern::cbor(cbor), pos + consumed));
     }
-    
+
     // Default: parse as CBOR diagnostic notation
     let (cbor_v20, consumed) =
         parse_dcbor_item_partial(&src[pos..]).map_err(|_| Error::Unknown)?;
