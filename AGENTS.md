@@ -120,29 +120,45 @@ This section outlines the comprehensive plan for integrating `dcbor-pattern` fun
 - ✅ `src/pattern/leaf/date_pattern.rs` - wrap `dcbor_pattern::DatePattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/null_pattern.rs` - wrap `dcbor_pattern::NullPattern` - **COMPLETED**
 - ✅ `src/pattern/leaf/known_value_pattern.rs` - wrap `dcbor_pattern::KnownValuePattern` - **COMPLETED**
+- 🔄 `src/pattern/leaf/cbor_pattern.rs` - augment with `dcbor_pattern::Pattern` - **NEXT**
 
-- ✅ **Checkpoint REACHED**: Successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`. All existing tests pass and new dcbor-pattern integration tests have been added. Ready to proceed to Phase 1.2.
+- ✅ **Checkpoint REACHED**: Successfully replaced all individual leaf pattern types with wrappers around `dcbor-pattern`. All existing tests pass and new dcbor-pattern integration tests have been added. Ready to proceed to Phase 1.3.
 
-#### 1.2 Leverage Existing as_leaf() Method
+#### 1.2 Leverage Existing as_leaf() Method ✅ **COMPLETED**
 **Goal**: Use the existing `as_leaf()` method from `bc-envelope` for envelope-to-CBOR conversion.
 
-**Current State**: The `as_leaf()` method in `bc-envelope/src/base/queries.rs` already provides clean, single-step conversion from envelope to CBOR: `pub fn as_leaf(&self) -> Option<CBOR>`. This is already being used in `cbor_pattern.rs`.
+**Status**: ✅ **COMPLETED** - All leaf patterns are now correctly using `envelope.subject().as_leaf()` for CBOR extraction.
 
-**Implementation**:
-- Use existing `envelope.subject().as_leaf()` pattern throughout leaf patterns
-- Handle special cases like `KnownValue` envelopes (already handled in current code)
-- No additional conversion layer needed - the existing API is sufficient
+**Implementation Notes**:
+- ✅ All leaf patterns use `envelope.subject().as_leaf()` pattern consistently
+- ✅ Special case handling for `KnownValue` envelopes using `envelope.subject().as_known_value()` and `known_value.to_cbor()`
+- ✅ No additional conversion layer needed - the existing API is sufficient
+- ✅ Verified working implementation across all leaf pattern types
 
-**Files to Modify**:
-- Update existing leaf pattern implementations to consistently use `as_leaf()`
+**Files Modified**:
+- ✅ All leaf pattern implementations consistently use `as_leaf()` where appropriate
+- ✅ `KnownValuePattern` uses special case handling as required
 
-#### 1.3 Update CBORPattern for Generic CBOR Matching
-**Goal**: Replace the custom `CBORPattern` with a wrapper around `dcbor-pattern`'s generic CBOR pattern matching.
+#### 1.3 Augment CBORPattern with dcbor-pattern Integration
+**Goal**: Extend the existing `CBORPattern` enum to support `dcbor-pattern` pattern expressions while preserving current functionality.
 
-**Implementation**:
-- Remove custom CBOR matching logic
-- Delegate to `dcbor_pattern::Pattern` for CBOR value patterns
-- Handle envelope-specific cases (KnownValue, etc.)
+**Current State**: `CBORPattern` supports:
+- `CBOR` - matches any CBOR value
+- `CBOR(diagnostic-notation)` - matches specific CBOR values using diagnostic notation
+- `CBOR(ur:type/value)` - matches specific CBOR values using UR encoding
+
+**Implementation Strategy**:
+- **Preserve existing functionality**: Keep current `Any` and `Value` variants for backward compatibility
+- **Add new Pattern variant**: Extend enum with `Pattern(dcbor_pattern::Pattern)` for advanced CBOR matching
+- **New syntax**: Add `CBOR(/patex/)` syntax following the established pattern used in `TEXT(/regex/)`, `BSTR(/regex/)`, etc.
+- **Enhanced capabilities**: Enable complex CBOR structure matching with quantifiers, captures, and advanced patterns
+- **Delegation approach**: Use the same successful pattern established with other leaf patterns
+
+**Benefits**:
+- Full backward compatibility with existing `CBOR()` patterns
+- Consistent syntax following established `/pattern/` convention
+- Access to dcbor-pattern's advanced matching capabilities
+- Clear separation between simple value matching and complex pattern matching
 
 ### Phase 2: Path and Capture Integration via CBOR-to-Envelope Conversion
 
