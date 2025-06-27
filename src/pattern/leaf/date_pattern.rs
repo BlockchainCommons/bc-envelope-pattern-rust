@@ -1,192 +1,105 @@
-use std::ops::RangeInclusive;
+use std::{collections::HashMap, ops::RangeInclusive};
 
 use bc_envelope::Envelope;
-use dcbor::{Date, prelude::*};
+use dcbor::Date;
 
 use crate::{
     Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
-/// Pattern for matching dates.
+/// Pattern for matching dates. This is a wrapper around
+/// dcbor_pattern::DatePattern that provides envelope-specific integration.
 #[derive(Debug, Clone)]
-pub enum DatePattern {
-    /// Matches any date.
-    Any,
-    /// Matches a specific date.
-    Value(Date),
-    /// Matches dates within a range (inclusive).
-    Range(RangeInclusive<Date>),
-    /// Matches dates that are on or after the specified date.
-    Earliest(Date),
-    /// Matches dates that are on or before the specified date.
-    Latest(Date),
-    /// Matches a date by its ISO-8601 string representation.
-    Iso8601(String),
-    /// Matches dates whose ISO-8601 string representation matches the given
-    /// regex pattern.
-    Regex(regex::Regex),
+pub struct DatePattern {
+    inner: dcbor_pattern::DatePattern,
 }
 
 impl PartialEq for DatePattern {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (DatePattern::Any, DatePattern::Any) => true,
-            (DatePattern::Value(a), DatePattern::Value(b)) => a == b,
-            (DatePattern::Range(a), DatePattern::Range(b)) => a == b,
-            (DatePattern::Earliest(a), DatePattern::Earliest(b)) => a == b,
-            (DatePattern::Latest(a), DatePattern::Latest(b)) => a == b,
-            (DatePattern::Iso8601(a), DatePattern::Iso8601(b)) => a == b,
-            (DatePattern::Regex(a), DatePattern::Regex(b)) => {
-                a.as_str() == b.as_str()
-            }
-            _ => false,
-        }
-    }
+    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
 }
 
 impl Eq for DatePattern {}
 
 impl std::hash::Hash for DatePattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            DatePattern::Any => {
-                0u8.hash(state);
-            }
-            DatePattern::Value(date) => {
-                1u8.hash(state);
-                date.hash(state);
-            }
-            DatePattern::Range(range) => {
-                2u8.hash(state);
-                range.start().hash(state);
-                range.end().hash(state);
-            }
-            DatePattern::Earliest(date) => {
-                3u8.hash(state);
-                date.hash(state);
-            }
-            DatePattern::Latest(date) => {
-                4u8.hash(state);
-                date.hash(state);
-            }
-            DatePattern::Iso8601(iso_string) => {
-                5u8.hash(state);
-                iso_string.hash(state);
-            }
-            DatePattern::Regex(regex) => {
-                6u8.hash(state);
-                // Regex does not implement Hash, so we hash its pattern string.
-                regex.as_str().hash(state);
-            }
-        }
+        self.inner.hash(state);
     }
 }
 
+// Re-export the dcbor-pattern DatePattern methods through associated
+// functions
 impl DatePattern {
     /// Creates a new `DatePattern` that matches any date.
-    pub fn any() -> Self { DatePattern::Any }
+    pub fn any() -> Self { Self { inner: dcbor_pattern::DatePattern::any() } }
 
     /// Creates a new `DatePattern` that matches a specific date.
-    pub fn value(date: Date) -> Self { DatePattern::Value(date) }
+    pub fn value(date: Date) -> Self {
+        Self { inner: dcbor_pattern::DatePattern::value(date) }
+    }
 
     /// Creates a new `DatePattern` that matches dates within a range
     /// (inclusive).
     pub fn range(range: RangeInclusive<Date>) -> Self {
-        DatePattern::Range(range)
+        Self { inner: dcbor_pattern::DatePattern::range(range) }
     }
 
     /// Creates a new `DatePattern` that matches dates that are on or after the
     /// specified date.
-    pub fn earliest(date: Date) -> Self { DatePattern::Earliest(date) }
+    pub fn earliest(date: Date) -> Self {
+        Self { inner: dcbor_pattern::DatePattern::earliest(date) }
+    }
 
     /// Creates a new `DatePattern` that matches dates that are on or before the
     /// specified date.
-    pub fn latest(date: Date) -> Self { DatePattern::Latest(date) }
+    pub fn latest(date: Date) -> Self {
+        Self { inner: dcbor_pattern::DatePattern::latest(date) }
+    }
 
     /// Creates a new `DatePattern` that matches a date by its ISO-8601 string
     /// representation.
     pub fn iso8601(iso_string: impl Into<String>) -> Self {
-        DatePattern::Iso8601(iso_string.into())
+        Self {
+            inner: dcbor_pattern::DatePattern::iso8601(iso_string),
+        }
     }
 
     /// Creates a new `DatePattern` that matches dates whose ISO-8601 string
     /// representation matches the given regex pattern.
-    pub fn regex(regex: regex::Regex) -> Self { DatePattern::Regex(regex) }
+    pub fn regex(regex: regex::Regex) -> Self {
+        Self { inner: dcbor_pattern::DatePattern::regex(regex) }
+    }
 }
 
 impl Matcher for DatePattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        // Check if the envelope subject contains a date (CBOR tag 1)
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        // Try to extract CBOR from the envelope using the existing as_leaf()
+        // method
         if let Some(cbor) = envelope.subject().as_leaf() {
-            if let CBORCase::Tagged(tag, _) = cbor.as_case() {
-                // Check if this is a date tag (tag 1)
-                if tag.value() == 1 {
-                    // Try to extract the date
-                    if let Ok(date) = Date::try_from(cbor.clone()) {
-                        match self {
-                            DatePattern::Any => vec![vec![envelope.clone()]],
-                            DatePattern::Value(expected_date) => {
-                                if date == *expected_date {
-                                    vec![vec![envelope.clone()]]
-                                } else {
-                                    vec![]
-                                }
-                            }
-                            DatePattern::Range(range) => {
-                                if range.contains(&date) {
-                                    vec![vec![envelope.clone()]]
-                                } else {
-                                    vec![]
-                                }
-                            }
-                            DatePattern::Earliest(earliest) => {
-                                if date >= *earliest {
-                                    vec![vec![envelope.clone()]]
-                                } else {
-                                    vec![]
-                                }
-                            }
-                            DatePattern::Latest(latest) => {
-                                if date <= *latest {
-                                    vec![vec![envelope.clone()]]
-                                } else {
-                                    vec![]
-                                }
-                            }
-                            DatePattern::Iso8601(expected_string) => {
-                                let date_string = date.to_string();
-                                if date_string == *expected_string {
-                                    vec![vec![envelope.clone()]]
-                                } else {
-                                    vec![]
-                                }
-                            }
-                            DatePattern::Regex(regex) => {
-                                let date_string = date.to_string();
-                                if regex.is_match(&date_string) {
-                                    vec![vec![envelope.clone()]]
-                                } else {
-                                    vec![]
-                                }
-                            }
-                        }
-                    } else {
-                        // Tagged with date tag but couldn't be parsed as date
-                        vec![]
-                    }
-                } else {
-                    // Not a date tag
-                    vec![]
-                }
+            // Delegate to dcbor-pattern for CBOR matching using paths() method
+            // DatePattern doesn't support captures, so we only get paths
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
+
+            // For simple leaf patterns, if dcbor-pattern found matches, return
+            // the envelope
+            if !dcbor_paths.is_empty() {
+                let envelope_paths = vec![vec![envelope.clone()]];
+                let envelope_captures = HashMap::new(); // No captures for simple date patterns
+                (envelope_paths, envelope_captures)
             } else {
-                // Not tagged
-                vec![]
+                (vec![], HashMap::new())
             }
         } else {
-            // Not a leaf CBOR value
-            vec![]
+            // Not a leaf envelope, no match
+            (vec![], HashMap::new())
         }
+    }
+
+    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
+        self.paths_with_captures(envelope).0
     }
 
     fn compile(
@@ -206,27 +119,15 @@ impl Matcher for DatePattern {
 
 impl std::fmt::Display for DatePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DatePattern::Any => write!(f, "DATE"),
-            DatePattern::Value(date) => write!(f, "DATE({})", date),
-            DatePattern::Range(range) => {
-                write!(f, "DATE({}...{})", range.start(), range.end())
-            }
-            DatePattern::Earliest(date) => write!(f, "DATE({}...)", date),
-            DatePattern::Latest(date) => write!(f, "DATE(...{})", date),
-            DatePattern::Iso8601(iso_string) => {
-                write!(f, "DATE({})", iso_string)
-            }
-            DatePattern::Regex(regex) => {
-                write!(f, "DATE(/{}/)", regex.as_str())
-            }
-        }
+        write!(f, "{}", self.inner)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use bc_envelope::Envelope;
+    use dcbor::prelude::*;
+    use dcbor_parse::parse_dcbor_item;
 
     use super::*;
 
@@ -386,5 +287,126 @@ mod tests {
         let pattern =
             DatePattern::regex(regex::Regex::new(r"^2023-.*").unwrap());
         assert_eq!(pattern.to_string(), "DATE(/^2023-.*/)");
+    }
+
+    #[test]
+    fn test_date_pattern_dcbor_integration() {
+        // Test that the dcbor-pattern integration works correctly
+        let date = Date::from_ymd(2023, 12, 25);
+        let date_envelope = Envelope::new(date.clone());
+        let text_envelope = Envelope::new("2023-12-25");
+        let number_envelope = Envelope::new(42);
+
+        // Test any pattern
+        let any_pattern = DatePattern::any();
+        assert!(any_pattern.matches(&date_envelope));
+        assert!(!any_pattern.matches(&text_envelope)); // Should not match text
+        assert!(!any_pattern.matches(&number_envelope)); // Should not match number
+
+        // Test exact value patterns
+        let exact_pattern = DatePattern::value(date.clone());
+        assert!(exact_pattern.matches(&date_envelope));
+        assert!(!exact_pattern.matches(&text_envelope));
+        assert!(!exact_pattern.matches(&number_envelope));
+
+        let different_pattern =
+            DatePattern::value(Date::from_ymd(2023, 12, 24));
+        assert!(!different_pattern.matches(&date_envelope));
+
+        // Test range patterns
+        let start = Date::from_ymd(2023, 12, 20);
+        let end = Date::from_ymd(2023, 12, 30);
+        let range_pattern = DatePattern::range(start..=end);
+        assert!(range_pattern.matches(&date_envelope));
+        assert!(!range_pattern.matches(&text_envelope));
+        assert!(!range_pattern.matches(&number_envelope));
+
+        // Test ISO8601 patterns
+        let iso_pattern = DatePattern::iso8601("2023-12-25");
+        assert!(iso_pattern.matches(&date_envelope));
+        assert!(!iso_pattern.matches(&text_envelope));
+
+        // Test regex patterns
+        let regex_pattern =
+            DatePattern::regex(regex::Regex::new(r"^2023-.*").unwrap());
+        assert!(regex_pattern.matches(&date_envelope));
+        assert!(!regex_pattern.matches(&text_envelope));
+
+        // Test paths
+        let paths = exact_pattern.paths(&date_envelope);
+        assert_eq!(paths.len(), 1);
+        assert_eq!(paths[0], vec![date_envelope.clone()]);
+
+        let no_paths = exact_pattern.paths(&text_envelope);
+        assert_eq!(no_paths.len(), 0);
+    }
+
+    #[test]
+    fn test_date_pattern_paths_with_captures() {
+        let date = Date::from_ymd(2023, 12, 25);
+        let date_envelope = Envelope::new(date.clone());
+        let pattern = DatePattern::value(date);
+
+        let (paths, captures) = pattern.paths_with_captures(&date_envelope);
+        assert_eq!(paths.len(), 1);
+        assert_eq!(paths[0], vec![date_envelope.clone()]);
+        assert_eq!(captures.len(), 0); // No captures for simple date patterns
+    }
+
+    #[test]
+    fn test_date_pattern_with_non_date_envelope() {
+        // Test with envelope that doesn't contain a date
+        let envelope = Envelope::new_assertion("key", "value");
+        let pattern = DatePattern::any();
+
+        let paths = pattern.paths(&envelope);
+        assert_eq!(paths.len(), 0); // Should not match non-date envelopes
+    }
+
+    #[test]
+    fn test_date_pattern_with_direct_cbor_values() {
+        // Test that our pattern works with CBOR date values
+        let date_cbor = parse_dcbor_item("1(1640995200)").unwrap(); // Unix timestamp as date
+        let text_cbor = parse_dcbor_item("\"2023-12-25\"").unwrap();
+
+        let date_envelope = Envelope::new(date_cbor);
+        let text_envelope = Envelope::new(text_cbor);
+
+        let any_pattern = DatePattern::any();
+        assert!(any_pattern.matches(&date_envelope));
+        assert!(!any_pattern.matches(&text_envelope));
+
+        // Test with a specific date conversion
+        if let Ok(parsed_date) =
+            Date::try_from(parse_dcbor_item("1(1640995200)").unwrap())
+        {
+            let specific_pattern = DatePattern::value(parsed_date);
+            assert!(specific_pattern.matches(&date_envelope));
+            assert!(!specific_pattern.matches(&text_envelope));
+        }
+    }
+
+    #[test]
+    fn test_date_pattern_earliest_latest() {
+        let date = Date::from_ymd(2023, 12, 25);
+        let envelope = Envelope::new(date.clone());
+
+        // Test earliest pattern
+        let earlier_date = Date::from_ymd(2023, 12, 20);
+        let earliest_pattern = DatePattern::earliest(earlier_date);
+        assert!(earliest_pattern.matches(&envelope));
+
+        let later_date = Date::from_ymd(2023, 12, 30);
+        let earliest_pattern = DatePattern::earliest(later_date);
+        assert!(!earliest_pattern.matches(&envelope));
+
+        // Test latest pattern
+        let later_date = Date::from_ymd(2023, 12, 30);
+        let latest_pattern = DatePattern::latest(later_date);
+        assert!(latest_pattern.matches(&envelope));
+
+        let earlier_date = Date::from_ymd(2023, 12, 20);
+        let latest_pattern = DatePattern::latest(earlier_date);
+        assert!(!latest_pattern.matches(&envelope));
     }
 }
