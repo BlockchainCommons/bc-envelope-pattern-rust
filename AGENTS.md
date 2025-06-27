@@ -20,3 +20,14 @@ This crate is now in preview release. You are likely to be asked for bug fixes, 
 - `bc-envelope`: One of the most important dependencies for this crate, `bc-envelope` provides the core functionality for working with Gordian Envelope. In particular, you will want to make sure you are familiar with the `envelope.rs` and `queries.rs` modules.
 - `dcbor`: Envelope is built on deterministic CBOR (dCBOR), which is implemented in the `dcbor` crate.
 - `dcbor-parse`: This crate provides a parser for dCBOR diagnostic notation, which is used to specify patterns in a human-readable format.
+- `dcbor-pattern`: This crate provides a pattern matcher for dCBOR values, which is used to match patterns against the leaves of the Envelope tree.
+
+## Current Task: Integration of `dcbor-pattern`.
+
+- `dcbor-pattern` is a crate that provides a pattern matcher for dCBOR values.
+- The goal is to integrate `dcbor-pattern` into `bc-envelope-pattern` so that it takes over the pattern matching for envelope leaves, which are dCBOR values.
+
+### Already complete:
+
+- This crate now uses `dcbor-pattern`'s implementations of `Interval`, `Reluctance`, and `Quantifier`.
+- This crate now has a new error type, `DcborPatternError`, and implements automatic conversion from `dcbor_pattern::Error`.

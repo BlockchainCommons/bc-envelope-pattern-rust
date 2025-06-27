@@ -1,17 +1,15 @@
 mod error;
 mod format;
-mod interval;
 mod parse;
 mod pattern;
-mod quantifier;
-mod reluctance;
 
 pub use error::{Error, Result};
 pub use format::{
     FormatPathsOpts, PathElementFormat, format_path, format_path_opt,
     format_paths, format_paths_opt,
 };
-pub use interval::Interval;
 pub use pattern::{Matcher, Path, Pattern};
-pub use quantifier::Quantifier;
-pub use reluctance::Reluctance;
+
+pub use dcbor_pattern::Interval;
+pub use dcbor_pattern::Quantifier;
+pub use dcbor_pattern::Reluctance;

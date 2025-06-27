@@ -25,6 +25,7 @@ bc-envelope = "^0.32.0"
 known-values = "^0.6.0"
 dcbor = { version = "^0.21.0", features = ["anyhow", "multithreaded"] }
 dcbor-parse = "^0.2.1"
+dcbor-pattern = "^0.1.0"
 bc-components = "^0.23.0"
 bc-ur = "^0.11.0"
 
