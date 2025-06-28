@@ -22,14 +22,15 @@ fn test_cbor_pattern_simple_array_paths() {
     let actual = format_paths(&paths);
 
     // Expected: 3 paths, each with root envelope + specific number envelope
-    // Note: The order matches what dcbor-pattern returns
+    // Note: The order matches what dcbor-pattern returns (corrected order)
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]
             4bf5122f LEAF 1
         4abc3113 LEAF [1, 2, 3]
-            084fed08 LEAF 3
-        4abc3113 LEAF [1, 2, 3]
             dbc1b4c9 LEAF 2
+        4abc3113 LEAF [1, 2, 3]
+            084fed08 LEAF 3
     "#}
     .trim();
 
@@ -167,10 +168,10 @@ fn test_cbor_pattern_paths_preserve_order() {
         }
     }
 
-    // Numbers should be found in dcbor-pattern order: 10, 30, 20
+    // Numbers should be found in dcbor-pattern order: 10, 20, 30
     assert_eq!(
         found_numbers,
-        vec![10, 30, 20],
+        vec![10, 20, 30],
         "Numbers should be found in dcbor-pattern order"
     );
 }

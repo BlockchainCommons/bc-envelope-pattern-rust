@@ -49,11 +49,11 @@ fn test_wrapped_pattern() {
     let wrapped_envelope = envelope.wrap();
     let paths = Pattern::unwrap().paths(&wrapped_envelope);
     // println!("{}", format_paths(&paths));
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
             7f83f7bd LEAF 42
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     // The matched paths include the assertion.
@@ -61,11 +61,11 @@ fn test_wrapped_pattern() {
         wrapped_envelope.add_assertion("an", "assertion");
     let paths = Pattern::unwrap().paths(&wrapped_envelope_with_assertion);
     // println!("{}", format_paths(&paths));
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         169aba00 NODE { 42 } [ "an": "assertion" ]
             7f83f7bd LEAF 42
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     let wrapped_twice = wrapped_envelope_with_assertion.wrap();

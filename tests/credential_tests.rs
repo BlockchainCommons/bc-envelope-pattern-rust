@@ -156,8 +156,7 @@ fn test_wrapped_repeat() {
     let expected = indoc! {r#"
         0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
             8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
-    "#}
-    .trim();
+    "#}.trim();
 
     assert_actual_expected!(
         format_paths_opt(
@@ -189,8 +188,7 @@ fn test_search_wrapped_repeat() {
         0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
             397a2d4c WRAPPED { ARID(4676635a) [ 'isA': "Certificate of Completion", "certif…
                 8122ffa9 NODE ARID(4676635a) [ 'isA': "Certificate of Completion", "certificate…
-    "#}
-    .trim();
+    "#}.trim();
 
     assert_actual_expected!(
         format_paths_opt(

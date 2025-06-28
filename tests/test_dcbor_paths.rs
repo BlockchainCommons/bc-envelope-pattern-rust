@@ -26,19 +26,20 @@ fn test_dcbor_pattern_extended_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         4bd40828 LEAF {"nested": {"value": 42}, "numbers": [1, 2, 3]}
             563fb650 LEAF {"value": 42}
                 7f83f7bd LEAF 42
         4bd40828 LEAF {"nested": {"value": 42}, "numbers": [1, 2, 3]}
             4abc3113 LEAF [1, 2, 3]
-                084fed08 LEAF 3
+                4bf5122f LEAF 1
         4bd40828 LEAF {"nested": {"value": 42}, "numbers": [1, 2, 3]}
             4abc3113 LEAF [1, 2, 3]
                 dbc1b4c9 LEAF 2
         4bd40828 LEAF {"nested": {"value": 42}, "numbers": [1, 2, 3]}
             4abc3113 LEAF [1, 2, 3]
-                4bf5122f LEAF 1
+                084fed08 LEAF 3
     "#}
     .trim();
 
@@ -83,6 +84,7 @@ fn test_dcbor_pattern_array_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         4cd61f73 LEAF [1, "hello", true]
             cb835593 LEAF "hello"
@@ -110,13 +112,14 @@ fn test_dcbor_pattern_array_elements() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]
             4bf5122f LEAF 1
         4abc3113 LEAF [1, 2, 3]
-            084fed08 LEAF 3
-        4abc3113 LEAF [1, 2, 3]
             dbc1b4c9 LEAF 2
+        4abc3113 LEAF [1, 2, 3]
+            084fed08 LEAF 3
     "#}
     .trim();
 
@@ -157,18 +160,19 @@ fn test_cbor_pattern_multiple_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         832e44f1 LEAF {"value": 42, "numbers": [1, 2, 3]}
             7f83f7bd LEAF 42
         832e44f1 LEAF {"value": 42, "numbers": [1, 2, 3]}
             4abc3113 LEAF [1, 2, 3]
-                084fed08 LEAF 3
+                4bf5122f LEAF 1
         832e44f1 LEAF {"value": 42, "numbers": [1, 2, 3]}
             4abc3113 LEAF [1, 2, 3]
                 dbc1b4c9 LEAF 2
         832e44f1 LEAF {"value": 42, "numbers": [1, 2, 3]}
             4abc3113 LEAF [1, 2, 3]
-                4bf5122f LEAF 1
+                084fed08 LEAF 3
     "#}
     .trim();
 
@@ -193,13 +197,14 @@ fn test_array_element_access() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]
             4bf5122f LEAF 1
         4abc3113 LEAF [1, 2, 3]
-            084fed08 LEAF 3
-        4abc3113 LEAF [1, 2, 3]
             dbc1b4c9 LEAF 2
+        4abc3113 LEAF [1, 2, 3]
+            084fed08 LEAF 3
     "#}
     .trim();
 

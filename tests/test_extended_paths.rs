@@ -21,13 +21,14 @@ fn test_cbor_pattern_extended_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]
             4bf5122f LEAF 1
         4abc3113 LEAF [1, 2, 3]
-            084fed08 LEAF 3
-        4abc3113 LEAF [1, 2, 3]
             dbc1b4c9 LEAF 2
+        4abc3113 LEAF [1, 2, 3]
+            084fed08 LEAF 3
     "#}.trim();
 
     assert_actual_expected!(actual, expected, "CBOR pattern should return extended paths for array elements");
@@ -47,16 +48,17 @@ fn test_cbor_pattern_extended_paths_nested_structure() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         73d02807 LEAF {"name": "Alice", "scores": [95, 87, 92]}
             3a129d53 LEAF [95, 87, 92]
                 61544f78 LEAF 95
         73d02807 LEAF {"name": "Alice", "scores": [95, 87, 92]}
             3a129d53 LEAF [95, 87, 92]
-                672fa214 LEAF 92
+                8fa86205 LEAF 87
         73d02807 LEAF {"name": "Alice", "scores": [95, 87, 92]}
             3a129d53 LEAF [95, 87, 92]
-                8fa86205 LEAF 87
+                672fa214 LEAF 92
     "#}.trim();
 
     assert_actual_expected!(actual, expected, "Nested structure should show proper path extension with intermediate elements");

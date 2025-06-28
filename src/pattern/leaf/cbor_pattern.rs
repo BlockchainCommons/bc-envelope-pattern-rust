@@ -149,6 +149,7 @@ impl Matcher for CBORPattern {
                     // Convert dcbor paths to envelope paths by extending the
                     // base envelope path
                     let base_path = vec![envelope.clone()];
+
                     let envelope_paths: Vec<Path> = dcbor_paths
                         .into_iter()
                         .map(|dcbor_path| {

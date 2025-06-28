@@ -66,6 +66,7 @@ fn test_node_pattern_with_traversal() {
 fn test_redacted_credential_patterns() {
     let redacted_credential = redacted_credential();
     // println!("{}", redacted_credential.format());
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         {
             ARID(4676635a) [
@@ -81,8 +82,7 @@ fn test_redacted_credential_patterns() {
             'note': "Signed by Example Electrical Engineering Board"
             'signed': Signature
         ]
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(redacted_credential.format(), expected);
 
     // Search for the obscured paths
@@ -103,6 +103,7 @@ fn test_redacted_credential_patterns() {
         .map(|el| vec![el.clone()])
         .collect();
     // println!("{}", format_paths(&formatted_obscured));
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         1f9ff098 ELIDED
         4a9b2e4d ELIDED
@@ -111,8 +112,7 @@ fn test_redacted_credential_patterns() {
         68895d8e ELIDED
         8ec5e912 ELIDED
         9b3d4785 ELIDED
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&formatted_obscured), expected);
 
     // Get the un-redacted credential
@@ -133,10 +133,10 @@ fn test_redacted_credential_patterns() {
     // Get the last element of the found path
     let found_element = found_paths[0].last().unwrap();
     // println!("{}", found_element.format());
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         "certificateNumber": "123-456-789"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(found_element.format(), expected);
 
     // The digest of the found element should match the first obscured element

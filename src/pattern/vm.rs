@@ -294,7 +294,10 @@ fn run_thread(
 
                     // Handle multiple paths from atomic patterns (e.g., CBOR
                     // patterns)
-                    for (i, path) in paths.into_iter().enumerate() {
+                    // Process paths in reverse order for spawning to preserve original order
+                    // since stack is LIFO
+                    let paths_vec: Vec<_> = paths.into_iter().collect();
+                    for (i, path) in paths_vec.iter().enumerate() {
                         if i == 0 {
                             // Use the first path for the current thread
                             // Check if this is a simple atomic match or an
@@ -311,18 +314,20 @@ fn run_thread(
                                     th.env = last_env.clone();
                                 }
                             }
-                        } else {
-                            // Spawn new threads for the remaining paths
-                            let mut fork = th.clone();
-                            // For additional paths, always use the full path
-                            // since these are
-                            // separate matches
-                            fork.path = path.clone();
-                            if let Some(last_env) = path.last() {
-                                fork.env = last_env.clone();
-                            }
-                            stack.push(fork);
                         }
+                    }
+
+                    // Spawn threads for remaining paths in reverse order to preserve
+                    // original order when processed from stack (LIFO)
+                    for path in paths_vec.iter().skip(1).rev() {
+                        let mut fork = th.clone();
+                        // For additional paths, always use the full path
+                        // since these are separate matches
+                        fork.path = path.clone();
+                        if let Some(last_env) = path.last() {
+                            fork.env = last_env.clone();
+                        }
+                        stack.push(fork);
                     }
                 }
                 MatchStructure(idx) => {

@@ -121,10 +121,10 @@ fn test_one_element_traversal_pattern() {
     assert_eq!(format!("{}", number_pattern), r#"NUMBER(42)"#);
 
     let envelope = Envelope::new(42);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         7f83f7bd LEAF 42
-    "#}
-    .trim();
+    "#}.trim();
     let paths = number_pattern.paths(&envelope);
     assert_actual_expected!(format_paths(&paths), expected);
 
@@ -144,21 +144,21 @@ fn test_wrapped_traversal() {
     let wrapped_4 = wrapped_3.wrap();
 
     // println!("{}", wrapped_4.tree_format());
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         25cb582c WRAPPED
             c1426a18 cont WRAPPED
                 ee8cade0 cont WRAPPED
                     febc1555 cont WRAPPED
                         e909da9a cont "data"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(wrapped_4.tree_format(), expected);
 
     // println!("{}", wrapped_4.format_flat());
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         { { { { "data" } } } }
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(wrapped_4.format_flat(), expected);
 
     // A pattern that matches the contents of a single wrapped envelope.
@@ -184,8 +184,7 @@ fn test_wrapped_traversal() {
         25cb582c WRAPPED { { { { "data" } } } }
             c1426a18 WRAPPED { { { "data" } } }
                 ee8cade0 WRAPPED { { "data" } }
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     // A pattern that matches three wrapped envelopes in a traversal path.
@@ -202,8 +201,7 @@ fn test_wrapped_traversal() {
             c1426a18 WRAPPED { { { "data" } } }
                 ee8cade0 WRAPPED { { "data" } }
                     febc1555 WRAPPED { "data" }
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     // A pattern that matches four wrapped envelopes in a traversal path.
@@ -222,8 +220,7 @@ fn test_wrapped_traversal() {
                 ee8cade0 WRAPPED { { "data" } }
                     febc1555 WRAPPED { "data" }
                         e909da9a LEAF "data"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 
     assert_eq!(
@@ -420,6 +417,7 @@ fn test_search_pattern_with_wrapped() {
 
     let secret_text_search_paths = secret_text_search_pattern.paths(&envelope);
     // println!("{}", format_paths(&paths));
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
             a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
@@ -443,6 +441,7 @@ fn test_search_pattern_with_wrapped() {
     );
     let secret_regex_search_paths =
         secret_regex_search_pattern.paths(&envelope);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
             a5d4710e ASSERTION "data": { "secret" [ "classification": "top-secret" ] }
@@ -474,6 +473,7 @@ fn test_search_pattern_credential() {
 
     let cred = credential();
     // println!("{}", cred.tree_format());
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         0b721f78 NODE
             397a2d4c subj WRAPPED
@@ -524,8 +524,7 @@ fn test_search_pattern_credential() {
             e6d7fca0 ASSERTION
                 0fcd6a39 pred 'note'
                 f106bad1 obj "Signed by Example Electrical Engineering…"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(cred.tree_format(), expected);
 
     // Search for all text in the credential
@@ -535,6 +534,7 @@ fn test_search_pattern_credential() {
         .iter()
         .map(|path| vec![(*path.last().unwrap()).clone()])
         .collect();
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         9e3bff3a LEAF "certificateNumber"
         21c21808 LEAF "123-456-789"
@@ -555,8 +555,7 @@ fn test_search_pattern_credential() {
         202c10ef LEAF "RF and Microwave Engineering"
         f8489ac1 LEAF "Example Electrical Engineering Board"
         f106bad1 LEAF "Signed by Example Electrical Engineering Board"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&found_elements), expected);
 
     // A pattern that searches for the text "James" in the credential
@@ -580,11 +579,11 @@ fn test_search_pattern_credential() {
         .iter()
         .map(|path| vec![(*path.last().unwrap()).clone()])
         .collect();
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         54b3e1e7 ASSERTION "professionalDevelopmentHours": 15
         8ec5e912 ASSERTION "continuingEducationUnits": 1
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&number_paths), expected);
 }
 

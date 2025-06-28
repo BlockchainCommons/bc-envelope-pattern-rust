@@ -489,12 +489,12 @@ fn repeat_optional_modes() {
 fn repeat_some_order() {
     let env = wrap_n(Envelope::new("x"), 2);
 
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 WRAPPED
             70b5f17d cont WRAPPED
                 5e85370e cont "x"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(env.tree_format(), expected);
 
     let pat = |mode| {
@@ -522,12 +522,12 @@ fn repeat_some_order() {
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 WRAPPED { { "x" } }
             70b5f17d WRAPPED { "x" }
                 5e85370e LEAF "x"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);
 }
 
@@ -543,32 +543,32 @@ fn repeat_range_order() {
     };
 
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         88e28c8b WRAPPED { { { { "x" } } } }
             79962374 WRAPPED { { { "x" } } }
                 06bb2465 WRAPPED { { "x" } }
                     70b5f17d WRAPPED { "x" }
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         88e28c8b WRAPPED { { { { "x" } } } }
             79962374 WRAPPED { { { "x" } } }
                 06bb2465 WRAPPED { { "x" } }
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         88e28c8b WRAPPED { { { { "x" } } } }
             79962374 WRAPPED { { { "x" } } }
                 06bb2465 WRAPPED { { "x" } }
                     70b5f17d WRAPPED { "x" }
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);
 }
 
@@ -650,6 +650,7 @@ fn test_capture() {
         .wrap()
         .wrap();
 
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         3defda74 WRAPPED
             fd881a24 cont WRAPPED
@@ -658,8 +659,7 @@ fn test_capture() {
                     78d666eb ASSERTION
                         db7dd21c pred "knows"
                         13b74194 obj "Bob"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(env.tree_format(), expected);
 
     // Pattern only captures `WRAPPED` elements leading to a `NODE`,
