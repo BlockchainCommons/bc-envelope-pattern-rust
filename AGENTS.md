@@ -71,6 +71,65 @@ The integration now provides seamless access to both envelope-level structure an
 
 The integration now provides seamless access to both envelope-level structure and internal CBOR pattern matches, maintaining full backwards compatibility while significantly enhancing pattern matching capabilities.
 
+## Phase 3: dcbor-pattern Capture Integration - PLANNED
+
+### Investigation Complete: Implementation Required ⚠️
+
+**Status**: dcbor-pattern captures are NOT currently integrated with bc-envelope-pattern captures. Investigation reveals the infrastructure exists but integration is incomplete.
+
+#### Current Implementation Gap
+
+The `CBORPattern::paths_with_captures` method currently:
+- Correctly calls `dcbor_pattern.paths_with_captures(&cbor)`
+- Uses the returned paths but **ignores the dcbor captures** (using `_dcbor_captures`)
+- Returns an empty HashMap for envelope captures: `std::collections::HashMap::new()`
+- Has TODO comments: `// TODO: Convert dcbor captures in future phase`
+
+#### dcbor-pattern Capture Infrastructure (Available)
+
+dcbor-pattern provides full capture support:
+- `CapturePattern` with `@name(pattern)` syntax
+- `paths_with_captures()` returns `(Vec<Path>, HashMap<String, Vec<Path>>)`
+- Captures work with search patterns, nested patterns, and complex compositions
+- Well-tested implementation with proper capture collection
+
+#### Required Integration Work
+
+**Core Implementation**: Update `CBORPattern::paths_with_captures` to:
+
+1. **Convert dcbor capture paths to envelope paths**:
+   ```rust
+   let (dcbor_paths, dcbor_captures) = dcbor_pattern.paths_with_captures(&subject_cbor);
+
+   let mut envelope_captures = HashMap::new();
+   for (capture_name, dcbor_capture_paths) in dcbor_captures {
+       let envelope_capture_paths: Vec<Path> = dcbor_capture_paths
+           .into_iter()
+           .map(|dcbor_path| convert_dcbor_path_to_envelope_path(dcbor_path, base_envelope))
+           .collect();
+       envelope_captures.insert(capture_name, envelope_capture_paths);
+   }
+   ```
+
+2. **Ensure unique capture names**: Verify dcbor capture names don't conflict with envelope capture names in the same pattern
+
+3. **Handle both KnownValue and CBOR leaf cases**: Apply the same capture conversion logic to both code paths
+
+#### Benefits of Integration
+
+- **Unified capture system**: `@name(pattern)` syntax works seamlessly in CBOR patterns
+- **Enhanced expressiveness**: Complex capture patterns like `CBOR(/@user(SEARCH(@score(NUMBER(>90))))/)` become possible
+- **Consistent API**: All capture patterns return envelope paths, maintaining API consistency
+- **No breaking changes**: Existing code continues to work; captures are purely additive
+
+#### Testing Requirements
+
+- Test dcbor captures with simple patterns: `CBOR(/@num(NUMBER(42))/)`
+- Test dcbor captures with search patterns: `CBOR(/@values(SEARCH(NUMBER))/)`
+- Test dcbor captures with nested structures and multiple captures
+- Test capture name uniqueness and proper conflict detection
+- Test integration with envelope-level captures in composite patterns
+
 ### Development Guidelines for Contributors
 
 When working on this crate:
