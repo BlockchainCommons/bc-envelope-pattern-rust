@@ -46,27 +46,35 @@ impl Matcher for LeafPattern {
         &self,
         envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = match self {
+        match self {
             LeafPattern::Any => {
-                if envelope.is_leaf() || envelope.is_known_value() {
+                let paths = if envelope.is_leaf() || envelope.is_known_value() {
                     vec![vec![envelope.clone()]]
                 } else {
                     vec![]
-                }
+                };
+                (paths, HashMap::new())
             }
-            LeafPattern::Cbor(pattern) => pattern.paths(envelope),
-            LeafPattern::Number(pattern) => pattern.paths(envelope),
-            LeafPattern::Text(pattern) => pattern.paths(envelope),
-            LeafPattern::ByteString(pattern) => pattern.paths(envelope),
-            LeafPattern::Tag(pattern) => pattern.paths(envelope),
-            LeafPattern::Array(pattern) => pattern.paths(envelope),
-            LeafPattern::Map(pattern) => pattern.paths(envelope),
-            LeafPattern::Bool(pattern) => pattern.paths(envelope),
-            LeafPattern::Null(pattern) => pattern.paths(envelope),
-            LeafPattern::Date(pattern) => pattern.paths(envelope),
-            LeafPattern::KnownValue(pattern) => pattern.paths(envelope),
-        };
-        (paths, HashMap::new())
+            LeafPattern::Cbor(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Number(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+            LeafPattern::Text(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::ByteString(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+            LeafPattern::Tag(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Array(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+            LeafPattern::Map(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Bool(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Null(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Date(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::KnownValue(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+        }
     }
 
     fn compile(

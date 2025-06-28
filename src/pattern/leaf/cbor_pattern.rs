@@ -33,6 +33,90 @@ impl CBORPattern {
     pub fn pattern(pattern: DcborPattern) -> Self {
         CBORPattern::Pattern(pattern)
     }
+
+    /// Convert dcbor captures to envelope captures by converting dcbor paths
+    /// to envelope paths.
+    fn convert_dcbor_captures_to_envelope_captures(
+        dcbor_captures: std::collections::HashMap<String, Vec<Vec<CBOR>>>,
+        base_envelope: &Envelope,
+    ) -> std::collections::HashMap<String, Vec<Path>> {
+        let mut envelope_captures = std::collections::HashMap::new();
+
+        for (capture_name, dcbor_capture_paths) in dcbor_captures {
+            let envelope_capture_paths: Vec<Path> = dcbor_capture_paths
+                .into_iter()
+                .map(|dcbor_path| {
+                    Self::convert_dcbor_path_to_envelope_path(
+                        dcbor_path,
+                        base_envelope,
+                    )
+                })
+                .collect();
+            envelope_captures.insert(capture_name, envelope_capture_paths);
+        }
+
+        envelope_captures
+    }
+
+    /// Convert a single dcbor path to an envelope path.
+    fn convert_dcbor_path_to_envelope_path(
+        dcbor_path: Vec<CBOR>,
+        base_envelope: &Envelope,
+    ) -> Vec<Envelope> {
+        let mut envelope_path = vec![base_envelope.clone()];
+
+        // Skip first element if it matches the base envelope's CBOR content
+        let skip_first =
+            if let Some(base_cbor) = base_envelope.subject().as_leaf() {
+                dcbor_path
+                    .first()
+                    .map(|first| first == &base_cbor)
+                    .unwrap_or(false)
+            } else {
+                false
+            };
+
+        let elements_to_add: Vec<_> = if skip_first {
+            dcbor_path.into_iter().skip(1).collect()
+        } else {
+            dcbor_path
+        };
+
+        for cbor_element in elements_to_add {
+            envelope_path.push(Envelope::new(cbor_element));
+        }
+
+        envelope_path
+    }
+
+    /// Collect capture names from a dcbor pattern
+    fn collect_dcbor_capture_names(
+        &self,
+        dcbor_pattern: &DcborPattern,
+        names: &mut Vec<String>,
+    ) {
+        // For now, parse the pattern string to extract capture names
+        // This is a simple approach until dcbor-pattern provides a better API
+        let pattern_str = dcbor_pattern.to_string();
+
+        // Simple regex-like parsing to find @name( patterns
+        let mut chars = pattern_str.chars().peekable();
+        while let Some(ch) = chars.next() {
+            if ch == '@' {
+                let mut name = String::new();
+                // Collect characters until we hit '('
+                while let Some(&next_ch) = chars.peek() {
+                    if next_ch == '(' {
+                        break;
+                    }
+                    name.push(chars.next().unwrap());
+                }
+                if !name.is_empty() && !names.contains(&name) {
+                    names.push(name);
+                }
+            }
+        }
+    }
 }
 
 impl std::hash::Hash for CBORPattern {
@@ -84,7 +168,7 @@ impl Matcher for CBORPattern {
                 CBORPattern::Pattern(dcbor_pattern) => {
                     // Create CBOR from the KnownValue for pattern matching
                     let known_value_cbor = known_value.to_cbor();
-                    let (dcbor_paths, _dcbor_captures) =
+                    let (dcbor_paths, dcbor_captures) =
                         dcbor_pattern.paths_with_captures(&known_value_cbor);
 
                     if !dcbor_paths.is_empty() {
@@ -110,8 +194,12 @@ impl Matcher for CBORPattern {
                             })
                             .collect();
 
+                        // Convert dcbor captures to envelope captures
                         let envelope_captures =
-                            std::collections::HashMap::new(); // TODO: Convert dcbor captures in future phase
+                            Self::convert_dcbor_captures_to_envelope_captures(
+                                dcbor_captures,
+                                envelope,
+                            );
                         (envelope_paths, envelope_captures)
                     } else {
                         (vec![], std::collections::HashMap::new())
@@ -142,7 +230,7 @@ impl Matcher for CBORPattern {
                 }
             }
             CBORPattern::Pattern(dcbor_pattern) => {
-                let (dcbor_paths, _dcbor_captures) =
+                let (dcbor_paths, dcbor_captures) =
                     dcbor_pattern.paths_with_captures(&subject_cbor);
 
                 if !dcbor_paths.is_empty() {
@@ -178,7 +266,12 @@ impl Matcher for CBORPattern {
                         })
                         .collect();
 
-                    let envelope_captures = std::collections::HashMap::new(); // TODO: Convert dcbor captures in future phase
+                    // Convert dcbor captures to envelope captures
+                    let envelope_captures =
+                        Self::convert_dcbor_captures_to_envelope_captures(
+                            dcbor_captures,
+                            envelope,
+                        );
                     (envelope_paths, envelope_captures)
                 } else {
                     (vec![], std::collections::HashMap::new())
@@ -195,13 +288,25 @@ impl Matcher for CBORPattern {
         &self,
         code: &mut Vec<Instr>,
         literals: &mut Vec<Pattern>,
-        _captures: &mut Vec<String>,
+        captures: &mut Vec<String>,
     ) {
+        // Register any capture names from this CBOR pattern
+        if let CBORPattern::Pattern(dcbor_pattern) = self {
+            let mut capture_names = Vec::new();
+            self.collect_dcbor_capture_names(dcbor_pattern, &mut capture_names);
+            for name in capture_names {
+                if !captures.contains(&name) {
+                    captures.push(name);
+                }
+            }
+        }
+
+        // Use standard atomic compilation - the VM will handle captures
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::Cbor(self.clone())),
             code,
             literals,
-            _captures,
+            captures,
         );
     }
 }

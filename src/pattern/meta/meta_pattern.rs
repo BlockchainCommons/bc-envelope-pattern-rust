@@ -43,18 +43,17 @@ impl Matcher for MetaPattern {
         &self,
         envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = match self {
-            MetaPattern::Any(pattern) => pattern.paths(envelope),
-            MetaPattern::None(pattern) => pattern.paths(envelope),
-            MetaPattern::And(pattern) => pattern.paths(envelope),
-            MetaPattern::Or(pattern) => pattern.paths(envelope),
-            MetaPattern::Not(pattern) => pattern.paths(envelope),
-            MetaPattern::Search(pattern) => pattern.paths(envelope),
-            MetaPattern::Traverse(pattern) => pattern.paths(envelope),
-            MetaPattern::Group(pattern) => pattern.paths(envelope),
-            MetaPattern::Capture(pattern) => pattern.paths(envelope),
-        };
-        (paths, HashMap::new())
+        match self {
+            MetaPattern::Any(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::None(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::And(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Or(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Not(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Search(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Traverse(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Group(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Capture(pattern) => pattern.paths_with_captures(envelope),
+        }
     }
 
     fn compile(

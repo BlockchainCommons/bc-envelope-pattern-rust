@@ -15,7 +15,8 @@ pub mod test_seed;
 ///         string with
 ///             indentation
 /// "#}.trim();
-/// assert_actual_expected!(generate_actual(), expected, "Description of the test");
+/// assert_actual_expected!(generate_actual(), expected, "Description of the
+/// test");
 ///
 /// Run it once with dummy data to let the test fail and see the expected
 /// output format. If the actual output is correct, then copy the actual

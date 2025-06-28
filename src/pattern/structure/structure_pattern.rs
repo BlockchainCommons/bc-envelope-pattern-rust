@@ -34,17 +34,16 @@ impl Matcher for StructurePattern {
         &self,
         envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = match self {
-            StructurePattern::Assertions(pattern) => pattern.paths(envelope),
-            StructurePattern::Digest(pattern) => pattern.paths(envelope),
-            StructurePattern::Node(pattern) => pattern.paths(envelope),
-            StructurePattern::Object(pattern) => pattern.paths(envelope),
-            StructurePattern::Obscured(pattern) => pattern.paths(envelope),
-            StructurePattern::Predicate(pattern) => pattern.paths(envelope),
-            StructurePattern::Subject(pattern) => pattern.paths(envelope),
-            StructurePattern::Wrapped(pattern) => pattern.paths(envelope),
-        };
-        (paths, HashMap::new())
+        match self {
+            StructurePattern::Assertions(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Digest(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Node(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Object(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Obscured(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Predicate(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Subject(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Wrapped(pattern) => pattern.paths_with_captures(envelope),
+        }
     }
 
     fn compile(

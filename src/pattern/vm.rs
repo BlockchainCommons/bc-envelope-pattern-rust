@@ -127,19 +127,22 @@ struct Thread {
 /// to bytecode.
 ///
 /// For SearchPattern, we provide a temporary fallback that uses the old
-/// recursive implementation until proper bytecode compilation is implemented.
+/// Match atomic patterns and return both paths and captures.
+///
+/// This function handles patterns that can produce captures (like CBOR patterns with named groups).
+/// This is the primary function used by the VM for pattern execution with capture support.
 #[allow(clippy::panic)]
-pub(crate) fn atomic_paths(
+pub(crate) fn atomic_paths_with_captures(
     p: &crate::pattern::Pattern,
     env: &Envelope,
-) -> Vec<Path> {
+) -> (Vec<Path>, std::collections::HashMap<String, Vec<Path>>) {
     use crate::pattern::Pattern::*;
     match p {
-        Leaf(l) => l.paths(env),
-        Structure(s) => s.paths(env),
+        Leaf(l) => l.paths_with_captures(env),
+        Structure(s) => s.paths_with_captures(env),
         Meta(meta) => match meta {
-            crate::pattern::meta::MetaPattern::Any(a) => a.paths(env),
-            crate::pattern::meta::MetaPattern::None(n) => n.paths(env),
+            crate::pattern::meta::MetaPattern::Any(a) => a.paths_with_captures(env),
+            crate::pattern::meta::MetaPattern::None(n) => n.paths_with_captures(env),
             crate::pattern::meta::MetaPattern::Search(_) => {
                 panic!(
                     "SearchPattern should be compiled to Search instruction, not MatchPredicate"
@@ -285,12 +288,22 @@ fn run_thread(
         loop {
             match prog.code[th.pc] {
                 MatchPredicate(idx) => {
-                    let paths = atomic_paths(&prog.literals[idx], &th.env);
+                    let (paths, pattern_captures) = atomic_paths_with_captures(&prog.literals[idx], &th.env);
                     if paths.is_empty() {
                         break;
                     }
 
                     th.pc += 1; // Advance to next instruction
+
+                    // Merge pattern captures into thread captures
+                    for (name, capture_paths) in pattern_captures {
+                        // Find the capture index for this name in the program's capture names
+                        if let Some(capture_idx) = prog.capture_names.iter().position(|n| n == &name) {
+                            if capture_idx < th.captures.len() {
+                                th.captures[capture_idx].extend(capture_paths);
+                            }
+                        }
+                    }
 
                     // Handle multiple paths from atomic patterns (e.g., CBOR
                     // patterns)
