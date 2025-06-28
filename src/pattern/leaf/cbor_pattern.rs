@@ -87,14 +87,31 @@ impl Matcher for CBORPattern {
                     let (dcbor_paths, _dcbor_captures) =
                         dcbor_pattern.paths_with_captures(&known_value_cbor);
 
-                    // For now, follow the same pattern as other leaf patterns:
-                    // If dcbor-pattern matches, return the envelope itself
                     if !dcbor_paths.is_empty() {
-                        // TODO: In Phase 2, we'll extend paths and convert
-                        // captures
-                        let envelope_paths = vec![vec![envelope.clone()]];
+                        // Convert dcbor paths to envelope paths by extending
+                        // the base envelope path
+                        let base_path = vec![envelope.clone()];
+                        let envelope_paths: Vec<Path> = dcbor_paths
+                            .into_iter()
+                            .map(|dcbor_path| {
+                                let mut extended_path = base_path.clone();
+                                // Convert each CBOR in the dcbor path to an
+                                // Envelope and append
+                                // Skip the first element as it represents the
+                                // root CBOR that we already have as the
+                                // envelope
+                                for cbor_element in
+                                    dcbor_path.into_iter().skip(1)
+                                {
+                                    extended_path
+                                        .push(Envelope::new(cbor_element));
+                                }
+                                extended_path
+                            })
+                            .collect();
+
                         let envelope_captures =
-                            std::collections::HashMap::new(); // TODO: Convert dcbor captures
+                            std::collections::HashMap::new(); // TODO: Convert dcbor captures in future phase
                         (envelope_paths, envelope_captures)
                     } else {
                         (vec![], std::collections::HashMap::new())
@@ -128,12 +145,39 @@ impl Matcher for CBORPattern {
                 let (dcbor_paths, _dcbor_captures) =
                     dcbor_pattern.paths_with_captures(&subject_cbor);
 
-                // For now, follow the same pattern as other leaf patterns:
-                // If dcbor-pattern matches, return the envelope itself
                 if !dcbor_paths.is_empty() {
-                    // TODO: In Phase 2, we'll extend paths and convert captures
-                    let envelope_paths = vec![vec![envelope.clone()]];
-                    let envelope_captures = std::collections::HashMap::new(); // TODO: Convert dcbor captures
+                    // Convert dcbor paths to envelope paths by extending the
+                    // base envelope path
+                    let base_path = vec![envelope.clone()];
+                    let envelope_paths: Vec<Path> = dcbor_paths
+                        .into_iter()
+                        .map(|dcbor_path| {
+                            let mut extended_path = base_path.clone();
+                            // Convert each CBOR in the dcbor path to an
+                            // Envelope and append
+                            // Skip the first element only if it exactly matches
+                            // our root CBOR
+                            let skip_first = dcbor_path
+                                .first()
+                                .map(|first| first == &subject_cbor)
+                                .unwrap_or(false);
+
+                            let elements_to_add: Box<
+                                dyn Iterator<Item = dcbor::CBOR>,
+                            > = if skip_first {
+                                Box::new(dcbor_path.into_iter().skip(1))
+                            } else {
+                                Box::new(dcbor_path.into_iter())
+                            };
+
+                            for cbor_element in elements_to_add {
+                                extended_path.push(Envelope::new(cbor_element));
+                            }
+                            extended_path
+                        })
+                        .collect();
+
+                    let envelope_captures = std::collections::HashMap::new(); // TODO: Convert dcbor captures in future phase
                     (envelope_paths, envelope_captures)
                 } else {
                     (vec![], std::collections::HashMap::new())
@@ -150,13 +194,13 @@ impl Matcher for CBORPattern {
         &self,
         code: &mut Vec<Instr>,
         literals: &mut Vec<Pattern>,
-        captures: &mut Vec<String>,
+        _captures: &mut Vec<String>,
     ) {
         compile_as_atomic(
             &Pattern::Leaf(LeafPattern::Cbor(self.clone())),
             code,
             literals,
-            captures,
+            _captures,
         );
     }
 }

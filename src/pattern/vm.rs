@@ -285,10 +285,45 @@ fn run_thread(
         loop {
             match prog.code[th.pc] {
                 MatchPredicate(idx) => {
-                    if atomic_paths(&prog.literals[idx], &th.env).is_empty() {
+                    let paths = atomic_paths(&prog.literals[idx], &th.env);
+                    if paths.is_empty() {
                         break;
                     }
-                    th.pc += 1;
+
+                    th.pc += 1; // Advance to next instruction
+
+                    // Handle multiple paths from atomic patterns (e.g., CBOR
+                    // patterns)
+                    for (i, path) in paths.into_iter().enumerate() {
+                        if i == 0 {
+                            // Use the first path for the current thread
+                            // Check if this is a simple atomic match or an
+                            // extended path
+                            if path.len() == 1 && path[0] == th.env {
+                                // Simple atomic match - keep existing path and
+                                // environment
+                                // (The pattern matched at the current position)
+                            } else {
+                                // Extended path from CBOR pattern - use the
+                                // full extended path
+                                th.path = path.clone();
+                                if let Some(last_env) = path.last() {
+                                    th.env = last_env.clone();
+                                }
+                            }
+                        } else {
+                            // Spawn new threads for the remaining paths
+                            let mut fork = th.clone();
+                            // For additional paths, always use the full path
+                            // since these are
+                            // separate matches
+                            fork.path = path.clone();
+                            if let Some(last_env) = path.last() {
+                                fork.env = last_env.clone();
+                            }
+                            stack.push(fork);
+                        }
+                    }
                 }
                 MatchStructure(idx) => {
                     // Use the structure pattern's direct matcher, not the
