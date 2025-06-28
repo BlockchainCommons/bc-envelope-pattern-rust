@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_components::{Digest, DigestProvider};
 use bc_envelope::prelude::*;
 
@@ -74,19 +76,25 @@ impl DigestPattern {
 }
 
 impl Matcher for DigestPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let digest = envelope.digest();
-        let is_hit = match self {
-            DigestPattern::Digest(pattern_digest) => *pattern_digest == *digest,
-            DigestPattern::Prefix(prefix) => digest.data().starts_with(prefix),
-            DigestPattern::BinaryRegex(regex) => regex.is_match(digest.data()),
-        };
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            let digest = envelope.digest();
+            let is_hit = match self {
+                DigestPattern::Digest(pattern_digest) => *pattern_digest == *digest,
+                DigestPattern::Prefix(prefix) => digest.data().starts_with(prefix),
+                DigestPattern::BinaryRegex(regex) => regex.is_match(digest.data()),
+            };
 
-        if is_hit {
-            vec![vec![envelope.clone()]]
-        } else {
-            vec![]
-        }
+            if is_hit {
+                vec![vec![envelope.clone()]]
+            } else {
+                vec![]
+            }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

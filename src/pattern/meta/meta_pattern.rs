@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use super::{
@@ -37,8 +39,11 @@ pub enum MetaPattern {
 }
 
 impl Matcher for MetaPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        match self {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = match self {
             MetaPattern::Any(pattern) => pattern.paths(envelope),
             MetaPattern::None(pattern) => pattern.paths(envelope),
             MetaPattern::And(pattern) => pattern.paths(envelope),
@@ -48,7 +53,8 @@ impl Matcher for MetaPattern {
             MetaPattern::Traverse(pattern) => pattern.paths(envelope),
             MetaPattern::Group(pattern) => pattern.paths(envelope),
             MetaPattern::Capture(pattern) => pattern.paths(envelope),
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

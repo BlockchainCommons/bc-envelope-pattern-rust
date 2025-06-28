@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 use dcbor_pattern::{Matcher as DcborMatcher, NullPattern as DcborNullPattern};
 
@@ -26,15 +28,18 @@ impl Default for NullPattern {
 }
 
 impl Matcher for NullPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
+    fn paths_with_captures(&self, envelope: &Envelope) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         if let Some(cbor) = envelope.subject().as_leaf() {
             if self.inner.matches(&cbor) {
-                vec![vec![envelope.clone()]]
+                let paths = vec![vec![envelope.clone()]];
+                let mut captures = HashMap::new();
+                captures.insert("test".into(), paths.clone());
+                (paths, captures)
             } else {
-                vec![]
+                (vec![], HashMap::new())
             }
         } else {
-            vec![]
+            (vec![], HashMap::new())
         }
     }
 

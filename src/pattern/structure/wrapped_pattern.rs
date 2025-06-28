@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::{
@@ -39,34 +41,40 @@ impl Default for WrappedPattern {
 }
 
 impl Matcher for WrappedPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let subject = envelope.subject();
-        if subject.is_wrapped() {
-            match self {
-                WrappedPattern::Any => {
-                    // Just match the wrapped envelope itself, don't descend
-                    vec![vec![envelope.clone()]]
-                }
-                WrappedPattern::Unwrap(pattern) => {
-                    // Match the content of the wrapped envelope
-                    if let Ok(unwrapped) = subject.try_unwrap() {
-                        pattern
-                            .paths(&unwrapped)
-                            .into_iter()
-                            .map(|mut path| {
-                                // Add the current envelope to the path
-                                path.insert(0, envelope.clone());
-                                path
-                            })
-                            .collect()
-                    } else {
-                        vec![]
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            let subject = envelope.subject();
+            if subject.is_wrapped() {
+                match self {
+                    WrappedPattern::Any => {
+                        // Just match the wrapped envelope itself, don't descend
+                        vec![vec![envelope.clone()]]
+                    }
+                    WrappedPattern::Unwrap(pattern) => {
+                        // Match the content of the wrapped envelope
+                        if let Ok(unwrapped) = subject.try_unwrap() {
+                            pattern
+                                .paths(&unwrapped)
+                                .into_iter()
+                                .map(|mut path| {
+                                    // Add the current envelope to the path
+                                    path.insert(0, envelope.clone());
+                                    path
+                                })
+                                .collect()
+                        } else {
+                            vec![]
+                        }
                     }
                 }
+            } else {
+                vec![]
             }
-        } else {
-            vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

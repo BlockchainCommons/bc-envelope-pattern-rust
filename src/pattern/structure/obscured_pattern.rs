@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::{
@@ -36,19 +38,25 @@ impl ObscuredPattern {
 }
 
 impl Matcher for ObscuredPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let is_hit = match self {
-            ObscuredPattern::Any => envelope.is_obscured(),
-            ObscuredPattern::Elided => envelope.is_elided(),
-            ObscuredPattern::Encrypted => envelope.is_encrypted(),
-            ObscuredPattern::Compressed => envelope.is_compressed(),
-        };
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            let is_hit = match self {
+                ObscuredPattern::Any => envelope.is_obscured(),
+                ObscuredPattern::Elided => envelope.is_elided(),
+                ObscuredPattern::Encrypted => envelope.is_encrypted(),
+                ObscuredPattern::Compressed => envelope.is_compressed(),
+            };
 
-        if is_hit {
-            vec![vec![envelope.clone()]]
-        } else {
-            vec![]
-        }
+            if is_hit {
+                vec![vec![envelope.clone()]]
+            } else {
+                vec![]
+            }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

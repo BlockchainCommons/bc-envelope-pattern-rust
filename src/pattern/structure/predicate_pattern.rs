@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{
@@ -19,23 +21,29 @@ impl PredicatePattern {
 }
 
 impl Matcher for PredicatePattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        if let Some(predicate) = envelope.as_predicate() {
-            match self {
-                PredicatePattern::Any => {
-                    vec![vec![predicate.clone()]]
-                }
-                PredicatePattern::Pattern(pattern) => {
-                    if pattern.matches(&predicate) {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            if let Some(predicate) = envelope.as_predicate() {
+                match self {
+                    PredicatePattern::Any => {
                         vec![vec![predicate.clone()]]
-                    } else {
-                        vec![]
+                    }
+                    PredicatePattern::Pattern(pattern) => {
+                        if pattern.matches(&predicate) {
+                            vec![vec![predicate.clone()]]
+                        } else {
+                            vec![]
+                        }
                     }
                 }
+            } else {
+                vec![]
             }
-        } else {
-            vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

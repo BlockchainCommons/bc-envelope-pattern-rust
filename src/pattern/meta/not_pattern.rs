@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
@@ -15,14 +17,18 @@ impl NotPattern {
 }
 
 impl Matcher for NotPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // If the inner pattern doesn't match, then we return the current
         // envelope as a match
-        if !self.pattern().matches(envelope) {
+        let paths = if !self.pattern().matches(envelope) {
             vec![vec![envelope.clone()]]
         } else {
             vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     /// Compile into byte-code (NOT = negation of the inner pattern).

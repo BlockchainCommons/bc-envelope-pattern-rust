@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{
@@ -19,23 +21,29 @@ impl ObjectPattern {
 }
 
 impl Matcher for ObjectPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        if let Some(object) = envelope.as_object() {
-            match self {
-                ObjectPattern::Any => {
-                    vec![vec![object.clone()]]
-                }
-                ObjectPattern::Pattern(pattern) => {
-                    if pattern.matches(&object) {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            if let Some(object) = envelope.as_object() {
+                match self {
+                    ObjectPattern::Any => {
                         vec![vec![object.clone()]]
-                    } else {
-                        vec![]
+                    }
+                    ObjectPattern::Pattern(pattern) => {
+                        if pattern.matches(&object) {
+                            vec![vec![object.clone()]]
+                        } else {
+                            vec![]
+                        }
                     }
                 }
+            } else {
+                vec![]
             }
-        } else {
-            vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

@@ -70,10 +70,6 @@ impl Matcher for TextPattern {
         }
     }
 
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        self.paths_with_captures(envelope).0
-    }
-
     fn compile(
         &self,
         code: &mut Vec<Instr>,

@@ -104,7 +104,7 @@ impl Matcher for NumberPattern {
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Try to extract CBOR from the envelope using the existing as_leaf()
         // method
-        if let Some(cbor) = envelope.subject().as_leaf() {
+        let paths = if let Some(cbor) = envelope.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // NumberPattern doesn't support captures, so we only get paths
             let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
@@ -112,20 +112,15 @@ impl Matcher for NumberPattern {
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
             if !dcbor_paths.is_empty() {
-                let envelope_paths = vec![vec![envelope.clone()]];
-                let envelope_captures = HashMap::new(); // No captures for simple number patterns
-                (envelope_paths, envelope_captures)
+                vec![vec![envelope.clone()]]
             } else {
-                (vec![], HashMap::new())
+                vec![]
             }
         } else {
             // Not a leaf envelope, no match
-            (vec![], HashMap::new())
-        }
-    }
-
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        self.paths_with_captures(envelope).0
+            vec![]
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
@@ -14,8 +16,11 @@ impl AndPattern {
 }
 
 impl Matcher for AndPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        if self
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = if self
             .patterns()
             .iter()
             .all(|pattern| pattern.matches(envelope))
@@ -23,7 +28,8 @@ impl Matcher for AndPattern {
             vec![vec![envelope.clone()]]
         } else {
             vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     /// Compile into byte-code (AND = all must match).

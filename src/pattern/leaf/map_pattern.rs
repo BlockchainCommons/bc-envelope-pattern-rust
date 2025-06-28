@@ -1,4 +1,4 @@
-use std::ops::RangeBounds;
+use std::{collections::HashMap, ops::RangeBounds};
 
 use bc_envelope::Envelope;
 
@@ -28,8 +28,11 @@ impl MapPattern {
 }
 
 impl Matcher for MapPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        if let Some(map) = envelope.subject().as_map() {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = if let Some(map) = envelope.subject().as_map() {
             match self {
                 MapPattern::Any => vec![vec![envelope.clone()]],
                 MapPattern::Interval(range) => {
@@ -42,7 +45,8 @@ impl Matcher for MapPattern {
             }
         } else {
             vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

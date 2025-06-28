@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::{Envelope, prelude::with_tags};
 use dcbor::prelude::*;
 
@@ -80,9 +82,9 @@ impl TaggedPattern {
 }
 
 impl Matcher for TaggedPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
+    fn paths_with_captures(&self, envelope: &Envelope) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Check if the envelope subject contains a tagged value
-        if let Some(cbor) = envelope.subject().as_leaf() {
+        let paths = if let Some(cbor) = envelope.subject().as_leaf() {
             if let CBORCase::Tagged(tag, _) = cbor.as_case() {
                 match self {
                     TaggedPattern::Any => vec![vec![envelope.clone()]],
@@ -133,7 +135,8 @@ impl Matcher for TaggedPattern {
             }
         } else {
             vec![]
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{
@@ -32,30 +34,33 @@ impl AssertionsPattern {
 }
 
 impl Matcher for AssertionsPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let mut result = Vec::new();
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let mut paths = Vec::new();
         for assertion in envelope.assertions() {
             match self {
                 AssertionsPattern::Any => {
-                    result.push(vec![assertion.clone()]);
+                    paths.push(vec![assertion.clone()]);
                 }
                 AssertionsPattern::WithPredicate(pattern) => {
                     if let Some(predicate) = assertion.as_predicate() {
                         if pattern.matches(&predicate) {
-                            result.push(vec![assertion.clone()]);
+                            paths.push(vec![assertion.clone()]);
                         }
                     }
                 }
                 AssertionsPattern::WithObject(pattern) => {
                     if let Some(object) = assertion.as_object() {
                         if pattern.matches(&object) {
-                            result.push(vec![assertion.clone()]);
+                            paths.push(vec![assertion.clone()]);
                         }
                     }
                 }
             }
         }
-        result
+        (paths, HashMap::new())
     }
 
     fn compile(

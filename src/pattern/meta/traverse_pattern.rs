@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
@@ -33,26 +35,32 @@ impl TraversePattern {
 }
 
 impl Matcher for TraversePattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        // Match head first
-        let head_paths = self.first.paths(envelope);
-        // If there's no further traversal, return head paths
-        if let Some(rest_seq) = &self.rest {
-            let mut result = Vec::new();
-            for path in head_paths {
-                if let Some(last_env) = path.last().cloned() {
-                    // Recursively match the rest of the traversal
-                    for tail_path in rest_seq.paths(&last_env) {
-                        let mut combined = path.clone();
-                        combined.extend(tail_path);
-                        result.push(combined);
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            // Match head first
+            let head_paths = self.first.paths(envelope);
+            // If there's no further traversal, return head paths
+            if let Some(rest_seq) = &self.rest {
+                let mut result = Vec::new();
+                for path in head_paths {
+                    if let Some(last_env) = path.last().cloned() {
+                        // Recursively match the rest of the traversal
+                        for tail_path in rest_seq.paths(&last_env) {
+                            let mut combined = path.clone();
+                            combined.extend(tail_path);
+                            result.push(combined);
+                        }
                     }
                 }
+                result
+            } else {
+                head_paths
             }
-            result
-        } else {
-            head_paths
-        }
+        };
+        (paths, HashMap::new())
     }
 
     /// Compile into byte-code (sequential).

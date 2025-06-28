@@ -1,4 +1,4 @@
-use std::ops::RangeBounds;
+use std::{collections::HashMap, ops::RangeBounds};
 
 use bc_envelope::Envelope;
 
@@ -31,23 +31,29 @@ impl NodePattern {
 }
 
 impl Matcher for NodePattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        if !envelope.is_node() {
-            return vec![];
-        }
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            if !envelope.is_node() {
+                return (vec![], HashMap::new());
+            }
 
-        let is_hit = match self {
-            NodePattern::Any => true,
-            NodePattern::AssertionsInterval(range) => {
-                range.contains(envelope.assertions().len())
+            let is_hit = match self {
+                NodePattern::Any => true,
+                NodePattern::AssertionsInterval(range) => {
+                    range.contains(envelope.assertions().len())
+                }
+            };
+
+            if is_hit {
+                vec![vec![envelope.clone()]]
+            } else {
+                vec![]
             }
         };
-
-        if is_hit {
-            vec![vec![envelope.clone()]]
-        } else {
-            vec![]
-        }
+        (paths, HashMap::new())
     }
 
     fn compile(

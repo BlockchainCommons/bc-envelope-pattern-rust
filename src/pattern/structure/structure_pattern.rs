@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use super::{
@@ -28,8 +30,11 @@ pub enum StructurePattern {
 }
 
 impl Matcher for StructurePattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        match self {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = match self {
             StructurePattern::Assertions(pattern) => pattern.paths(envelope),
             StructurePattern::Digest(pattern) => pattern.paths(envelope),
             StructurePattern::Node(pattern) => pattern.paths(envelope),
@@ -38,7 +43,8 @@ impl Matcher for StructurePattern {
             StructurePattern::Predicate(pattern) => pattern.paths(envelope),
             StructurePattern::Subject(pattern) => pattern.paths(envelope),
             StructurePattern::Wrapped(pattern) => pattern.paths(envelope),
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

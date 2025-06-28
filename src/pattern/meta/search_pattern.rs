@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, collections::HashMap};
 
 use bc_components::DigestProvider;
 use bc_envelope::{EdgeType, Envelope};
@@ -15,58 +15,64 @@ impl SearchPattern {
 }
 
 impl Matcher for SearchPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let result_paths = RefCell::new(Vec::new());
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            let result_paths = RefCell::new(Vec::new());
 
-        // State consists of the path from root to current node
-        let visitor = |current_envelope: &Envelope,
-                       _level: usize,
-                       _incoming_edge: EdgeType,
-                       path_to_current: Vec<Envelope>|
-         -> (Vec<Envelope>, bool) {
-            // Create the path to this node
-            let mut new_path = path_to_current.clone();
-            new_path.push(current_envelope.clone());
+            // State consists of the path from root to current node
+            let visitor = |current_envelope: &Envelope,
+                        _level: usize,
+                        _incoming_edge: EdgeType,
+                        path_to_current: Vec<Envelope>|
+            -> (Vec<Envelope>, bool) {
+                // Create the path to this node
+                let mut new_path = path_to_current.clone();
+                new_path.push(current_envelope.clone());
 
-            // Test the pattern against this node
-            let pattern_paths = self.0.paths(current_envelope);
+                // Test the pattern against this node
+                let pattern_paths = self.0.paths(current_envelope);
 
-            // If the pattern matches, emit the full paths
-            for pattern_path in pattern_paths {
-                let mut full_path = new_path.clone();
-                // If the pattern path has elements beyond just the current
-                // envelope, extend with those additional
-                // elements. If the pattern path starts with the
-                // current envelope, skip it to avoid duplication.
-                if pattern_path.len() > 1 {
-                    full_path.extend(pattern_path.into_iter().skip(1));
-                } else if pattern_path.len() == 1
-                    && pattern_path[0].digest() != current_envelope.digest()
-                {
-                    // Pattern found a different element, add it to the path
-                    full_path.extend(pattern_path);
+                // If the pattern matches, emit the full paths
+                for pattern_path in pattern_paths {
+                    let mut full_path = new_path.clone();
+                    // If the pattern path has elements beyond just the current
+                    // envelope, extend with those additional
+                    // elements. If the pattern path starts with the
+                    // current envelope, skip it to avoid duplication.
+                    if pattern_path.len() > 1 {
+                        full_path.extend(pattern_path.into_iter().skip(1));
+                    } else if pattern_path.len() == 1
+                        && pattern_path[0].digest() != current_envelope.digest()
+                    {
+                        // Pattern found a different element, add it to the path
+                        full_path.extend(pattern_path);
+                    }
+                    result_paths.borrow_mut().push(full_path);
                 }
-                result_paths.borrow_mut().push(full_path);
+
+                // Continue walking with the new path
+                (new_path, false)
+            };
+
+            // Start walking from the root with an empty path
+            envelope.walk(false, Vec::new(), &visitor);
+
+            let mut seen = std::collections::HashSet::new();
+            let mut unique = Vec::new();
+            for path in result_paths.into_inner() {
+                let digest_path: Vec<_> =
+                    path.iter().map(|e| e.digest().into_owned()).collect();
+                if seen.insert(digest_path) {
+                    unique.push(path);
+                }
             }
 
-            // Continue walking with the new path
-            (new_path, false)
+            unique
         };
-
-        // Start walking from the root with an empty path
-        envelope.walk(false, Vec::new(), &visitor);
-
-        let mut seen = std::collections::HashSet::new();
-        let mut unique = Vec::new();
-        for path in result_paths.into_inner() {
-            let digest_path: Vec<_> =
-                path.iter().map(|e| e.digest().into_owned()).collect();
-            if seen.insert(digest_path) {
-                unique.push(path);
-            }
-        }
-
-        unique
+        (paths, HashMap::new())
     }
 
     fn compile(

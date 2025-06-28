@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use super::{
@@ -40,8 +42,11 @@ pub enum LeafPattern {
 }
 
 impl Matcher for LeafPattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        match self {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = match self {
             LeafPattern::Any => {
                 if envelope.is_leaf() || envelope.is_known_value() {
                     vec![vec![envelope.clone()]]
@@ -60,7 +65,8 @@ impl Matcher for LeafPattern {
             LeafPattern::Null(pattern) => pattern.paths(envelope),
             LeafPattern::Date(pattern) => pattern.paths(envelope),
             LeafPattern::KnownValue(pattern) => pattern.paths(envelope),
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(

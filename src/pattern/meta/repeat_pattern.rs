@@ -1,9 +1,12 @@
 //! AST node + compiler for `{min,max}` quantifiers.
 
+use std::collections::HashMap;
+
 use crate::{
-    Matcher, Quantifier,
-    pattern::{Pattern, vm::Instr},
+    pattern::{vm::Instr, Pattern}, Matcher, Path, Quantifier
 };
+
+use bc_envelope::Envelope;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct GroupPattern {
@@ -35,6 +38,13 @@ impl GroupPattern {
 }
 
 impl Matcher for GroupPattern {
+    fn paths_with_captures(
+        &self,
+        _envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        panic!("GroupPattern does not support paths_with_captures directly; use compile instead");
+    }
+
     /// Emit a high-level `Repeat` instruction for the VM.
     fn compile(
         &self,

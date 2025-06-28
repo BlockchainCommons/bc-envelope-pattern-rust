@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{
@@ -18,9 +20,12 @@ impl Default for NonePattern {
 }
 
 impl Matcher for NonePattern {
-    fn paths(&self, _envelope: &Envelope) -> Vec<Path> {
+    fn paths_with_captures(
+        &self,
+        _envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Never matches any element.
-        Vec::new()
+        (Vec::new(), HashMap::new())
     }
 
     fn compile(

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bc_envelope::Envelope;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
@@ -17,20 +19,26 @@ impl SubjectPattern {
 }
 
 impl Matcher for SubjectPattern {
-    fn paths(&self, env: &Envelope) -> Vec<Path> {
-        let subject = env.subject();
-        match self {
-            SubjectPattern::Any => {
-                vec![vec![subject.clone()]]
-            }
-            SubjectPattern::Pattern(pattern) => {
-                if pattern.matches(&subject) {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+        let paths = {
+            let subject = envelope.subject();
+            match self {
+                SubjectPattern::Any => {
                     vec![vec![subject.clone()]]
-                } else {
-                    vec![]
+                }
+                SubjectPattern::Pattern(pattern) => {
+                    if pattern.matches(&subject) {
+                        vec![vec![subject.clone()]]
+                    } else {
+                        vec![]
+                    }
                 }
             }
-        }
+        };
+        (paths, HashMap::new())
     }
 
     fn compile(
