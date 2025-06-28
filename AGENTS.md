@@ -37,17 +37,12 @@ Core integration work is complete and tested:
 
 ### Phase 2: Enhanced Path and Capture Integration
 
-Currently, dcbor-pattern matches return envelope-level paths. Future work could:
-- **Extend path details**: When dcbor-pattern matches within CBOR leaves, extend paths to show internal CBOR structure
+Currently, bc-envelope-pattern matches return envelope-level paths.
+
+- **Extend path details**: When dcbor-pattern matches within CBOR leaves, extend paths to show internal CBOR structure. Use `.into()` to convert `CBOR` objects to Envelope leaves and `.as_leaf()` to convert Envelope leaves to `CBOR` objects.
 - **Enhanced captures**: Merge dcbor-pattern captures with envelope captures for more detailed extraction
 - **Composite formatting**: Show both envelope context and internal CBOR match details
-
-### Phase 3 (Optional): Advanced Parser Features
-
-Potential parser enhancements:
-- **Direct dcbor-pattern delegation**: Use dcbor-pattern's parser directly for some leaf patterns
-- **Extended syntax**: Support more advanced dcbor-pattern features in envelope context
-- **Better error spans**: Enhance error reporting with precise location information
+- **Better error spans**: Ensure that `dcbor-pattern` parsing errors are reported with precise location information at the `bc-envelope-pattern` level.
 
 ### Development Guidelines for Contributors
 
