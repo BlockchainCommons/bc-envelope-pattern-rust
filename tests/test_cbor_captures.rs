@@ -4,7 +4,6 @@ use bc_envelope::prelude::*;
 use bc_envelope_pattern::{
     FormatPathsOpts, Matcher, Pattern, format_paths_with_captures,
 };
-use dcbor_pattern::Pattern as DcborPattern;
 use indoc::indoc;
 
 /// Test simple dcbor captures within CBOR patterns
@@ -14,8 +13,7 @@ fn test_simple_dcbor_capture() {
     let envelope = Envelope::new(42);
 
     // Create CBOR pattern with dcbor capture: /@num(NUMBER(42))/
-    let dcbor_pattern = DcborPattern::parse("@num(NUMBER(42))").unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let pattern = Pattern::parse("CBOR(/@num(NUMBER(42))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -55,8 +53,7 @@ fn test_dcbor_capture_with_search() {
     let envelope = Envelope::new(vec![1, 2, 3]);
 
     // Create CBOR pattern with search: /@values(SEARCH(NUMBER))/
-    let dcbor_pattern = DcborPattern::parse("@values(SEARCH(NUMBER))").unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let pattern = Pattern::parse("CBOR(/@values(SEARCH(NUMBER))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -114,8 +111,7 @@ fn test_multiple_dcbor_captures() {
     let envelope = Envelope::new(vec!["name", "Alice", "age", "30"]);
 
     // Create CBOR pattern with text search: /@names(SEARCH(TEXT))/
-    let dcbor_pattern = DcborPattern::parse("@names(SEARCH(TEXT))").unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let pattern = Pattern::parse("CBOR(/@names(SEARCH(TEXT))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -184,11 +180,10 @@ fn test_nested_dcbor_captures() {
 
     // Create CBOR pattern with nested captures:
     // /@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))/
-    let dcbor_pattern = DcborPattern::parse(
-        "@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))",
+    let pattern = Pattern::parse(
+        "CBOR(/@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))/)",
     )
     .unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -274,9 +269,8 @@ fn test_mixed_envelope_and_dcbor_captures() {
 
     // Create pattern with envelope capture wrapping CBOR pattern with dcbor
     // capture @envelope_level(CBOR(/@dcbor_level(NUMBER(42))/))
-    let dcbor_pattern =
-        DcborPattern::parse("@dcbor_level(NUMBER(42))").unwrap();
-    let cbor_pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let cbor_pattern =
+        Pattern::parse("CBOR(/@dcbor_level(NUMBER(42))/)").unwrap();
     let pattern = Pattern::capture("envelope_level", cbor_pattern);
 
     // Execute pattern
@@ -336,8 +330,8 @@ fn test_capture_name_conflicts() {
 
     // Create pattern with same capture name at envelope and dcbor levels
     // @same_name(CBOR(/@same_name(NUMBER(42))/))
-    let dcbor_pattern = DcborPattern::parse("@same_name(NUMBER(42))").unwrap();
-    let cbor_pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let cbor_pattern =
+        Pattern::parse("CBOR(/@same_name(NUMBER(42))/)").unwrap();
     let pattern = Pattern::capture("same_name", cbor_pattern);
 
     // Execute pattern
@@ -386,8 +380,7 @@ fn test_array_traversal_captures() {
     let envelope = Envelope::new(vec!["hello", "42", "world", "123"]); // All strings for simplicity
 
     // Create CBOR pattern with search captures: /@text(SEARCH(TEXT))/
-    let dcbor_pattern = DcborPattern::parse("@text(SEARCH(TEXT))").unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let pattern = Pattern::parse("CBOR(/@text(SEARCH(TEXT))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -450,8 +443,7 @@ fn test_cbor_captures_no_match() {
     let envelope = Envelope::new("hello");
 
     // Create CBOR pattern that won't match: /@num(NUMBER)/
-    let dcbor_pattern = DcborPattern::parse("@num(NUMBER)").unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let pattern = Pattern::parse("CBOR(/@num(NUMBER)/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -485,8 +477,7 @@ fn test_cbor_captures_performance() {
     let envelope = Envelope::new(numbers);
 
     // Create CBOR pattern that captures all numbers: /@nums(SEARCH(NUMBER))/
-    let dcbor_pattern = DcborPattern::parse("@nums(SEARCH(NUMBER))").unwrap();
-    let pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let pattern = Pattern::parse("CBOR(/@nums(SEARCH(NUMBER))/)").unwrap();
 
     // Execute pattern with timing
     let start = std::time::Instant::now();
@@ -554,8 +545,7 @@ fn test_comprehensive_cbor_captures() {
     let envelope = Envelope::new(vec!["Alice", "Bob", "Charlie"]);
 
     // Create comprehensive CBOR pattern with search captures
-    let dcbor_pattern = DcborPattern::parse("@people(SEARCH(TEXT))").unwrap();
-    let cbor_pattern = Pattern::cbor_pattern(dcbor_pattern);
+    let cbor_pattern = Pattern::parse("CBOR(/@people(SEARCH(TEXT))/)").unwrap();
     let pattern = Pattern::capture("data", cbor_pattern);
 
     // Execute pattern

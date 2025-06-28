@@ -26,3 +26,11 @@ impl Pattern {
         }
     }
 }
+
+impl TryFrom<&str> for Pattern {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self> {
+        Self::parse(value)
+    }
+}

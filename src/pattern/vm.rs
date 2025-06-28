@@ -326,7 +326,7 @@ fn run_thread(
                                 if path_idx < distributed_captures.len() {
                                     distributed_captures[path_idx]
                                         .entry(name.clone())
-                                        .or_insert_with(Vec::new)
+                                        .or_default()
                                         .push(capture_path);
                                 }
                             }
@@ -336,7 +336,7 @@ fn run_thread(
                             if !distributed_captures.is_empty() {
                                 distributed_captures[0]
                                     .entry(name)
-                                    .or_insert_with(Vec::new)
+                                    .or_default()
                                     .extend(capture_paths);
                             }
                         }

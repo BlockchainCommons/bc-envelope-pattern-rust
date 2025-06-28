@@ -6,7 +6,7 @@ fn main() {
     println!("Testing DCBOR capture detection...");
 
     // Create a dcbor pattern with capture
-    let dcbor_pattern = DcborPattern::parse("@num(NUMBER(42))").unwrap();
+    let dcbor_pattern: DcborPattern = "@num(NUMBER(42))".try_into().unwrap();
     println!("DCBOR pattern: {}", dcbor_pattern);
 
     // Test it directly against a CBOR value
