@@ -70,8 +70,8 @@ fn test_dcbor_capture_with_search() {
     );
     assert_eq!(
         captures["values"].len(),
-        9,
-        "Should capture nine instances (3 numbers found 3 times each)"
+        3,
+        "Should capture three instances (one per number)"
     );
 
     // Verify formatted output follows rubric
@@ -84,18 +84,6 @@ fn test_dcbor_capture_with_search() {
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @values
-            4abc3113 LEAF [1, 2, 3]
-                4bf5122f LEAF 1
-            4abc3113 LEAF [1, 2, 3]
-                dbc1b4c9 LEAF 2
-            4abc3113 LEAF [1, 2, 3]
-                084fed08 LEAF 3
-            4abc3113 LEAF [1, 2, 3]
-                4bf5122f LEAF 1
-            4abc3113 LEAF [1, 2, 3]
-                dbc1b4c9 LEAF 2
-            4abc3113 LEAF [1, 2, 3]
-                084fed08 LEAF 3
             4abc3113 LEAF [1, 2, 3]
                 4bf5122f LEAF 1
             4abc3113 LEAF [1, 2, 3]
@@ -144,12 +132,11 @@ fn test_multiple_dcbor_captures() {
         captures.contains_key("names"),
         "Should have 'names' capture"
     );
-    // Due to SEARCH behavior, we get more captures than unique texts (each text
-    // found multiple times)
+    // Due to SEARCH behavior, we get one capture per text string found
     assert_eq!(
         captures["names"].len(),
-        16,
-        "Should capture sixteen instances (each text found 4 times)"
+        4,
+        "Should capture four instances (one per text string)"
     );
 
     // Verify formatted output follows rubric
@@ -162,30 +149,6 @@ fn test_multiple_dcbor_captures() {
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @names
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                800a0588 LEAF "name"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                13941b48 LEAF "Alice"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                5943be12 LEAF "age"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                08e52634 LEAF "30"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                800a0588 LEAF "name"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                13941b48 LEAF "Alice"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                5943be12 LEAF "age"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                08e52634 LEAF "30"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                800a0588 LEAF "name"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                13941b48 LEAF "Alice"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                5943be12 LEAF "age"
-            ce1042d4 LEAF ["name", "Alice", "age", "30"]
-                08e52634 LEAF "30"
             ce1042d4 LEAF ["name", "Alice", "age", "30"]
                 800a0588 LEAF "name"
             ce1042d4 LEAF ["name", "Alice", "age", "30"]
@@ -252,18 +215,18 @@ fn test_nested_dcbor_captures() {
     );
     assert_eq!(
         captures["users"].len(),
-        4,
-        "Should capture four user instances (due to SEARCH behavior)"
+        2,
+        "Should capture two user instances (one per nested array)"
     );
     assert_eq!(
         captures["name"].len(),
-        4,
-        "Should capture four name instances (due to SEARCH behavior)"
+        2,
+        "Should capture two name instances (one per nested array)"
     );
     assert_eq!(
         captures["score"].len(),
-        4,
-        "Should capture four score instances (due to SEARCH behavior)"
+        2,
+        "Should capture two score instances (one per nested array)"
     );
     // Verify formatted output follows rubric
     let actual = format_paths_with_captures(
@@ -279,24 +242,12 @@ fn test_nested_dcbor_captures() {
                 6daf5539 LEAF ["Alice", "95"]
             7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
                 43a6ef66 LEAF ["Bob", "85"]
-            7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
-                6daf5539 LEAF ["Alice", "95"]
-            7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
-                43a6ef66 LEAF ["Bob", "85"]
         @score
             7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
                 6daf5539 LEAF ["Alice", "95"]
             7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
                 43a6ef66 LEAF ["Bob", "85"]
-            7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
-                6daf5539 LEAF ["Alice", "95"]
-            7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
-                43a6ef66 LEAF ["Bob", "85"]
         @users
-            7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
-                6daf5539 LEAF ["Alice", "95"]
-            7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
-                43a6ef66 LEAF ["Bob", "85"]
             7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
                 6daf5539 LEAF ["Alice", "95"]
             7dfc2858 LEAF [["Alice", "95"], ["Bob", "85"]]
@@ -452,8 +403,8 @@ fn test_array_traversal_captures() {
     assert!(captures.contains_key("text"), "Should have 'text' capture");
     assert_eq!(
         captures["text"].len(),
-        16,
-        "Should capture sixteen instances (each text found 4 times)"
+        4,
+        "Should capture four instances (one per text element)"
     );
 
     // Verify formatted output follows rubric
@@ -466,30 +417,6 @@ fn test_array_traversal_captures() {
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @text
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                cb835593 LEAF "hello"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                9fa6eb00 LEAF "42"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                29651e19 LEAF "world"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                9bf5bb3e LEAF "123"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                cb835593 LEAF "hello"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                9fa6eb00 LEAF "42"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                29651e19 LEAF "world"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                9bf5bb3e LEAF "123"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                cb835593 LEAF "hello"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                9fa6eb00 LEAF "42"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                29651e19 LEAF "world"
-            162867a4 LEAF ["hello", "42", "world", "123"]
-                9bf5bb3e LEAF "123"
             162867a4 LEAF ["hello", "42", "world", "123"]
                 cb835593 LEAF "hello"
             162867a4 LEAF ["hello", "42", "world", "123"]
@@ -575,11 +502,11 @@ fn test_cbor_captures_performance() {
     );
     assert_eq!(captures.len(), 1, "Should have exactly one capture group");
     assert!(captures.contains_key("nums"), "Should have 'nums' capture");
-    // Due to SEARCH behavior, we get more captures than unique numbers
+    // Due to SEARCH behavior, we get one capture per number
     assert_eq!(
         captures["nums"].len(),
-        9,
-        "Should capture nine instances (each number found 3 times)"
+        3,
+        "Should capture three instances (one per number)"
     );
 
     // Verify formatted output follows rubric
@@ -592,18 +519,6 @@ fn test_cbor_captures_performance() {
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @nums
-            4abc3113 LEAF [1, 2, 3]
-                4bf5122f LEAF 1
-            4abc3113 LEAF [1, 2, 3]
-                dbc1b4c9 LEAF 2
-            4abc3113 LEAF [1, 2, 3]
-                084fed08 LEAF 3
-            4abc3113 LEAF [1, 2, 3]
-                4bf5122f LEAF 1
-            4abc3113 LEAF [1, 2, 3]
-                dbc1b4c9 LEAF 2
-            4abc3113 LEAF [1, 2, 3]
-                084fed08 LEAF 3
             4abc3113 LEAF [1, 2, 3]
                 4bf5122f LEAF 1
             4abc3113 LEAF [1, 2, 3]
@@ -666,8 +581,8 @@ fn test_comprehensive_cbor_captures() {
     );
     assert_eq!(
         captures["people"].len(),
-        9,
-        "Should capture nine people instances (each person found 3 times)"
+        3,
+        "Should capture three people instances (one per person)"
     );
 
     // Verify formatted output follows rubric
@@ -687,18 +602,6 @@ fn test_comprehensive_cbor_captures() {
             aea55aad LEAF ["Alice", "Bob", "Charlie"]
                 ee8e3b02 LEAF "Charlie"
         @people
-            aea55aad LEAF ["Alice", "Bob", "Charlie"]
-                13941b48 LEAF "Alice"
-            aea55aad LEAF ["Alice", "Bob", "Charlie"]
-                13b74194 LEAF "Bob"
-            aea55aad LEAF ["Alice", "Bob", "Charlie"]
-                ee8e3b02 LEAF "Charlie"
-            aea55aad LEAF ["Alice", "Bob", "Charlie"]
-                13941b48 LEAF "Alice"
-            aea55aad LEAF ["Alice", "Bob", "Charlie"]
-                13b74194 LEAF "Bob"
-            aea55aad LEAF ["Alice", "Bob", "Charlie"]
-                ee8e3b02 LEAF "Charlie"
             aea55aad LEAF ["Alice", "Bob", "Charlie"]
                 13941b48 LEAF "Alice"
             aea55aad LEAF ["Alice", "Bob", "Charlie"]

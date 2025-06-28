@@ -129,8 +129,9 @@ struct Thread {
 /// For SearchPattern, we provide a temporary fallback that uses the old
 /// Match atomic patterns and return both paths and captures.
 ///
-/// This function handles patterns that can produce captures (like CBOR patterns with named groups).
-/// This is the primary function used by the VM for pattern execution with capture support.
+/// This function handles patterns that can produce captures (like CBOR patterns
+/// with named groups). This is the primary function used by the VM for pattern
+/// execution with capture support.
 #[allow(clippy::panic)]
 pub(crate) fn atomic_paths_with_captures(
     p: &crate::pattern::Pattern,
@@ -141,8 +142,12 @@ pub(crate) fn atomic_paths_with_captures(
         Leaf(l) => l.paths_with_captures(env),
         Structure(s) => s.paths_with_captures(env),
         Meta(meta) => match meta {
-            crate::pattern::meta::MetaPattern::Any(a) => a.paths_with_captures(env),
-            crate::pattern::meta::MetaPattern::None(n) => n.paths_with_captures(env),
+            crate::pattern::meta::MetaPattern::Any(a) => {
+                a.paths_with_captures(env)
+            }
+            crate::pattern::meta::MetaPattern::None(n) => {
+                n.paths_with_captures(env)
+            }
             crate::pattern::meta::MetaPattern::Search(_) => {
                 panic!(
                     "SearchPattern should be compiled to Search instruction, not MatchPredicate"
@@ -288,28 +293,55 @@ fn run_thread(
         loop {
             match prog.code[th.pc] {
                 MatchPredicate(idx) => {
-                    let (paths, pattern_captures) = atomic_paths_with_captures(&prog.literals[idx], &th.env);
+                    let (paths, pattern_captures) = atomic_paths_with_captures(
+                        &prog.literals[idx],
+                        &th.env,
+                    );
                     if paths.is_empty() {
                         break;
                     }
 
                     th.pc += 1; // Advance to next instruction
 
-                    // Merge pattern captures into thread captures
+                    // Handle multiple paths from atomic patterns (e.g., CBOR
+                    // patterns) Process paths in reverse
+                    // order for spawning to preserve original order
+                    // since stack is LIFO
+                    let paths_vec: Vec<_> = paths.into_iter().collect();
+
+                    // Distribute captures fairly across paths
+                    // For each capture group, we need to associate captures
+                    // with their corresponding paths
+                    let mut distributed_captures: Vec<
+                        std::collections::HashMap<String, Vec<Path>>,
+                    > = vec![std::collections::HashMap::new(); paths_vec.len()];
+
                     for (name, capture_paths) in pattern_captures {
-                        // Find the capture index for this name in the program's capture names
-                        if let Some(capture_idx) = prog.capture_names.iter().position(|n| n == &name) {
-                            if capture_idx < th.captures.len() {
-                                th.captures[capture_idx].extend(capture_paths);
+                        // If we have the same number of paths as captures,
+                        // distribute 1:1
+                        if capture_paths.len() == paths_vec.len() {
+                            for (path_idx, capture_path) in
+                                capture_paths.into_iter().enumerate()
+                            {
+                                if path_idx < distributed_captures.len() {
+                                    distributed_captures[path_idx]
+                                        .entry(name.clone())
+                                        .or_insert_with(Vec::new)
+                                        .push(capture_path);
+                                }
+                            }
+                        } else {
+                            // Fallback: give all captures to the first path
+                            // (this maintains backwards compatibility)
+                            if !distributed_captures.is_empty() {
+                                distributed_captures[0]
+                                    .entry(name)
+                                    .or_insert_with(Vec::new)
+                                    .extend(capture_paths);
                             }
                         }
                     }
 
-                    // Handle multiple paths from atomic patterns (e.g., CBOR
-                    // patterns)
-                    // Process paths in reverse order for spawning to preserve original order
-                    // since stack is LIFO
-                    let paths_vec: Vec<_> = paths.into_iter().collect();
                     for (i, path) in paths_vec.iter().enumerate() {
                         if i == 0 {
                             // Use the first path for the current thread
@@ -327,19 +359,69 @@ fn run_thread(
                                     th.env = last_env.clone();
                                 }
                             }
+
+                            // Add distributed captures for this path to the
+                            // current thread
+                            if let Some(path_captures) =
+                                distributed_captures.get(i)
+                            {
+                                for (name, capture_paths) in path_captures {
+                                    if let Some(capture_idx) = prog
+                                        .capture_names
+                                        .iter()
+                                        .position(|n| n == name)
+                                    {
+                                        if capture_idx < th.captures.len() {
+                                            th.captures[capture_idx]
+                                                .extend(capture_paths.clone());
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    // Spawn threads for remaining paths in reverse order to preserve
-                    // original order when processed from stack (LIFO)
-                    for path in paths_vec.iter().skip(1).rev() {
+                    // Spawn threads for remaining paths in reverse order to
+                    // preserve original order when
+                    // processed from stack (LIFO)
+                    for (path_idx, path) in paths_vec
+                        .iter()
+                        .enumerate()
+                        .skip(1)
+                        .collect::<Vec<_>>()
+                        .into_iter()
+                        .rev()
+                    {
                         let mut fork = th.clone();
+                        // Reset captures for the fork to avoid duplication
+                        for capture_vec in &mut fork.captures {
+                            capture_vec.clear();
+                        }
                         // For additional paths, always use the full path
                         // since these are separate matches
                         fork.path = path.clone();
                         if let Some(last_env) = path.last() {
                             fork.env = last_env.clone();
                         }
+
+                        // Add distributed captures for this path to the fork
+                        if let Some(path_captures) =
+                            distributed_captures.get(path_idx)
+                        {
+                            for (name, capture_paths) in path_captures {
+                                if let Some(capture_idx) = prog
+                                    .capture_names
+                                    .iter()
+                                    .position(|n| n == name)
+                                {
+                                    if capture_idx < fork.captures.len() {
+                                        fork.captures[capture_idx]
+                                            .extend(capture_paths.clone());
+                                    }
+                                }
+                            }
+                        }
+
                         stack.push(fork);
                     }
                 }

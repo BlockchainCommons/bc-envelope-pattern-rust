@@ -1,6 +1,5 @@
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Pattern, Matcher, format_paths};
-use dcbor::prelude::*;
 
 fn main() {
     println!("Testing CBOR pattern captures...");
