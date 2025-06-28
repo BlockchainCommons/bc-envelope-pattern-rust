@@ -73,7 +73,225 @@ The integration now provides seamless access to both envelope-level structure an
 
 ## Phase 3: Complete capture implementation - IN PROGRESS
 
-<Development Plan goes here>
+### Development Plan: dcbor-pattern Capture Integration
+
+Based on investigation of how `dcbor-pattern` implements named captures and analysis of the current `bc-envelope-pattern` capture implementation gap, here is the comprehensive plan for Phase 3:
+
+#### Current Status Summary
+
+**✅ CONFIRMED Working Infrastructure:**
+- `bc-envelope-pattern` has envelope-level capture support ONLY via the meta `CapturePattern`
+- Pattern `@name(NUMBER(42))` works perfectly: matches and captures correctly
+- `dcbor-pattern` has complete CBOR-level capture support via `CapturePattern`
+- Both use identical `@name(pattern)` syntax and `paths_with_captures()` API
+- Both correctly handle nested captures and complex capture scenarios
+
+**❌ CONFIRMED Missing Integration:**
+- **ALL base patterns** (leaf, structure) in `bc-envelope-pattern` return empty `HashMap::new()` for captures
+- **Only** the meta `CapturePattern` actually collects captures by wrapping other patterns
+- `CBORPattern::paths_with_captures()` ignores dcbor captures (marked with `_dcbor_captures`)
+- **VERIFIED**: Pattern `CBOR(/@name(NUMBER(42))/)` matches but returns 0 captures
+- **VERIFIED**: Pattern `@env(CBOR(/@dcbor(NUMBER(42))/))` captures `env` but ignores `dcbor`
+- No conversion from dcbor capture paths to envelope capture paths
+- No testing coverage for CBOR pattern captures
+- TODO comments indicate incomplete implementation
+
+**Key Discovery**: The capture system in `bc-envelope-pattern` is fundamentally different from `dcbor-pattern`:
+- In `dcbor-pattern`: Individual patterns can have captures (e.g., `TextPattern` with regex captures)
+- In `bc-envelope-pattern`: ONLY the meta `CapturePattern` handles captures by wrapping other patterns
+
+#### Phase 3 Implementation Tasks
+
+##### Task 3.1: Core Capture Path Conversion (HIGH PRIORITY)
+
+**Objective**: Update `CBORPattern::paths_with_captures` to properly convert dcbor captures to envelope captures.
+
+**Location**: `src/pattern/leaf/cbor_pattern.rs` lines 89 and 142
+
+**Key Insight**: Unlike other leaf patterns that always return `HashMap::new()` for captures, `CBORPattern` needs to be the FIRST base pattern to actually implement capture support by delegating to dcbor-pattern's capture system.
+
+**Changes Required**:
+
+1. **Replace ignored `_dcbor_captures` with proper handling**:
+   ```rust
+   // Current code:
+   let (dcbor_paths, _dcbor_captures) = dcbor_pattern.paths_with_captures(&subject_cbor);
+
+   // New code:
+   let (dcbor_paths, dcbor_captures) = dcbor_pattern.paths_with_captures(&subject_cbor);
+   ```
+
+2. **Implement dcbor-to-envelope capture path conversion**:
+   ```rust
+   // Convert dcbor captures to envelope captures
+   let mut envelope_captures = std::collections::HashMap::new();
+   for (capture_name, dcbor_capture_paths) in dcbor_captures {
+       let envelope_capture_paths: Vec<Path> = dcbor_capture_paths
+           .into_iter()
+           .map(|dcbor_path| convert_dcbor_capture_path_to_envelope_path(dcbor_path, envelope))
+           .collect();
+       envelope_captures.insert(capture_name, envelope_capture_paths);
+   }
+   ```
+
+3. **Create helper function for path conversion**:
+   ```rust
+   fn convert_dcbor_capture_path_to_envelope_path(dcbor_path: Vec<CBOR>, base_envelope: &Envelope) -> Vec<Envelope> {
+       let mut envelope_path = vec![base_envelope.clone()];
+
+       // Skip first element if it matches the base envelope's CBOR content
+       let skip_first = if let Some(base_cbor) = base_envelope.subject().as_leaf() {
+           dcbor_path.first().map(|first| first == &base_cbor).unwrap_or(false)
+       } else {
+           false
+       };
+
+       let elements_to_add = if skip_first {
+           dcbor_path.into_iter().skip(1)
+       } else {
+           dcbor_path.into_iter().skip(0)
+       };
+
+       for cbor_element in elements_to_add {
+           envelope_path.push(Envelope::new(cbor_element));
+       }
+
+       envelope_path
+   }
+   ```
+
+4. **Apply to both KnownValue and CBOR leaf code paths** (lines 89 and 142)
+
+**Note**: This makes `CBORPattern` unique among bc-envelope-pattern's base patterns as the first to actually return non-empty captures from `paths_with_captures()`.
+
+##### Task 3.2: Comprehensive Test Coverage (HIGH PRIORITY)
+
+**Objective**: Create comprehensive test suite for dcbor captures within CBOR patterns.
+
+**Location**: New file `tests/test_cbor_captures.rs`
+
+**Test Cases Required**:
+
+1. **Simple dcbor captures**:
+   ```rust
+   // Pattern: CBOR(/@num(NUMBER(42))/)
+   // Envelope: 42
+   // Expected: captures["num"] = [path to 42]
+   ```
+
+2. **Search pattern captures**:
+   ```rust
+   // Pattern: CBOR(/@values(SEARCH(NUMBER))/)
+   // Envelope: [1, 2, 3]
+   // Expected: captures["values"] = [paths to 1, 2, 3]
+   ```
+
+3. **Nested structure captures**:
+   ```rust
+   // Pattern: CBOR(/@user(SEARCH(@score(NUMBER(>90))))/)
+   // Envelope: {"users": [{"name": "Alice", "score": 95}, {"name": "Bob", "score": 85}]}
+   // Expected: captures["user"] includes paths, captures["score"] = [path to 95]
+   ```
+
+4. **Multiple captures in single pattern**:
+   ```rust
+   // Pattern: CBOR(/@name(TEXT) & @age(NUMBER)/)
+   // Test capture isolation and proper path assignment
+   ```
+
+5. **Complex array/map traversal captures**:
+   ```rust
+   // Pattern: CBOR(/ARRAY(@item(TEXT) > @item(NUMBER))/)
+   // Test sequence capture behavior
+   ```
+
+6. **Capture name conflict detection**:
+   ```rust
+   // Pattern: @env_capture(CBOR(/@same_name(NUMBER)/))
+   // Verify no conflicts between envelope and dcbor capture names
+   ```
+
+##### Task 3.3: Integration Testing (MEDIUM PRIORITY)
+
+**Objective**: Ensure dcbor captures work seamlessly with existing envelope capture patterns.
+
+**Test Scenarios**:
+
+1. **Mixed envelope + dcbor captures**:
+   ```rust
+   // Pattern: @wrapper(WRAPPED -> @content(CBOR(/@number(NUMBER)/)))
+   // Verify both envelope and dcbor captures work together
+   ```
+
+2. **Capture composition**:
+   ```rust
+   // Pattern: SEARCH(@found(CBOR(/@inner(TEXT)/)))
+   // Test nested meta-pattern + dcbor captures
+   ```
+
+3. **VM integration**:
+   ```rust
+   // Verify capture instructions work correctly with CBOR patterns
+   // Test CaptureStart/CaptureEnd instruction integration
+   ```
+
+##### Task 3.4: Error Handling and Edge Cases (MEDIUM PRIORITY)
+
+**Objective**: Robust error handling for capture edge cases.
+
+**Implementation Required**:
+
+1. **Capture name validation**:
+   - Ensure dcbor capture names don't conflict with envelope capture names
+   - Provide clear error messages for conflicts
+
+2. **Empty capture handling**:
+   - Proper behavior when dcbor patterns match but captures are empty
+   - Consistent HashMap behavior for missing captures
+
+3. **Path conversion error handling**:
+   - Handle malformed dcbor paths gracefully
+   - Validate CBOR-to-Envelope conversion assumptions
+
+##### Task 3.5: Documentation and Examples (LOW PRIORITY)
+
+**Objective**: Document the new integrated capture functionality.
+
+**Documentation Updates**:
+
+1. **Update `AGENTS.md`**: Mark Phase 3 as complete, document new capabilities
+2. **Update `docs/PatternSyntax.md`**: Add examples of CBOR pattern captures
+3. **Add code examples**: Demonstrate combined envelope + dcbor captures
+4. **API documentation**: Document new capture behavior in method docs
+
+#### Implementation Order
+
+1. **Task 3.1** (Core implementation) - Essential foundation
+2. **Task 3.2** (Basic testing) - Validate core functionality
+3. **Task 3.4** (Error handling) - Ensure robustness
+4. **Task 3.3** (Integration testing) - Verify complete system works
+5. **Task 3.5** (Documentation) - Complete the feature
+
+#### Success Criteria
+
+- ✅ All existing tests continue to pass (no regressions)
+- ✅ `CBOR(/@name(pattern)/)` syntax works correctly
+- ✅ dcbor captures integrate seamlessly with envelope captures
+- ✅ No capture name conflicts between levels
+- ✅ Complex nested capture scenarios work correctly
+- ✅ All test patterns from requirements are implemented and pass
+- ✅ `cargo test` and `cargo clippy` pass without issues
+- ✅ Performance impact is minimal (captures are opt-in)
+
+#### Technical Notes
+
+- **Architectural Difference**: bc-envelope-pattern uses a wrapper-based capture system (only `CapturePattern` captures) while dcbor-pattern allows individual patterns to have captures. CBORPattern bridges this gap by being the first base pattern to delegate capture functionality.
+- **Path conversion complexity**: The key challenge is converting dcbor paths (Vec<CBOR>) to envelope paths (Vec<Envelope>) while maintaining correct tree traversal semantics
+- **Capture merging**: When both envelope-level `CapturePattern` and CBOR patterns have captures, ensure proper HashMap merging without key conflicts
+- **Memory efficiency**: Capture conversion should be lazy/on-demand to avoid unnecessary allocations
+- **Thread safety**: Ensure capture collections work correctly in VM multi-threading scenarios
+
+This integration will provide a unified capture system where `@name(pattern)` syntax works seamlessly across both envelope structure patterns (via `CapturePattern` wrapper) and internal CBOR content patterns (via `CBORPattern` delegation), significantly enhancing pattern expressiveness while maintaining full backwards compatibility.
 
 ## Phase 4: dcbor-pattern Capture Integration - PLANNED
 
