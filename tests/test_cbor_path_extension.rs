@@ -4,6 +4,7 @@ use indoc::indoc;
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Matcher, Pattern, format_paths};
 use dcbor_parse::parse_dcbor_item;
+use dcbor_pattern::{Matcher as _, Pattern as DcborPattern};
 
 /// Test CBOR pattern path extension functionality using proper formatting and assertions.
 /// These tests verify that CBOR patterns extend paths to include the internal CBOR structure
@@ -28,9 +29,9 @@ fn test_cbor_pattern_simple_array_paths() {
         4abc3113 LEAF [1, 2, 3]
             4bf5122f LEAF 1
         4abc3113 LEAF [1, 2, 3]
-            084fed08 LEAF 3
-        4abc3113 LEAF [1, 2, 3]
             dbc1b4c9 LEAF 2
+        4abc3113 LEAF [1, 2, 3]
+            084fed08 LEAF 3
     "#}.trim();
 
     assert_actual_expected!(actual, expected, "CBOR pattern should return extended paths for array elements");
@@ -220,4 +221,74 @@ fn test_cbor_pattern_map_key_value_paths() {
                    "Last element of path {} should be a number", i);
         }
     }
+}
+
+
+#[test]
+fn test_search_array_order() {
+    let cbor = dcbor_parse::parse_dcbor_item(r#"[[1, 2, 3], [4, 5, 6]]"#).unwrap();
+    let dcbor_pattern = DcborPattern::parse("SEARCH(ARRAY)").unwrap();
+
+    let paths = dcbor_pattern.paths(&cbor);
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        [[1, 2, 3], [4, 5, 6]]
+        [[1, 2, 3], [4, 5, 6]]
+            [1, 2, 3]
+        [[1, 2, 3], [4, 5, 6]]
+            [4, 5, 6]
+    "#}.trim();
+    assert_actual_expected!(dcbor_pattern::format_paths(&paths), expected);
+
+    let pattern = DcborPattern::parse("SEARCH(NUMBER)").unwrap();
+    let paths = pattern.paths(&cbor);
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        [[1, 2, 3], [4, 5, 6]]
+            [1, 2, 3]
+                1
+        [[1, 2, 3], [4, 5, 6]]
+            [1, 2, 3]
+                2
+        [[1, 2, 3], [4, 5, 6]]
+            [1, 2, 3]
+                3
+        [[1, 2, 3], [4, 5, 6]]
+            [4, 5, 6]
+                4
+        [[1, 2, 3], [4, 5, 6]]
+            [4, 5, 6]
+                5
+        [[1, 2, 3], [4, 5, 6]]
+            [4, 5, 6]
+                6
+    "#}.trim();
+    assert_actual_expected!(dcbor_pattern::format_paths(&paths), expected);
+
+    let envelope = Envelope::new(cbor);
+    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    let paths = pattern.paths(&envelope);
+    // The traversal order below should be the same as the one above.
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]
+            4abc3113 LEAF [1, 2, 3]
+                4bf5122f LEAF 1
+        88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]
+            4abc3113 LEAF [1, 2, 3]
+                dbc1b4c9 LEAF 2
+        88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]
+            4abc3113 LEAF [1, 2, 3]
+                084fed08 LEAF 3
+        88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]
+            f215fbf4 LEAF [4, 5, 6]
+                e52d9c50 LEAF 4
+        88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]
+            f215fbf4 LEAF [4, 5, 6]
+                e77b9a9a LEAF 5
+        88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]
+            f215fbf4 LEAF [4, 5, 6]
+                67586e98 LEAF 6
+    "#}.trim();
+    assert_actual_expected!(format_paths(&paths), expected);
 }
