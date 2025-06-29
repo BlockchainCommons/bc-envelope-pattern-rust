@@ -179,9 +179,8 @@ fn test_nested_dcbor_captures() {
     let envelope = Envelope::new(vec![vec!["Alice", "95"], vec!["Bob", "85"]]);
 
     // Create CBOR pattern with nested captures:
-    // /@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))/
     let pattern = Pattern::parse(
-        "CBOR(/@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))/)",
+        "CBOR(/@users(SEARCH([@name(TEXT), @score(TEXT)]))/)",
     )
     .unwrap();
 
