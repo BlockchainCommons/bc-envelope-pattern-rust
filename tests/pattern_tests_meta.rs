@@ -25,7 +25,7 @@ fn test_and_pattern() {
     assert!(!impossible_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", impossible_pattern),
-        r#"NUMBER(42)&TEXT("foo")"#
+        r#"42&"foo""#
     );
 
     // A pattern that requires the envelope to match both a number greater
@@ -70,7 +70,7 @@ fn test_or_pattern() {
     // A pattern that requires the envelope to match either the string "foo" or
     // the string "bar".
     let pattern = Pattern::or(vec![Pattern::text("bar"), Pattern::text("baz")]);
-    assert_eq!(format!("{}", pattern), r#"TEXT("bar")|TEXT("baz")"#);
+    assert_eq!(format!("{}", pattern), r#""bar"|"baz""#);
 
     // An envelope that is a number, so it doesn't match the pattern.
     let envelope = Envelope::new(42).add_assertion("an", "assertion");
@@ -86,7 +86,7 @@ fn test_or_pattern() {
     assert!(foo_or_greater_than_40_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", foo_or_greater_than_40_pattern),
-        r#"TEXT("foo")|NUMBER(>40)"#
+        r#""foo"|NUMBER(>40)"#
     );
 
     // The match path includes the assertion.
@@ -110,7 +110,7 @@ fn test_or_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", foo_or_greater_than_40_with_subject_pattern),
-        r#"TEXT("foo")|NUMBER(>40)->SUBJECT"#
+        r#""foo"|NUMBER(>40)->SUBJECT"#
     );
 }
 
@@ -264,7 +264,7 @@ fn optional_wrapped_pattern() {
 fn test_search_pattern() {
     // A pattern that searches for any text in the envelope
     let text_search_pattern = Pattern::search(Pattern::any_text());
-    assert_eq!(format!("{}", text_search_pattern), r#"SEARCH(TEXT)"#);
+    assert_eq!(format!("{}", text_search_pattern), r#"SEARCH(text)"#);
 
     // Test searching for text in a simple envelope
     let envelope = Envelope::new("Alice")
@@ -291,7 +291,7 @@ fn test_search_pattern() {
 
     // A pattern that searches for the text "Bob" in the envelope
     let bob_search_pattern = Pattern::search(Pattern::text("Bob"));
-    assert_eq!(format!("{}", bob_search_pattern), r#"SEARCH(TEXT("Bob"))"#);
+    assert_eq!(format!("{}", bob_search_pattern), r#"SEARCH("Bob")"#);
     let bob_search_paths = bob_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -338,7 +338,7 @@ fn test_search_pattern() {
 fn test_search_pattern_nested() {
     // A pattern that searches for any text in the envelope
     let text_search_pattern = Pattern::search(Pattern::any_text());
-    assert_eq!(format!("{}", text_search_pattern), r#"SEARCH(TEXT)"#);
+    assert_eq!(format!("{}", text_search_pattern), r#"SEARCH(text)"#);
 
     // Test searching in a more complex nested envelope
     let inner_envelope =
@@ -408,7 +408,7 @@ fn test_search_pattern_with_wrapped() {
     let secret_text_search_pattern = Pattern::search(Pattern::text("secret"));
     assert_eq!(
         format!("{}", secret_text_search_pattern),
-        r#"SEARCH(TEXT("secret"))"#
+        r#"SEARCH("secret")"#
     );
 
     let inner =
@@ -437,7 +437,7 @@ fn test_search_pattern_with_wrapped() {
     ));
     assert_eq!(
         format!("{}", secret_regex_search_pattern),
-        r#"SEARCH(TEXT(/secret/))"#
+        r#"SEARCH(/secret/)"#
     );
     let secret_regex_search_paths =
         secret_regex_search_pattern.paths(&envelope);
@@ -600,7 +600,7 @@ fn test_not_pattern() {
         Pattern::not_matching(Pattern::text("non_matching_text"));
     assert_eq!(
         format!("{}", not_matching_text_pattern),
-        r#"!TEXT("non_matching_text")"#
+        r#"!"non_matching_text""#
     );
     let not_matches = not_matching_text_pattern.matches(&envelope);
     assert!(
@@ -650,7 +650,7 @@ fn test_not_pattern() {
     ]);
     assert_eq!(
         format!("{}", complex_pattern),
-        r#"!TEXT("wrong_subject")&ASSERTPRED(TEXT("key1"))"#
+        r#"!"wrong_subject"&ASSERTPRED("key1")"#
     );
 
     let matches = complex_pattern.matches(&envelope);

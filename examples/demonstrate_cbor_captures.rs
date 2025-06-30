@@ -42,12 +42,12 @@ fn main() {
     // Example 3: Mixed envelope and CBOR captures
     println!("📝 Example 3: Mixed envelope and CBOR captures");
     let envelope = Envelope::new("hello");
-    let dcbor_pattern = DcborPattern::parse("@content(TEXT)").unwrap();
+    let dcbor_pattern = DcborPattern::parse("@content(text)").unwrap();
     let cbor_pattern = Pattern::cbor_pattern(dcbor_pattern);
     let pattern = Pattern::capture("wrapper", cbor_pattern);
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    println!("  Pattern: @wrapper(CBOR(/@content(TEXT)/))");
+    println!("  Pattern: @wrapper(CBOR(/@content(text)/))");
     println!("  Envelope: {}", envelope);
     println!("  Paths found: {}", paths.len());
     println!("  Captures found: {}", captures.len());
@@ -62,11 +62,11 @@ fn main() {
         vec!["Alice", "95"],
         vec!["Bob", "85"]
     ]);
-    let dcbor_pattern = DcborPattern::parse("@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))").unwrap();
+    let dcbor_pattern = DcborPattern::parse("@users(SEARCH(ARRAY(@name(text) > @score(text))))").unwrap();
     let pattern = Pattern::cbor_pattern(dcbor_pattern);
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    println!("  Pattern: CBOR(/@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))/)");
+    println!("  Pattern: CBOR(/@users(SEARCH(ARRAY(@name(text) > @score(text))))/)");
     println!("  Envelope: {}", envelope);
     println!("  Paths found: {}", paths.len());
     println!("  Captures found: {}", captures.len());

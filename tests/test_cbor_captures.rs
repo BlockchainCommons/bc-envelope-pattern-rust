@@ -110,8 +110,8 @@ fn test_multiple_dcbor_captures() {
     // This simulates a map-like structure using alternating key-value pairs
     let envelope = Envelope::new(vec!["name", "Alice", "age", "30"]);
 
-    // Create CBOR pattern with text search: /@names(SEARCH(TEXT))/
-    let pattern = Pattern::parse("CBOR(/@names(SEARCH(TEXT))/)").unwrap();
+    // Create CBOR pattern with text search: /@names(SEARCH(text))/
+    let pattern = Pattern::parse("CBOR(/@names(SEARCH(text))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -180,7 +180,7 @@ fn test_nested_dcbor_captures() {
 
     // Create CBOR pattern with nested captures:
     let pattern = Pattern::parse(
-        "CBOR(/@users(SEARCH([@name(TEXT), @score(TEXT)]))/)",
+        "CBOR(/@users(SEARCH([@name(text), @score(text)]))/)",
     )
     .unwrap();
 
@@ -378,8 +378,8 @@ fn test_array_traversal_captures() {
     // Create envelope with mixed array ["hello", "42", "world", "123"]
     let envelope = Envelope::new(vec!["hello", "42", "world", "123"]); // All strings for simplicity
 
-    // Create CBOR pattern with search captures: /@text(SEARCH(TEXT))/
-    let pattern = Pattern::parse("CBOR(/@text(SEARCH(TEXT))/)").unwrap();
+    // Create CBOR pattern with search captures: /@text(SEARCH(text))/
+    let pattern = Pattern::parse("CBOR(/@text(SEARCH(text))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -544,7 +544,7 @@ fn test_comprehensive_cbor_captures() {
     let envelope = Envelope::new(vec!["Alice", "Bob", "Charlie"]);
 
     // Create comprehensive CBOR pattern with search captures
-    let cbor_pattern = Pattern::parse("CBOR(/@people(SEARCH(TEXT))/)").unwrap();
+    let cbor_pattern = Pattern::parse("CBOR(/@people(SEARCH(text))/)").unwrap();
     let pattern = Pattern::capture("data", cbor_pattern);
 
     // Execute pattern

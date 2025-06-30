@@ -56,7 +56,8 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.
 - Update the `NULL` pattern to use the `dcbor-pattern` crate's `null` syntax for matching null values.
 - Update the `BSTR` pattern to use the `dcbor-pattern` crate's `bstr` syntax for matching byte strings.
+- Update the `TEXT` pattern to use the `dcbor-pattern` crate's `text` syntax for matching text strings.
 
 ### NEXT TASK:
 
-- Update the `TEXT pattern to use the `dcbor-pattern` crate's `text` syntax for matching text strings.
+- Complete testing and documentation for the TEXT pattern updates.

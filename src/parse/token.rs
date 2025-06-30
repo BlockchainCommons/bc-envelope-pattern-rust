@@ -125,9 +125,6 @@ pub enum Token {
     #[token("TAG")]
     Tag,
 
-    #[token("TEXT")]
-    Text,
-
     // Meta Pattern Keywords
     #[token("NONE")]
     None,
@@ -142,8 +139,14 @@ pub enum Token {
     #[token("false")]
     BoolFalse,
 
+    #[token("text")]
+    TextKeyword,
+
     #[token("NaN")]
     NaN,
+
+    #[token("\"", parse_string_literal_token)]
+    StringLiteral(Result<String>),
 
     // Grouping and Range delimiters
     #[token("(")]
@@ -375,6 +378,58 @@ fn parse_range(lex: &mut Lexer<Token>) -> Result<Quantifier> {
     }
 }
 
+/// Callback used by the `StringLiteral` variant above.
+fn parse_string_literal_token(lex: &mut Lexer<Token>) -> Result<String> {
+    let src = lex.remainder(); // everything after the first '"'
+    let mut escape = false;
+    let mut content = String::new();
+
+    for (i, b) in src.bytes().enumerate() {
+        let consumed = i + 1;
+        match b {
+            b'"' if !escape => {
+                // End of string
+                lex.bump(consumed);
+                return Ok(content);
+            }
+            b'\\' if !escape => {
+                escape = true;
+            }
+            b'n' if escape => {
+                content.push('\n');
+                escape = false;
+            }
+            b't' if escape => {
+                content.push('\t');
+                escape = false;
+            }
+            b'r' if escape => {
+                content.push('\r');
+                escape = false;
+            }
+            b'\\' if escape => {
+                content.push('\\');
+                escape = false;
+            }
+            b'"' if escape => {
+                content.push('"');
+                escape = false;
+            }
+            c => {
+                if escape {
+                    // Invalid escape sequence, but we'll be lenient
+                    content.push('\\');
+                    escape = false;
+                }
+                content.push(c as char);
+            }
+        }
+    }
+
+    // Unterminated string literal
+    Err(Error::UnexpectedEndOfInput)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -398,7 +453,6 @@ mod tests {
 
         // Test leaf pattern keywords
         assert_eq!(Token::lexer("ARRAY").next(), Some(Ok(Token::Array)));
-        assert_eq!(Token::lexer("TEXT").next(), Some(Ok(Token::Text)));
         assert_eq!(Token::lexer("NUMBER").next(), Some(Ok(Token::Number)));
 
         // Test literals

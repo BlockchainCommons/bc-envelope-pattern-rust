@@ -118,11 +118,11 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `TAG ( /regex/ )`
         - Matches a CBOR tagged value with a name that matches the specified regex.
 - Text
-    - `TEXT`
+    - `text`
         - Matches any text value.
-    - `TEXT ( "string" )`
+    - `"string"`
         - Matches a text value with the specified string. Gordian Envelope and CBOR diagnostic notation use double quotes for text strings, so we use that syntax here for familiarity.
-    - `TEXT ( /regex/ )`
+    - `/regex/`
         - Matches a text value that matches the specified regex. No double quotes are used here, as the regex is not a string but a pattern to match against the text value.
 
 ## Structure Patterns

@@ -28,64 +28,70 @@ fn parse_bool_false() {
 }
 
 #[test]
-fn parse_text_patterns() {
-    let p = Pattern::parse("TEXT").unwrap();
+fn parse_text_dcbor_pattern_syntax() {
+    // Test the new dcbor-pattern syntax
+    let p = Pattern::parse("text").unwrap();
     assert_eq!(p, Pattern::any_text());
-    assert_eq!(p.to_string(), "TEXT");
+    assert_eq!(p.to_string(), "text");
 
-    let p = Pattern::parse(r#"TEXT("hello")"#).unwrap();
+    let p = Pattern::parse(r#""hello""#).unwrap();
     assert_eq!(p, Pattern::text("hello"));
-    assert_eq!(p.to_string(), r#"TEXT("hello")"#);
+    assert_eq!(p.to_string(), r#""hello""#);
 
-    let spaced = r#"TEXT ( "hello" )"#;
-    let p_spaced = Pattern::parse(spaced).unwrap();
-    assert_eq!(p_spaced, Pattern::text("hello"));
-    assert_eq!(p_spaced.to_string(), r#"TEXT("hello")"#);
-
-    let p = Pattern::parse("TEXT(/h.*o/)").unwrap();
+    let p = Pattern::parse("/h.*o/").unwrap();
     let regex = regex::Regex::new("h.*o").unwrap();
     assert_eq!(p, Pattern::text_regex(regex));
-    assert_eq!(p.to_string(), "TEXT(/h.*o/)");
+    assert_eq!(p.to_string(), "/h.*o/");
+
+    // Test with various string content
+    let p = Pattern::parse(r#""hello world""#).unwrap();
+    assert_eq!(p, Pattern::text("hello world"));
+    assert_eq!(p.to_string(), r#""hello world""#);
+
+    // Test with escaped quotes
+    let p = Pattern::parse(r#""say \"hello\"""#).unwrap();
+    assert_eq!(p, Pattern::text(r#"say "hello""#));
+    assert_eq!(p.to_string(), r#""say \"hello\"""#);
 }
 
 #[test]
 fn parse_number_patterns() {
     let p = Pattern::parse("NUMBER").unwrap();
     assert_eq!(p, Pattern::any_number());
-    assert_eq!(p.to_string(), "NUMBER");
+    assert_eq!(p.to_string(), "number");
 
     let p = Pattern::parse("NUMBER(42)").unwrap();
     assert_eq!(p, Pattern::number(42));
-    assert_eq!(p.to_string(), "NUMBER(42)");
+    assert_eq!(p.to_string(), "42");
 
     let spaced = "NUMBER ( 42 )";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::number(42));
-    assert_eq!(p_spaced.to_string(), "NUMBER(42)");
+    assert_eq!(p_spaced.to_string(), "42");
 
     let p = Pattern::parse("NUMBER(1...3)").unwrap();
     assert_eq!(p, Pattern::number_range(1..=3));
-    assert_eq!(p.to_string(), "NUMBER(1...3)");
+    assert_eq!(p.to_string(), "1...3");
 
     let p = Pattern::parse("NUMBER(>5)").unwrap();
     assert_eq!(p, Pattern::number_greater_than(5));
-    assert_eq!(p.to_string(), "NUMBER(>5)");
+    assert_eq!(p.to_string(), ">5");
 
     let p = Pattern::parse("NUMBER(>=5)").unwrap();
     assert_eq!(p, Pattern::number_greater_than_or_equal(5));
-    assert_eq!(p.to_string(), "NUMBER(>=5)");
+    assert_eq!(p.to_string(), ">=5");
 
     let p = Pattern::parse("NUMBER(<5)").unwrap();
     assert_eq!(p, Pattern::number_less_than(5));
-    assert_eq!(p.to_string(), "NUMBER(<5)");
+    assert_eq!(p.to_string(), "<5");
 
     let p = Pattern::parse("NUMBER(<=5)").unwrap();
     assert_eq!(p, Pattern::number_less_than_or_equal(5));
-    assert_eq!(p.to_string(), "NUMBER(<=5)");
+    assert_eq!(p.to_string(), "<=5");
 
     let p = Pattern::parse("NUMBER(NaN)").unwrap();
     assert_eq!(p, Pattern::number_nan());
-    assert_eq!(p.to_string(), "NUMBER(NaN)");
+    assert_eq!(p.to_string(), "NaN");
 }
 
 #[test]
@@ -134,33 +140,33 @@ fn parse_bstr_patterns() {
 fn parse_date_patterns() {
     let p = Pattern::parse("DATE").unwrap();
     assert_eq!(p, Pattern::any_date());
-    assert_eq!(p.to_string(), "DATE");
+    assert_eq!(p.to_string(), "date");
 
     let p = Pattern::parse("DATE(2023-12-25)").unwrap();
     let d = Date::from_string("2023-12-25").unwrap();
     assert_eq!(p, Pattern::date(d.clone()));
-    assert_eq!(p.to_string(), "DATE(2023-12-25)");
+    assert_eq!(p.to_string(), "date'2023-12-25'");
 
     let p = Pattern::parse("DATE(2023-12-24...2023-12-26)").unwrap();
     let start = Date::from_string("2023-12-24").unwrap();
     let end = Date::from_string("2023-12-26").unwrap();
     assert_eq!(p, Pattern::date_range(start..=end));
-    assert_eq!(p.to_string(), "DATE(2023-12-24...2023-12-26)");
+    assert_eq!(p.to_string(), "date'2023-12-24...2023-12-26'");
 
     let p = Pattern::parse("DATE(2023-12-24...)").unwrap();
     let start = Date::from_string("2023-12-24").unwrap();
     assert_eq!(p, Pattern::date_earliest(start.clone()));
-    assert_eq!(p.to_string(), "DATE(2023-12-24...)");
+    assert_eq!(p.to_string(), "date'2023-12-24...'");
 
     let p = Pattern::parse("DATE(...2023-12-26)").unwrap();
     let end = Date::from_string("2023-12-26").unwrap();
     assert_eq!(p, Pattern::date_latest(end.clone()));
-    assert_eq!(p.to_string(), "DATE(...2023-12-26)");
+    assert_eq!(p.to_string(), "date'...2023-12-26'");
 
     let p = Pattern::parse("DATE(/2023-.*/)").unwrap();
     let regex = regex::Regex::new("2023-.*").unwrap();
     assert_eq!(p, Pattern::date_regex(regex));
-    assert_eq!(p.to_string(), "DATE(/2023-.*/)");
+    assert_eq!(p.to_string(), "date'/2023-.*/'");
 }
 
 #[test]
@@ -213,20 +219,20 @@ fn parse_tag_patterns() {
 fn parse_known_value_patterns() {
     let p = Pattern::parse("KNOWN").unwrap();
     assert_eq!(p, Pattern::any_known_value());
-    assert_eq!(p.to_string(), "KNOWN");
+    assert_eq!(p.to_string(), "known");
 
     let p = Pattern::parse("KNOWN('1')").unwrap();
     assert_eq!(p, Pattern::known_value(KnownValue::new(1)));
-    assert_eq!(p.to_string(), "KNOWN('1')");
+    assert_eq!(p.to_string(), "'1'");
 
     let p = Pattern::parse("KNOWN('date')").unwrap();
     assert_eq!(p, Pattern::known_value_named("date"));
-    assert_eq!(p.to_string(), "KNOWN('date')");
+    assert_eq!(p.to_string(), "'date'");
 
     let p = Pattern::parse("KNOWN(/da.*/)").unwrap();
     let regex = regex::Regex::new("da.*").unwrap();
     assert_eq!(p, Pattern::known_value_regex(regex));
-    assert_eq!(p.to_string(), "KNOWN(/da.*/)");
+    assert_eq!(p.to_string(), "'/da.*/'");
 }
 
 #[test]

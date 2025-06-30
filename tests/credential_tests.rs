@@ -95,7 +95,7 @@ fn test_credential() {
 #[test]
 fn test_parsed_search_text_or_number() {
     let env = credential();
-    let pattern = Pattern::parse("SEARCH(ASSERTOBJ(TEXT|NUMBER))").unwrap();
+    let pattern = Pattern::parse("SEARCH(ASSERTOBJ(text|NUMBER))").unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 11);
 }
@@ -104,7 +104,7 @@ fn test_parsed_search_text_or_number() {
 fn test_parsed_firstname_capture() {
     let env = credential();
     let pattern_str =
-        r#"SEARCH(ASSERTPRED(TEXT("firstName"))->OBJ(TEXT("James")))"#;
+        r#"SEARCH(ASSERTPRED("firstName")->OBJ("James"))"#;
     let pattern = Pattern::parse(pattern_str).unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
@@ -114,7 +114,7 @@ fn test_parsed_firstname_capture() {
 fn test_search_capture_propagation() {
     let env = credential();
     let pattern_str =
-        r#"SEARCH(@cap(ASSERTPRED(TEXT("firstName"))->OBJ(TEXT("James"))))"#;
+        r#"SEARCH(@cap(ASSERTPRED("firstName")->OBJ("James")))"#;
     let pattern = Pattern::parse(pattern_str).unwrap();
     let (paths, caps) = pattern.paths_with_captures(&env);
     assert_eq!(paths.len(), 1);

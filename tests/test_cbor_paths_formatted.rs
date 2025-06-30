@@ -97,7 +97,7 @@ fn test_cbor_pattern_text_search_paths() {
     .unwrap();
     let envelope = Envelope::new(cbor_data);
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(TEXT)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/SEARCH(text)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 6 text values: "Alice", "apple", "banana", "name", "items",

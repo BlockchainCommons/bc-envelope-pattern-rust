@@ -77,7 +77,7 @@ fn test_dcbor_pattern_array_paths() {
     let envelope = Envelope::new(array_cbor);
 
     // Find all text values in the array
-    let pattern = Pattern::parse("CBOR(/SEARCH(TEXT)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/SEARCH(text)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     assert_eq!(paths.len(), 1, "Should find 1 text element"); // Should find "hello"

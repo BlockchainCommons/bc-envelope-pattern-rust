@@ -8,7 +8,7 @@ fn parse_bool_or() {
         p,
         Pattern::or(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p.to_string(), "true|false");
+    assert_eq!(p.to_string(), src);
 
     let spaced = "true | false";
     let p_spaced = Pattern::parse(spaced).unwrap();
@@ -80,9 +80,9 @@ fn parse_operator_precedence() {
 
 #[test]
 fn parse_not_patterns() {
-    let p = Pattern::parse(r#"!TEXT("hi")"#).unwrap();
+    let p = Pattern::parse(r#"!"hi""#).unwrap();
     assert_eq!(p, Pattern::not_matching(Pattern::text("hi")));
-    assert_eq!(p.to_string(), r#"!TEXT("hi")"#);
+    assert_eq!(p.to_string(), r#"!"hi""#);
 
     let expr = "!* & NONE";
     let p = Pattern::parse(expr).unwrap();
@@ -96,9 +96,9 @@ fn parse_not_patterns() {
 
 #[test]
 fn parse_search_pattern() {
-    let p = Pattern::parse("SEARCH(TEXT)").unwrap();
+    let p = Pattern::parse("SEARCH(text)").unwrap();
     assert_eq!(p, Pattern::search(Pattern::any_text()));
-    assert_eq!(p.to_string(), "SEARCH(TEXT)");
+    assert_eq!(p.to_string(), "SEARCH(text)");
 }
 
 #[test]
@@ -110,25 +110,25 @@ fn parse_repeat_patterns() {
     );
     assert_eq!(p.to_string(), "(WRAPPED)*");
 
-    let p = Pattern::parse("(TEXT)+?").unwrap();
+    let p = Pattern::parse("(text)+?").unwrap();
     assert_eq!(
         p,
         Pattern::repeat(Pattern::any_text(), 1.., Reluctance::Lazy)
     );
-    assert_eq!(p.to_string(), "(TEXT)+?");
+    assert_eq!(p.to_string(), "(text)+?");
 
     let p = Pattern::parse("(NUMBER){2,4}+").unwrap();
     assert_eq!(
         p,
         Pattern::repeat(Pattern::any_number(), 2..=4, Reluctance::Possessive)
     );
-    assert_eq!(p.to_string(), "(NUMBER){2,4}+");
+    assert_eq!(p.to_string(), "(number){2,4}+");
 }
 
 #[test]
 fn parse_capture_patterns() {
-    let src = "@name(NUMBER(1))";
-    let p = Pattern::parse(src).unwrap();
+    let src = "@name(1)";
+    let p = Pattern::parse("@name(NUMBER(1))").unwrap();
     assert_eq!(p, Pattern::capture("name", Pattern::number(1)));
     assert_eq!(p.to_string(), src);
 
@@ -140,7 +140,7 @@ fn parse_capture_patterns() {
 
 #[test]
 fn parse_nested_capture_patterns() {
-    let src = r#"@outer(@inner(TEXT("hi")))"#;
+    let src = r#"@outer(@inner("hi"))"#;
     let p = Pattern::parse(src).unwrap();
     assert_eq!(
         p,
@@ -154,8 +154,8 @@ fn parse_nested_capture_patterns() {
 
 #[test]
 fn parse_capture_name_variants() {
-    let src = "@cap_1(NUMBER(42))";
-    let p = Pattern::parse(src).unwrap();
+    let src = "@cap_1(42)";
+    let p = Pattern::parse("@cap_1(NUMBER(42))").unwrap();
     assert_eq!(p, Pattern::capture("cap_1", Pattern::number(42)));
     assert_eq!(p.to_string(), src);
 }

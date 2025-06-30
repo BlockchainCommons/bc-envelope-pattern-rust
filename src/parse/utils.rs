@@ -14,38 +14,6 @@ pub(crate) fn skip_ws(src: &str, pos: &mut usize) {
     }
 }
 
-pub(crate) fn parse_string_literal(src: &str) -> Result<(String, usize)> {
-    let mut pos = 0;
-    skip_ws(src, &mut pos);
-
-    let bytes = src.as_bytes();
-    if pos >= bytes.len() || bytes[pos] != b'"' {
-        return Err(Error::UnexpectedEndOfInput);
-    }
-    pos += 1;
-    let start = pos;
-    let mut escape = false;
-    while pos < bytes.len() {
-        let b = bytes[pos];
-        pos += 1;
-        if escape {
-            escape = false;
-            continue;
-        }
-        if b == b'\\' {
-            escape = true;
-            continue;
-        }
-        if b == b'"' {
-            let inner = &src[start..pos - 1];
-            let value = inner.replace(r#"\""#, r#"""#).replace(r#"\\"#, r#"\"#);
-            skip_ws(src, &mut pos);
-            return Ok((value, pos));
-        }
-    }
-    Err(Error::UnexpectedEndOfInput)
-}
-
 pub(crate) fn parse_uint_digits(src: &str, pos: &mut usize) -> Result<f64> {
     let start = *pos;
     while let Some(ch) = src[*pos..].chars().next() {

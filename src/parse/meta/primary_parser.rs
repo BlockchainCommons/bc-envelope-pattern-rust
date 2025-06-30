@@ -26,12 +26,12 @@ pub(crate) fn parse_primary(
     match token {
         Token::RepeatZeroOrMore => Ok(Pattern::any()), /* Support dcbor-pattern's * syntax */
         Token::Array => leaf::parse_array(lexer),
-        Token::BoolKeyword => Ok(Pattern::any_bool()), /* New dcbor-pattern
-                                                         * bool syntax */
-        Token::BoolTrue => Ok(Pattern::bool(true)), /* New dcbor-pattern
-                                                      * true syntax */
-        Token::BoolFalse => Ok(Pattern::bool(false)), /* New dcbor-pattern
-                                                        * false syntax */
+        Token::BoolKeyword => Ok(Pattern::any_bool()), /* New dcbor-pattern */
+        // bool syntax
+        Token::BoolTrue => Ok(Pattern::bool(true)), /* New dcbor-pattern */
+        // true syntax
+        Token::BoolFalse => Ok(Pattern::bool(false)), /* New dcbor-pattern */
+        // false syntax
         Token::ByteString => Ok(Pattern::any_byte_string()), /* New dcbor-pattern bstr syntax */
         Token::HexPattern(Ok(bytes)) => Ok(Pattern::byte_string(bytes)), /* New dcbor-pattern h'hex' syntax */
         Token::HexPattern(Err(e)) => Err(e),
@@ -67,7 +67,16 @@ pub(crate) fn parse_primary(
         Token::None => Ok(Pattern::none()),
         Token::Null => leaf::parse_null(lexer),
         Token::Number => leaf::parse_number(lexer),
-        Token::Text => leaf::parse_text(lexer),
+        Token::TextKeyword => Ok(Pattern::any_text()), /* New dcbor-pattern
+                                                         * text syntax */
+        Token::StringLiteral(Ok(s)) => Ok(Pattern::text(s)), /* New dcbor-pattern "string" syntax */
+        Token::StringLiteral(Err(e)) => Err(e),
+        Token::Regex(Ok(regex_str)) => {
+            let regex = regex::Regex::new(&regex_str)
+                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
+            Ok(Pattern::text_regex(regex))
+        }
+        Token::Regex(Err(e)) => Err(e),
         t => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
     }
 }
