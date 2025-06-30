@@ -22,120 +22,12 @@ This crate is now in preview release. You are likely to be asked for bug fixes, 
 - `dcbor-parse`: This crate provides a parser for dCBOR diagnostic notation, which is used to specify patterns in a human-readable format.
 - `dcbor-pattern`: This crate provides a pattern matcher for dCBOR values, which is used to match patterns against the leaves of the Envelope tree.
 
-## Current Status: `dcbor-pattern` Integration
-
-Basic integration of `dcbor-pattern` into `bc-envelope-pattern` has been successfully completed. This crate now delegates all CBOR leaf pattern matching to the mature `dcbor-pattern` crate while maintaining full backwards compatibility and envelope-specific functionality.
-
-### Integration Summary:
-
-Core integration work is complete and tested:
-- **Full `CBOR(/pattern/)` syntax support** using dcbor-pattern expressions (e.g., `CBOR(/NUMBER/)`, `CBOR(/TEXT/)`, `CBOR(/ARRAY/)`)
-- **Robust pattern validation** that correctly rejects invalid syntax (e.g., `uint`) and accepts valid patterns
-- **Complete backwards compatibility** - all existing APIs work unchanged
-- **Comprehensive test coverage** including integration tests and error handling validation
-- **Seamless error handling** with proper conversion from dcbor-pattern errors
-
-### Phase 2: Enhanced Path and Capture Integration - COMPLETED ✅
-
-**✅ Phase 2 integration is now complete!** bc-envelope-pattern now provides extended path details that show internal CBOR structure when dcbor-pattern matches within CBOR leaves.
-
-#### Completed Features:
-
-- **✅ Extended path details**: When dcbor-pattern matches within CBOR leaves, paths are extended to show internal CBOR structure elements as individual Envelope path components
-- **✅ Proper path conversion**: Uses `.into()` to convert `CBOR` objects to Envelope leaves and handles path extension correctly
-- **✅ Multiple path results**: The VM now properly spawns threads for each path returned by atomic patterns, enabling multiple path results for CBOR patterns
-- **✅ Comprehensive test coverage**: All tests now use `format_paths()` and `assert_actual_expected!` with `indoc!` for multiline expected strings, following the established rubric
-- **✅ Edge case handling**: Covers arrays, nested structures, single values, text searches, no matches, order preservation, complex nesting, and map key/value traversal
-- **✅ Code cleanup**: Removed debug output and ensured all test files follow the established rubric with proper formatting and assertions
-- **✅ All tests passing**: 267 tests pass (including 73 unit tests, 194 integration tests) with 3 ignored tests for future work
-
-#### Test Files Updated and Verified:
-- `tests/test_cbor_path_extension.rs` - Complete CBOR path extension test coverage
-- `tests/test_cbor_paths_formatted.rs` - Path formatting verification tests
-- `tests/test_dcbor_paths.rs` - Basic dcbor-pattern integration tests
-- `tests/test_extended_paths.rs` - Extended path functionality tests
-- `tests/common/mod.rs` - Fixed `assert_actual_expected!` macro
-
-#### Technical Implementation:
-
-- **CBORPattern path extension**: `CBORPattern::paths_with_captures` properly converts dcbor-pattern paths (Vec<CBOR>) into Envelope paths, handling root skipping and correct path extension
-- **VM thread spawning**: Updated `MatchPredicate` instruction to spawn threads for each path returned by `atomic_paths`, replacing single-path compilation
-- **Test framework compliance**: All relevant tests use the established rubric with `bc_envelope_pattern::format_paths()`, `assert_actual_expected!`, and `indoc!` for output validation
-- **Macro improvements**: Fixed the `assert_actual_expected!` macro to properly handle format arguments
-
-The integration now provides seamless access to both envelope-level structure and internal CBOR pattern matches, maintaining full backwards compatibility while significantly enhancing pattern matching capabilities.
-
-- **CBORPattern path extension**: `CBORPattern::paths_with_captures` properly converts dcbor-pattern paths (Vec<CBOR>) into Envelope paths, handling root skipping and correct path extension
-- **VM thread spawning**: Updated `MatchPredicate` instruction to spawn threads for each path returned by `atomic_paths`, replacing single-path compilation
-- **Test framework compliance**: All relevant tests use the established rubric with `bc_envelope_pattern::format_paths()`, `assert_actual_expected!`, and `indoc!` for output validation
-
-The integration now provides seamless access to both envelope-level structure and internal CBOR pattern matches, maintaining full backwards compatibility while significantly enhancing pattern matching capabilities.
-
-## Phase 3: Complete CBOR Pattern Capture Integration - COMPLETED ✅
-
-**✅ Phase 3 integration is now complete!** bc-envelope-pattern now provides full support for named captures in CBOR patterns, seamlessly integrating `dcbor-pattern`'s mature capture system.
-
-### Completed Features:
-
-- **✅ Full CBOR capture support**: Patterns like `CBOR(/@name(NUMBER)/)` now correctly return captures in addition to matches
-- **✅ Complete capture path conversion**: dcbor capture paths (Vec<CBOR>) are properly converted to envelope paths (Vec<Envelope>) while maintaining correct tree traversal semantics
-- **✅ Comprehensive VM integration**: The Pattern VM now properly propagates captures from atomic patterns through the `atomic_paths_with_captures` function
-- **✅ Seamless envelope + CBOR capture mixing**: Patterns like `@env(CBOR(/@dcbor(NUMBER)/))` correctly capture at both envelope and CBOR levels
-- **✅ Robust capture name handling**: No conflicts between envelope-level and CBOR-level capture names
-- **✅ Complex pattern support**: Nested captures, search patterns, array traversal, and multi-level structures all work correctly
-- **✅ Comprehensive test coverage**: 10 comprehensive tests covering all major use cases, edge cases, and performance scenarios
-- **✅ Zero regression**: All existing functionality continues to work unchanged
-
-### Technical Implementation:
-
-- **CBORPattern capture conversion**: Implemented full conversion logic from dcbor captures to envelope captures, including proper path extension and root skipping
-- **VM capture propagation**: Added `atomic_paths_with_captures` function to the VM that properly merges captures from leaf patterns
-- **Compile-time capture registration**: CBOR patterns now register their capture names during compilation so the VM can properly handle them
-- **Helper functions**: Created robust conversion utilities for transforming dcbor paths to envelope paths
-
-### Test Coverage:
-
-Created comprehensive test suite in `tests/test_cbor_captures.rs` with coverage for:
-- Simple dcbor captures: `CBOR(/@num(NUMBER(42))/)`
-- Search pattern captures: `CBOR(/@values(SEARCH(NUMBER))/)`
-- Nested structure captures: `CBOR(/@users(SEARCH(ARRAY(@name(TEXT) > @score(TEXT))))/)`
-- Mixed envelope + dcbor captures
-- Capture name conflict handling
-- Array traversal captures
-- Performance testing with large datasets
-- Edge cases (no matches, complex nesting)
-
-**All 10 CBOR capture tests pass**, confirming full integration success. The test suite has been modernized to use the established test rubric with `format_paths_with_captures` and `assert_actual_expected!` for proper output validation.
-
-### API Usage:
-
-The public API now fully supports CBOR captures:
-
-```rust
-// Create a CBOR pattern with named captures
-let dcbor_pattern = dcbor_pattern::Pattern::parse("@name(TEXT)").unwrap();
-let pattern = Pattern::cbor_pattern(dcbor_pattern);
-
-// Execute and get both paths and captures
-let (paths, captures) = pattern.paths_with_captures(&envelope);
-// captures["name"] now contains the captured text values
-```
-
-This integration maintains full backwards compatibility while significantly enhancing pattern expressiveness. The capture system now works seamlessly across both envelope structure patterns and internal CBOR content patterns.
-
-**✅ COMPLETE: All CBOR capture integration tests are now modernized, follow the test rubric, and pass successfully!**
-
-## Phase 4: Documentation and Final Polish - PLANNED
-
-### Development Guidelines for Contributors
-
 When working on this crate:
 
-1. **Maintain backwards compatibility**: All existing APIs must continue to work
-2. **Test thoroughly**: Run `cargo test` and `cargo clippy` before submitting changes
-3. **Follow established patterns**: New patterns should use the dcbor-pattern integration approach
-4. **Document changes**: Update both code documentation and this AGENTS.md file as needed
-5. **Validate dcbor-pattern syntax**: Use only valid dcbor-pattern expressions (e.g., `NUMBER`, not `uint`)
+1. **Test thoroughly**: Run `cargo test` and `cargo clippy` before submitting changes
+2. **Follow established patterns**: New patterns should use the dcbor-pattern integration approach
+3. **Document changes**: Update both code documentation and this AGENTS.md file as needed
+4. **Validate dcbor-pattern syntax**: Use only valid dcbor-pattern expressions (e.g., `NUMBER`, not `uint`)
 
 ### Architecture Notes
 
@@ -150,5 +42,12 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 - **CBOR/Envelope Isomorphism**: `CBOR` objects can be converted to Envelope leaves using `.into()`. Envelope leaves can be converted to `CBOR` objects using `.as_leaf()`.
 - **Easy Creation of CBOR Objects**: For tests, use `dcbor_parse::parse_dcbor_item()` to create `CBOR` objects from diagnostic notation strings. Prefer this over programmatically constructing `CBOR` objects.
-- **`dcbor-pattern` Pattern Expression (patex) Syntax**: Documented here: [../dcbor-pattern/docs/PatternSyntax.md](../dcbor-pattern/docs/PatternSyntax.md)
-- **`bc-envelope-pattern` Pattern Expression (patex) Syntax**: Documented here: [docs/PatternSyntax.md](docs/PatternSyntax.md)
+- **`dcbor-pattern` Pattern Expression (patex) Syntax**: Documented here: [../dcbor-pattern/docs/DCBORPatternSyntax.md](../dcbor-pattern/docs/DCBORPatternSyntax.md)
+- **`bc-envelope-pattern` Pattern Expression (patex) Syntax**: Documented here: [docs/EnvelopePatternSyntax.md](docs/EnvelopePatternSyntax.md)
+
+
+## Current Status: update patterns.
+
+Next task:
+
+- Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax.
