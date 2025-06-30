@@ -60,4 +60,6 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ### NEXT TASK:
 
-- Complete testing and documentation for the TEXT pattern updates.
+- Update the `NUMBER` pattern to use the `dcbor-pattern` crate's `number` syntax for matching numbers.
+  - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
+  - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
