@@ -46,15 +46,6 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a byte string with the specified hex value. Note that the `h'...'` syntax is used to denote hex strings in CBOR diagnostic notation, so we use it here for familiarity.
     - `h'/regex/'`
         - Matches a byte string that matches the specified binary regex.
-- CBOR
-    - `CBOR`
-        - Matches any CBOR value.
-    - `CBOR ( diagnostic-notation )`
-        - Matches a CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
-    - `CBOR ( ur:type/value )`
-        - Matches a CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
-    - `CBOR ( /patex/ )`
-        - Matches a CBOR value that matches the specified dcbor-pattern expression. This enables advanced pattern matching within CBOR structures including quantifiers, captures, and complex structural patterns. The pattern expression uses dcbor-pattern syntax.
 - Date
     - `date`
         - Matches any date value.
@@ -69,14 +60,14 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `date'/regex/'`
         - Matches a date value that matches the specified regex.
 - Known Value
-    - `KNOWN`
+    - `known`
         - Matches any known value. (See the `known-values` crate for more information.)
-    - `KNOWN ( 'value' )`
-        - Matches the specified known value, which is a u64 value. Gordian Envelope prints known values enclosed in single quotes, so we use that syntax here for familiarity.
-    - `KNOWN ( 'name' )`
+    - `'value'`
+        - Matches the specified known value, which is a u64 value. dCBOR prints known values enclosed in single quotes, so we use that syntax here for familiarity.
+    - `'name'`
         - Matches the known value with the specified name. Again we use single quotes here for familiarity.
-    - `KNOWN ( /regex/ )`
-        - Matches a known value with a name that matches the specified regex. We do not use the single quotes here.
+    - `'/regex/'`
+        - Matches a known value with a name that matches the specified regex.
 - Map
     - `MAP`
         - Matches any map.
@@ -124,6 +115,15 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a text value with the specified string. Gordian Envelope and CBOR diagnostic notation use double quotes for text strings, so we use that syntax here for familiarity.
     - `/regex/`
         - Matches a text value that matches the specified regex. No double quotes are used here, as the regex is not a string but a pattern to match against the text value.
+- CBOR
+    - `CBOR`
+        - Matches any CBOR value.
+    - `CBOR ( diagnostic-notation )`
+        - Matches a CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
+    - `CBOR ( ur:type/value )`
+        - Matches a CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
+    - `CBOR ( /patex/ )`
+        - Matches a CBOR value that matches the specified dcbor-pattern expression. This enables advanced pattern matching within CBOR structures including quantifiers, captures, and complex structural patterns. The pattern expression uses dcbor-pattern syntax.
 
 ## Structure Patterns
 

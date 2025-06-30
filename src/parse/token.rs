@@ -110,7 +110,7 @@ pub enum Token {
     #[token("date")]
     DateKeyword,
 
-    #[token("KNOWN")]
+    #[token("known")]
     Known,
 
     #[token("MAP")]
@@ -213,6 +213,12 @@ pub enum Token {
 
     #[token("{", parse_range)]
     Range(Result<Quantifier>),
+
+    #[token("'", parse_single_quoted_pattern)]
+    SingleQuotedPattern(Result<String>),
+
+    #[token("'/", parse_single_quoted_regex)]
+    SingleQuotedRegex(Result<String>),
 }
 
 /// Callback used by the `Regex` variant above.
@@ -465,6 +471,52 @@ fn parse_string_literal_token(lex: &mut Lexer<Token>) -> Result<String> {
 
     // Unterminated string literal
     Err(Error::UnexpectedEndOfInput)
+}
+
+/// Callback used by the `SingleQuotedPattern` variant above.
+fn parse_single_quoted_pattern(lex: &mut Lexer<Token>) -> Result<String> {
+    let src = lex.remainder(); // everything after the first '
+
+    // Parse content until we find the closing '
+    for (i, ch) in src.char_indices() {
+        if ch == '\'' {
+            // Found the closing delimiter
+            let content = &src[..i];
+            lex.bump(i + 1); // +1 to also eat the '
+            return Ok(content.to_string());
+        }
+    }
+
+    // Unterminated single quoted literal
+    Err(Error::UnterminatedRegex(lex.span()))
+}
+
+/// Callback used by the `SingleQuotedRegex` variant above.
+fn parse_single_quoted_regex(lex: &mut Lexer<Token>) -> Result<String> {
+    let src = lex.remainder(); // everything after the first '/
+    let mut escape = false;
+
+    for (i, ch) in src.char_indices() {
+        match (ch, escape) {
+            ('\\', false) => escape = true, // start of an escape
+            ('/', false) => {
+                // Found the closing delimiter
+                lex.bump(i + 1); // +1 to also eat the '/'
+                if i + 1 < src.len() && src.chars().nth(i + 1) == Some('\'') {
+                    lex.bump(1); // eat the closing '
+                }
+                let regex_str = &src[..i];
+                match regex::Regex::new(regex_str) {
+                    Ok(_) => return Ok(regex_str.to_string()),
+                    Err(_) => return Err(Error::InvalidRegex(lex.span())),
+                }
+            }
+            _ => escape = false, // any other char ends an escape
+        }
+    }
+
+    // Unterminated regex literal
+    Err(Error::UnterminatedRegex(lex.span()))
 }
 
 #[cfg(test)]

@@ -60,8 +60,19 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - Update the `NUMBER` pattern to use the `dcbor-pattern` crate's `number` syntax for matching numbers.
 - Update the `DATE` pattern to use the `dcbor-pattern` crate's `date` syntax for matching dates.
 
+### COMPLETE:
+
+- Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax for matching any envelope.
+- Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.
+- Update the `NULL` pattern to use the `dcbor-pattern` crate's `null` syntax for matching null values.
+- Update the `BSTR` pattern to use the `dcbor-pattern` crate's `bstr` syntax for matching byte strings.
+- Update the `TEXT` pattern to use the `dcbor-pattern` crate's `text` syntax for matching text strings.
+- Update the `NUMBER` pattern to use the `dcbor-pattern` crate's `number` syntax for matching numbers.
+- Update the `DATE` pattern to use the `dcbor-pattern` crate's `date` syntax for matching dates.
+- Update the `KNOWN` pattern to use the `dcbor-pattern` crate's `known` syntax for matching known values.
+
 ### NEXT TASK:
 
-- Update the `KNOWN` pattern to use the `dcbor-pattern` crate's `known` syntax for matching arrays.
+- Update the `TAG` pattern to use the `dcbor-pattern` crate's `tagged` syntax for matching arrays.
   - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
   - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.

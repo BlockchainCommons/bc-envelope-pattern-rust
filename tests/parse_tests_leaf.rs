@@ -227,19 +227,19 @@ fn parse_tag_patterns() {
 
 #[test]
 fn parse_known_value_patterns() {
-    let p = Pattern::parse("KNOWN").unwrap();
+    let p = Pattern::parse("known").unwrap();
     assert_eq!(p, Pattern::any_known_value());
     assert_eq!(p.to_string(), "known");
 
-    let p = Pattern::parse("KNOWN('1')").unwrap();
+    let p = Pattern::parse("'1'").unwrap();
     assert_eq!(p, Pattern::known_value(KnownValue::new(1)));
     assert_eq!(p.to_string(), "'1'");
 
-    let p = Pattern::parse("KNOWN('date')").unwrap();
+    let p = Pattern::parse("'date'").unwrap();
     assert_eq!(p, Pattern::known_value_named("date"));
     assert_eq!(p.to_string(), "'date'");
 
-    let p = Pattern::parse("KNOWN(/da.*/)").unwrap();
+    let p = Pattern::parse("'/da.*/'").unwrap();
     let regex = regex::Regex::new("da.*").unwrap();
     assert_eq!(p, Pattern::known_value_regex(regex));
     assert_eq!(p.to_string(), "'/da.*/'");

@@ -5,6 +5,7 @@ use super::{
     search_parser::parse_search,
 };
 use crate::{Error, Pattern, Result};
+use known_values::KnownValue;
 
 pub(crate) fn parse_primary(
     lexer: &mut logos::Lexer<Token>,
@@ -48,7 +49,22 @@ pub(crate) fn parse_primary(
         }
         Token::DatePattern(Err(e)) => Err(e),
         Token::Tag => leaf::parse_tag(lexer),
-        Token::Known => leaf::parse_known_value(lexer),
+        Token::Known => Ok(Pattern::any_known_value()), /* New dcbor-pattern known syntax */
+        Token::SingleQuotedPattern(Ok(content)) => {
+            // Parse single-quoted known value pattern
+            if let Ok(value) = content.parse::<u64>() {
+                Ok(Pattern::known_value(KnownValue::new(value)))
+            } else {
+                Ok(Pattern::known_value_named(content))
+            }
+        }
+        Token::SingleQuotedPattern(Err(e)) => Err(e),
+        Token::SingleQuotedRegex(Ok(regex_str)) => {
+            let regex = regex::Regex::new(&regex_str)
+                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
+            Ok(Pattern::known_value_regex(regex))
+        }
+        Token::SingleQuotedRegex(Err(e)) => Err(e),
         Token::Leaf => Ok(Pattern::any_leaf()),
         Token::Cbor => leaf::parse_cbor(lexer),
         Token::Map => leaf::parse_map(lexer),
