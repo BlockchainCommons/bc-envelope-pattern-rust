@@ -104,7 +104,7 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 #### Important Notes:
 
-    - Remember: you are just a proxy for the functionality in `dcbor-pattern`. You do not need to implement any additional logic for the `array` pattern, just have `dcbor-pattern` parse from `[` through `]`. There will be no envelope patterns inside the `array` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
+    - Remember: The array pattern is just a proxy for the functionality in `dcbor-pattern`, and all you are doing is adapting the existing syntax. You do not need to implement any additional logic for the `array` pattern, just pass from `[` through `]` to `dcbor-pattern`. There will be no envelope patterns inside the `array` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
     - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
     - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
