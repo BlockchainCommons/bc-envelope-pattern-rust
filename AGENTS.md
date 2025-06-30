@@ -62,34 +62,6 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ### NEXT TASK:
 
-None - The DATE pattern update has been completed successfully.
-
-## DATE Pattern Update Summary
-
-The DATE pattern has been successfully updated from the old uppercase `DATE(...)` syntax to the new dcbor-pattern lowercase `date'...'` syntax:
-
-**Old syntax (removed):**
-- `DATE` - matches any date
-- `DATE(iso-8601)` - matches specific date
-- `DATE(iso-8601...iso-8601)` - matches date range
-- `DATE(iso-8601...)` - matches date earliest
-- `DATE(...iso-8601)` - matches date latest
-- `DATE(/regex/)` - matches date regex
-
-**New syntax (implemented):**
-- `date` - matches any date
-- `date'iso-8601'` - matches specific date
-- `date'iso-8601...iso-8601'` - matches date range
-- `date'iso-8601...'` - matches date earliest
-- `date'...iso-8601'` - matches date latest
-- `date'/regex/'` - matches date regex
-
-**Changes made:**
-1. **Token updates**: Replaced `#[token("DATE")]` with `#[token("date")]` DateKeyword and added `#[token("date'", parse_date_pattern)]` DatePattern
-2. **Parser updates**: Updated primary parser to handle new DateKeyword and DatePattern tokens
-3. **Date parser rewrite**: Completely rewrote `date_parser.rs` to use new `parse_date_content()` function supporting dcbor-pattern syntax
-4. **Test updates**: Updated all tests to use the new lowercase syntax
-5. **Documentation updates**: Updated `EnvelopePatternSyntax.md` to reflect new syntax
-6. **Cleanup**: Removed unused `parse_date_inner()` and `parse_iso8601()` functions
-
-All tests pass and clippy reports no issues. The implementation is complete and ready for use.
+- Update the `KNOWN` pattern to use the `dcbor-pattern` crate's `known` syntax for matching arrays.
+  - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
+  - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
