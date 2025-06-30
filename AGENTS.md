@@ -48,6 +48,9 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ## Current Status: update patterns.
 
-Next task:
+- This is de novo development, so DO NOT take any action to ensure backward-compatibility.
+- Once you have completed the `NEXT TASK`, stop and let me run tests.
 
-- Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax.
+### NEXT TASK:
+
+- Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax for matching any envelope.
