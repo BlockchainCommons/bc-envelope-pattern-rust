@@ -76,3 +76,4 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - Update the `TAG` pattern to use the `dcbor-pattern` crate's `tagged` syntax for matching arrays.
   - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
   - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
+  - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
