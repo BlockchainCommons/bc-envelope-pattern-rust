@@ -153,23 +153,23 @@ mod tests {
 
     #[test]
     fn test_number_pattern_display() {
-        assert_eq!(NumberPattern::any().to_string(), "NUMBER");
-        assert_eq!(NumberPattern::exact(42.0).to_string(), "NUMBER(42)");
+        assert_eq!(NumberPattern::any().to_string(), "number");
+        assert_eq!(NumberPattern::exact(42.0).to_string(), "42");
         assert_eq!(
             NumberPattern::range(1.0..=10.0).to_string(),
-            "NUMBER(1...10)"
+            "1...10"
         );
-        assert_eq!(NumberPattern::greater_than(5.0).to_string(), "NUMBER(>5)");
+        assert_eq!(NumberPattern::greater_than(5.0).to_string(), ">5");
         assert_eq!(
             NumberPattern::greater_than_or_equal(5.0).to_string(),
-            "NUMBER(>=5)"
+            ">=5"
         );
-        assert_eq!(NumberPattern::less_than(5.0).to_string(), "NUMBER(<5)");
+        assert_eq!(NumberPattern::less_than(5.0).to_string(), "<5");
         assert_eq!(
             NumberPattern::less_than_or_equal(5.0).to_string(),
-            "NUMBER(<=5)"
+            "<=5"
         );
-        assert_eq!(NumberPattern::nan().to_string(), "NUMBER(NaN)");
+        assert_eq!(NumberPattern::nan().to_string(), "NaN");
     }
 
     #[test]

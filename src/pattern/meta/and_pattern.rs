@@ -76,6 +76,6 @@ mod tests {
         let pattern1 = Pattern::number_greater_than(5);
         let pattern2 = Pattern::number_less_than(10);
         let and_pattern = AndPattern::new(vec![pattern1, pattern2]);
-        assert_eq!(and_pattern.to_string(), "NUMBER(>5)&NUMBER(<10)");
+        assert_eq!(and_pattern.to_string(), ">5&<10");
     }
 }

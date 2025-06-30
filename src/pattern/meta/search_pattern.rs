@@ -116,6 +116,6 @@ mod tests {
     #[test]
     fn test_search_pattern_display() {
         let pattern = SearchPattern::new(Pattern::text("test"));
-        assert_eq!(pattern.to_string(), r#"SEARCH(TEXT("test"))"#);
+        assert_eq!(pattern.to_string(), r#"SEARCH("test")"#);
     }
 }

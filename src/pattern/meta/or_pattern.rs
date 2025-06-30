@@ -112,6 +112,6 @@ mod tests {
         let pattern1 = Pattern::text("Alice");
         let pattern2 = Pattern::text("Bob");
         let or_pattern = OrPattern::new(vec![pattern1, pattern2]);
-        assert_eq!(or_pattern.to_string(), r#"TEXT("Alice")|TEXT("Bob")"#);
+        assert_eq!(or_pattern.to_string(), r#""Alice"|"Bob""#);
     }
 }

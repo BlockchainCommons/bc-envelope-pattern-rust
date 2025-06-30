@@ -113,9 +113,9 @@ mod tests {
     #[test]
     fn test_not_pattern_display() {
         let pattern = NotPattern::new(Pattern::text("test"));
-        assert_eq!(pattern.to_string(), r#"!TEXT("test")"#);
+        assert_eq!(pattern.to_string(), r#"!"test""#);
 
         let pattern = NotPattern::new(Pattern::any());
-        assert_eq!(pattern.to_string(), "!ANY");
+        assert_eq!(pattern.to_string(), "!*");
     }
 }

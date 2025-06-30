@@ -265,28 +265,28 @@ mod tests {
     #[test]
     fn test_date_pattern_display() {
         let pattern = DatePattern::any();
-        assert_eq!(pattern.to_string(), "DATE");
+        assert_eq!(pattern.to_string(), "date");
 
         let pattern = DatePattern::value(Date::from_ymd(2023, 12, 25));
-        assert_eq!(pattern.to_string(), "DATE(2023-12-25)");
+        assert_eq!(pattern.to_string(), "date'2023-12-25'");
 
         let pattern = DatePattern::range(
             Date::from_ymd(2023, 12, 20)..=Date::from_ymd(2023, 12, 30),
         );
-        assert_eq!(pattern.to_string(), "DATE(2023-12-20...2023-12-30)");
+        assert_eq!(pattern.to_string(), "date'2023-12-20...2023-12-30'");
 
         let pattern = DatePattern::earliest(Date::from_ymd(2023, 12, 25));
-        assert_eq!(pattern.to_string(), "DATE(2023-12-25...)");
+        assert_eq!(pattern.to_string(), "date'2023-12-25...'");
 
         let pattern = DatePattern::latest(Date::from_ymd(2023, 12, 25));
-        assert_eq!(pattern.to_string(), "DATE(...2023-12-25)");
+        assert_eq!(pattern.to_string(), "date'...2023-12-25'");
 
         let pattern = DatePattern::iso8601("2023-12-25");
-        assert_eq!(pattern.to_string(), "DATE(2023-12-25)");
+        assert_eq!(pattern.to_string(), "date'2023-12-25'");
 
         let pattern =
             DatePattern::regex(regex::Regex::new(r"^2023-.*").unwrap());
-        assert_eq!(pattern.to_string(), "DATE(/^2023-.*/)");
+        assert_eq!(pattern.to_string(), "date'/^2023-.*/'");
     }
 
     #[test]

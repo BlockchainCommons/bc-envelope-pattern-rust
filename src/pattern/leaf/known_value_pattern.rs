@@ -225,14 +225,14 @@ mod tests {
         bc_envelope::register_tags();
 
         let pattern = KnownValuePattern::any();
-        assert_eq!(pattern.to_string(), "KNOWN");
+        assert_eq!(pattern.to_string(), "known");
         let pattern = KnownValuePattern::value(known_values::DATE);
-        assert_eq!(pattern.to_string(), "KNOWN('date')");
+        assert_eq!(pattern.to_string(), "'date'");
         let pattern = KnownValuePattern::named("date");
-        assert_eq!(pattern.to_string(), "KNOWN('date')");
+        assert_eq!(pattern.to_string(), "'date'");
         let regex = regex::Regex::new(r"^da.*").unwrap();
         let pattern = KnownValuePattern::regex(regex);
-        assert_eq!(pattern.to_string(), "KNOWN(/^da.*/)");
+        assert_eq!(pattern.to_string(), "'/^da.*/'");
     }
 
     #[test]

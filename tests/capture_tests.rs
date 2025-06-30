@@ -10,7 +10,7 @@ fn capture_simple_number() {
     let (paths, caps) = pat.paths_with_captures(&env);
     assert_eq!(paths.len(), 1);
     assert_eq!(caps.get("num").unwrap().len(), 1);
-    assert_eq!(pat.to_string(), "@num(NUMBER(42))");
+    assert_eq!(pat.to_string(), "@num(42)");
 }
 
 #[test]

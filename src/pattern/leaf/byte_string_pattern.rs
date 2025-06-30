@@ -170,15 +170,15 @@ mod tests {
 
     #[test]
     fn test_byte_string_pattern_display() {
-        assert_eq!(ByteStringPattern::any().to_string(), "BSTR");
+        assert_eq!(ByteStringPattern::any().to_string(), "bstr");
         assert_eq!(
             ByteStringPattern::value(vec![1, 2, 3]).to_string(),
-            r#"BSTR(h'010203')"#
+            r#"h'010203'"#
         );
         let regex = regex::bytes::Regex::new(r"^\d+$").unwrap();
         assert_eq!(
             ByteStringPattern::regex(regex).to_string(),
-            r"BSTR(/^\d+$/)"
+            r"h'/^\d+$/'"
         );
     }
 

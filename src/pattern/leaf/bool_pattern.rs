@@ -99,9 +99,9 @@ mod tests {
 
     #[test]
     fn test_bool_pattern_display() {
-        assert_eq!(BoolPattern::any().to_string(), "BOOL");
-        assert_eq!(BoolPattern::value(true).to_string(), "BOOL(true)");
-        assert_eq!(BoolPattern::value(false).to_string(), "BOOL(false)");
+        assert_eq!(BoolPattern::any().to_string(), "bool");
+        assert_eq!(BoolPattern::value(true).to_string(), "true");
+        assert_eq!(BoolPattern::value(false).to_string(), "false");
     }
 
     #[test]
