@@ -157,10 +157,10 @@ impl Matcher for TaggedPattern {
 impl std::fmt::Display for TaggedPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TaggedPattern::Any => write!(f, "TAG"),
-            TaggedPattern::Value(tag) => write!(f, "TAG({})", tag),
-            TaggedPattern::Named(name) => write!(f, "TAG({})", name),
-            TaggedPattern::Regex(regex) => write!(f, "TAG(/{}/)", regex),
+            TaggedPattern::Any => write!(f, "tagged"),
+            TaggedPattern::Value(tag) => write!(f, "tagged({})", tag),
+            TaggedPattern::Named(name) => write!(f, "tagged({})", name),
+            TaggedPattern::Regex(regex) => write!(f, "tagged(/{}/)", regex),
         }
     }
 }
@@ -283,13 +283,13 @@ mod tests {
         bc_envelope::register_tags();
 
         let pattern = TaggedPattern::any();
-        assert_eq!(pattern.to_string(), "TAG");
+        assert_eq!(pattern.to_string(), "tagged");
         let pattern = TaggedPattern::value(100);
-        assert_eq!(pattern.to_string(), "TAG(100)");
+        assert_eq!(pattern.to_string(), "tagged(100)");
         let pattern = TaggedPattern::named("date");
-        assert_eq!(pattern.to_string(), "TAG(date)");
+        assert_eq!(pattern.to_string(), "tagged(date)");
         let regex = regex::Regex::new(r"^da.*").unwrap();
         let pattern = TaggedPattern::regex(regex);
-        assert_eq!(pattern.to_string(), "TAG(/^da.*/)");
+        assert_eq!(pattern.to_string(), "tagged(/^da.*/)");
     }
 }

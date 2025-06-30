@@ -122,8 +122,8 @@ pub enum Token {
     #[token("number")]
     NumberKeyword,
 
-    #[token("TAG")]
-    Tag,
+    #[token("tagged")]
+    Tagged,
 
     // Meta Pattern Keywords
     #[token("NONE")]

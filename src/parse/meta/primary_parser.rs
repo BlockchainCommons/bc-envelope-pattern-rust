@@ -1,3 +1,5 @@
+use known_values::KnownValue;
+
 use super::{
     super::{Token, leaf, structure},
     capture_parser::parse_capture,
@@ -5,7 +7,6 @@ use super::{
     search_parser::parse_search,
 };
 use crate::{Error, Pattern, Result};
-use known_values::KnownValue;
 
 pub(crate) fn parse_primary(
     lexer: &mut logos::Lexer<Token>,
@@ -42,14 +43,16 @@ pub(crate) fn parse_primary(
             Ok(Pattern::byte_string_binary_regex(regex))
         }
         Token::HexBinaryRegex(Err(e)) => Err(e),
-        Token::DateKeyword => Ok(Pattern::any_date()), /* New dcbor-pattern date syntax */
+        Token::DateKeyword => Ok(Pattern::any_date()), /* New dcbor-pattern
+                                                         * date syntax */
         Token::DatePattern(Ok(content)) => {
             // Parse the dcbor-pattern date syntax
             leaf::parse_date_content(content)
         }
         Token::DatePattern(Err(e)) => Err(e),
-        Token::Tag => leaf::parse_tag(lexer),
-        Token::Known => Ok(Pattern::any_known_value()), /* New dcbor-pattern known syntax */
+        Token::Tagged => leaf::parse_tag(lexer),
+        Token::Known => Ok(Pattern::any_known_value()), /* New dcbor-pattern
+                                                          * known syntax */
         Token::SingleQuotedPattern(Ok(content)) => {
             // Parse single-quoted known value pattern
             if let Ok(value) = content.parse::<u64>() {

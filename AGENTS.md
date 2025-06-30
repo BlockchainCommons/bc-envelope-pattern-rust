@@ -74,6 +74,31 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 ### NEXT TASK:
 
 - Update the `TAG` pattern to use the `dcbor-pattern` crate's `tagged` syntax for matching arrays.
-  - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
-  - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
-  - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
+
+#### Old Syntax:
+    - `TAG`
+        - Matches any CBOR tagged value.
+    - `TAG ( value )`
+        - Matches the specified CBOR tagged value. This is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
+    - `TAG ( name )`
+        - Matches the CBOR tagged value with the specified name. It is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
+    - `TAG ( /regex/ )`
+        - Matches a CBOR tagged value with a name that matches the specified regex.
+
+#### New Syntax:
+    - `tagged`
+        - Matches any CBOR tagged value.
+    - `tagged ( value, pattern )`
+        - Matches the specified CBOR tagged value with content that matches the given pattern. The tag value is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
+    - `tagged ( name, pattern )`
+        - Matches the CBOR tagged value with the specified name and content that matches the given pattern. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
+    - `tagged ( /regex/, pattern )`
+        - Matches a CBOR tagged value with a name that matches the specified regex and content that matches the given pattern.
+
+#### Important Notes:
+    - Remember: once you've parsed `tagged` or `tagged(value, pattern)`, you are just a proxy for the functionality in `dcbor-pattern`. You do not need to implement any additional logic for the `tagged` pattern. There will be no envelope patterns inside the `tagged` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
+    - `dcbor-pattern` can do everything including looking up tag names.
+    - You *do* need to call `bc_envelope::register_tags()` at the start of *every* test that may need tag name resolution.
+    - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
+    - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
+    - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
