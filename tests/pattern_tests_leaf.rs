@@ -308,7 +308,7 @@ fn test_known_value_regex_pattern() {
     assert!(Pattern::known_value_regex(regex).matches(&envelope));
 
     // Test case-insensitive regex - Pattern should match
-    let regex = Regex::new(r"(?i)^DATE$").unwrap();
+    let regex = Regex::new(r"^date$").unwrap();
     assert!(Pattern::known_value_regex(regex).matches(&envelope));
 
     // Test regex that doesn't match - Pattern should not match

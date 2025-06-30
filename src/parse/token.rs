@@ -107,8 +107,8 @@ pub enum Token {
     #[token("CBOR")]
     Cbor,
 
-    #[token("DATE")]
-    Date,
+    #[token("date")]
+    DateKeyword,
 
     #[token("KNOWN")]
     Known,
@@ -208,6 +208,9 @@ pub enum Token {
     #[token("h'/", parse_hex_binary_regex)]
     HexBinaryRegex(Result<String>),
 
+    #[token("date'", parse_date_pattern)]
+    DatePattern(Result<String>),
+
     #[token("{", parse_range)]
     Range(Result<Quantifier>),
 }
@@ -284,6 +287,24 @@ fn parse_hex_binary_regex(lex: &mut Lexer<Token>) -> Result<String> {
     }
 
     // Unterminated regex literal
+    Err(Error::UnterminatedRegex(lex.span()))
+}
+
+/// Callback used by the `DatePattern` variant above.
+fn parse_date_pattern(lex: &mut Lexer<Token>) -> Result<String> {
+    let src = lex.remainder(); // everything after the first date'
+
+    // Parse content until we find the closing '
+    for (i, ch) in src.char_indices() {
+        if ch == '\'' {
+            // Found the closing delimiter
+            let content = &src[..i];
+            lex.bump(i + 1); // +1 to also eat the '
+            return Ok(content.to_string());
+        }
+    }
+
+    // Unterminated date pattern literal
     Err(Error::UnterminatedRegex(lex.span()))
 }
 
@@ -469,7 +490,10 @@ mod tests {
 
         // Test leaf pattern keywords
         assert_eq!(Token::lexer("ARRAY").next(), Some(Ok(Token::Array)));
-        assert_eq!(Token::lexer("number").next(), Some(Ok(Token::NumberKeyword)));
+        assert_eq!(
+            Token::lexer("number").next(),
+            Some(Ok(Token::NumberKeyword))
+        );
 
         // Test literals
         assert_eq!(Token::lexer("bool").next(), Some(Ok(Token::BoolKeyword)));
@@ -519,7 +543,8 @@ mod tests {
                 // Successfully parsed as unsigned integer
             }
             Some(Ok(Token::Integer(Ok(42)))) => {
-                // Successfully parsed as signed integer (this is also acceptable)
+                // Successfully parsed as signed integer (this is also
+                // acceptable)
             }
             _ => {
                 panic!("Failed to parse integer literal, got: {:?}", token);
@@ -534,7 +559,8 @@ mod tests {
                 // Successfully parsed as unsigned integer
             }
             Some(Ok(Token::Integer(Ok(0)))) => {
-                // Successfully parsed as signed integer (this is also acceptable)
+                // Successfully parsed as signed integer (this is also
+                // acceptable)
             }
             _ => {
                 panic!("Failed to parse zero literal, got: {:?}", token);

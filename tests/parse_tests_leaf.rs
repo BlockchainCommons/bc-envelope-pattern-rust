@@ -148,32 +148,32 @@ fn parse_bstr_patterns() {
 
 #[test]
 fn parse_date_patterns() {
-    let p = Pattern::parse("DATE").unwrap();
+    let p = Pattern::parse("date").unwrap();
     assert_eq!(p, Pattern::any_date());
     assert_eq!(p.to_string(), "date");
 
-    let p = Pattern::parse("DATE(2023-12-25)").unwrap();
+    let p = Pattern::parse("date'2023-12-25'").unwrap();
     let d = Date::from_string("2023-12-25").unwrap();
     assert_eq!(p, Pattern::date(d.clone()));
     assert_eq!(p.to_string(), "date'2023-12-25'");
 
-    let p = Pattern::parse("DATE(2023-12-24...2023-12-26)").unwrap();
+    let p = Pattern::parse("date'2023-12-24...2023-12-26'").unwrap();
     let start = Date::from_string("2023-12-24").unwrap();
     let end = Date::from_string("2023-12-26").unwrap();
     assert_eq!(p, Pattern::date_range(start..=end));
     assert_eq!(p.to_string(), "date'2023-12-24...2023-12-26'");
 
-    let p = Pattern::parse("DATE(2023-12-24...)").unwrap();
+    let p = Pattern::parse("date'2023-12-24...'").unwrap();
     let start = Date::from_string("2023-12-24").unwrap();
     assert_eq!(p, Pattern::date_earliest(start.clone()));
     assert_eq!(p.to_string(), "date'2023-12-24...'");
 
-    let p = Pattern::parse("DATE(...2023-12-26)").unwrap();
+    let p = Pattern::parse("date'...2023-12-26'").unwrap();
     let end = Date::from_string("2023-12-26").unwrap();
     assert_eq!(p, Pattern::date_latest(end.clone()));
     assert_eq!(p.to_string(), "date'...2023-12-26'");
 
-    let p = Pattern::parse("DATE(/2023-.*/)").unwrap();
+    let p = Pattern::parse("date'/2023-.*/'").unwrap();
     let regex = regex::Regex::new("2023-.*").unwrap();
     assert_eq!(p, Pattern::date_regex(regex));
     assert_eq!(p.to_string(), "date'/2023-.*/'");

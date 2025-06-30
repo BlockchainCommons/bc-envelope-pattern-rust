@@ -56,17 +56,17 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `CBOR ( /patex/ )`
         - Matches a CBOR value that matches the specified dcbor-pattern expression. This enables advanced pattern matching within CBOR structures including quantifiers, captures, and complex structural patterns. The pattern expression uses dcbor-pattern syntax.
 - Date
-    - `DATE`
+    - `date`
         - Matches any date value.
-    - `DATE ( iso-8601 )`
-        - Matches a date value with the specified ISO 8601 format. This is a bare string with no delimiters apart from the enclosing parentheses.
-    - `DATE ( iso-8601 ... iso-8601 )`
+    - `date'iso-8601'`
+        - Matches a date value with the specified ISO 8601 format.
+    - `date'iso-8601...iso-8601'`
         - Matches a date value within the specified range.
-    - `DATE ( iso-8601 ... )`
+    - `date'iso-8601...'`
         - Matches a date value greater than or equal to the specified ISO 8601 date.
-    - `DATE ( ... iso-8601 )`
+    - `date'...iso-8601'`
         - Matches a date value less than or equal to the specified ISO 8601 date.
-    - `DATE ( /regex/ )`
+    - `date'/regex/'`
         - Matches a date value that matches the specified regex.
 - Known Value
     - `KNOWN`

@@ -41,7 +41,12 @@ pub(crate) fn parse_primary(
             Ok(Pattern::byte_string_binary_regex(regex))
         }
         Token::HexBinaryRegex(Err(e)) => Err(e),
-        Token::Date => leaf::parse_date(lexer),
+        Token::DateKeyword => Ok(Pattern::any_date()), /* New dcbor-pattern date syntax */
+        Token::DatePattern(Ok(content)) => {
+            // Parse the dcbor-pattern date syntax
+            leaf::parse_date_content(content)
+        }
+        Token::DatePattern(Err(e)) => Err(e),
         Token::Tag => leaf::parse_tag(lexer),
         Token::Known => leaf::parse_known_value(lexer),
         Token::Leaf => Ok(Pattern::any_leaf()),
