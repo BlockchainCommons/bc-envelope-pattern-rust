@@ -100,14 +100,14 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `-Infinity`
         - Matches negative infinity.
 - Tagged
-    - `TAG`
+    - `tagged`
         - Matches any CBOR tagged value.
-    - `TAG ( value )`
-        - Matches the specified CBOR tagged value. This is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
-    - `TAG ( name )`
-        - Matches the CBOR tagged value with the specified name. It is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
-    - `TAG ( /regex/ )`
-        - Matches a CBOR tagged value with a name that matches the specified regex.
+    - `tagged ( value, pattern )`
+        - Matches the specified CBOR tagged value with content that matches the given pattern. The tag value is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
+    - `tagged ( name, pattern )`
+        - Matches the CBOR tagged value with the specified name and content that matches the given pattern. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
+    - `tagged ( /regex/, pattern )`
+        - Matches a CBOR tagged value with a name that matches the specified regex and content that matches the given pattern.
 - Text
     - `text`
         - Matches any text value.

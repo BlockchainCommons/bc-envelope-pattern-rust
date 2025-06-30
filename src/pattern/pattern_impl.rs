@@ -67,7 +67,7 @@ use super::{
     leaf::{
         ArrayPattern, BoolPattern, ByteStringPattern, DatePattern,
         KnownValuePattern, LeafPattern, MapPattern, NullPattern, NumberPattern,
-        TaggedPattern, TextPattern,
+        TextPattern,
     },
     meta::{
         AndPattern, CapturePattern, GroupPattern, MetaPattern, NotPattern,
@@ -356,24 +356,52 @@ impl Pattern {
 }
 
 impl Pattern {
+    /// Creates a new `Pattern` that matches any tagged value.
+    /// This is a proxy to dcbor-pattern's tagged functionality.
     pub fn any_tag() -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::any()))
+        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
+            crate::pattern::leaf::TaggedPattern::any()
+        ))
     }
 
+    /// Creates a new `Pattern` that matches a specific tagged value with any content.
+    /// This is a proxy to dcbor-pattern's tagged functionality.
     pub fn tagged(tag: dcbor::Tag) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::value(tag)))
+        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
+            crate::pattern::leaf::TaggedPattern::value(tag.value())
+        ))
     }
 
+    /// Creates a new `Pattern` that matches a tagged value with specific tag value and any content.
+    /// This is a proxy to dcbor-pattern's tagged functionality.
     pub fn tagged_with_value(value: u64) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::value(value)))
+        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
+            crate::pattern::leaf::TaggedPattern::value(value)
+        ))
     }
 
+    /// Creates a new `Pattern` that matches a tagged value with specific tag name and any content.
+    /// This is a proxy to dcbor-pattern's tagged functionality.
     pub fn tagged_with_name(name: impl Into<String>) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::named(name)))
+        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
+            crate::pattern::leaf::TaggedPattern::named(name.into())
+        ))
     }
 
+    /// Creates a new `Pattern` that matches a tagged value with tag name matching regex and any content.
+    /// This is a proxy to dcbor-pattern's tagged functionality.
     pub fn tagged_with_regex(regex: regex::Regex) -> Self {
-        Pattern::Leaf(LeafPattern::Tag(TaggedPattern::regex(regex)))
+        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
+            crate::pattern::leaf::TaggedPattern::regex(regex)
+        ))
+    }
+
+    /// Creates a new `Pattern` that matches a tagged value from a dcbor_pattern::TaggedPattern.
+    /// This is an internal helper for the parser.
+    pub(crate) fn tagged_from_dcbor_pattern(tagged_pattern: dcbor_pattern::TaggedPattern) -> Self {
+        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
+            crate::pattern::leaf::TaggedPattern::from_dcbor_pattern(tagged_pattern)
+        ))
     }
 }
 

@@ -2,7 +2,7 @@ mod common;
 
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{
-    FormatPathsOpts, Matcher, Pattern, format_paths_with_captures,
+    FormatPathsOpts, Matcher, Pattern, format_paths_with_captures_opt,
 };
 use indoc::indoc;
 
@@ -25,7 +25,7 @@ fn test_simple_dcbor_capture() {
     assert_eq!(captures["num"].len(), 1, "Should capture one instance");
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -72,7 +72,7 @@ fn test_dcbor_capture_with_search() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -136,7 +136,7 @@ fn test_multiple_dcbor_captures() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -223,7 +223,7 @@ fn test_nested_dcbor_captures() {
         "Should capture two score instances (one per nested array)"
     );
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -298,7 +298,7 @@ fn test_mixed_envelope_and_dcbor_captures() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -350,7 +350,7 @@ fn test_capture_name_conflicts() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -400,7 +400,7 @@ fn test_array_traversal_captures() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -452,7 +452,7 @@ fn test_cbor_captures_no_match() {
     assert_eq!(captures.len(), 0, "Should have no captures");
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -500,7 +500,7 @@ fn test_cbor_captures_performance() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),
@@ -575,7 +575,7 @@ fn test_comprehensive_cbor_captures() {
     );
 
     // Verify formatted output follows rubric
-    let actual = format_paths_with_captures(
+    let actual = format_paths_with_captures_opt(
         &paths,
         &captures,
         FormatPathsOpts::default(),

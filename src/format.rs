@@ -197,10 +197,21 @@ pub fn format_path(path: &Path) -> String {
     format_path_opt(path, FormatPathsOpts::default())
 }
 
+pub fn format_paths_with_captures(
+    paths: &[Path],
+    captures: &std::collections::HashMap<String, Vec<Path>>,
+) -> String {
+    format_paths_with_captures_opt(
+        paths,
+        captures,
+        FormatPathsOpts::default(),
+    )
+}
+
 /// Format multiple paths with captures in a structured way.
 /// Captures come first, sorted lexicographically by name, with their name
 /// prefixed by '@'. Regular paths follow after all captures.
-pub fn format_paths_with_captures(
+pub fn format_paths_with_captures_opt(
     paths: &[Path],
     captures: &std::collections::HashMap<String, Vec<Path>>,
     opts: impl AsRef<FormatPathsOpts>,
@@ -264,7 +275,11 @@ pub fn format_paths_opt(
     opts: impl AsRef<FormatPathsOpts>,
 ) -> String {
     // Call format_paths_with_captures with empty captures
-    format_paths_with_captures(paths, &std::collections::HashMap::new(), opts)
+    format_paths_with_captures_opt(
+        paths,
+        &std::collections::HashMap::new(),
+        opts,
+    )
 }
 
 /// Format multiple paths with default options.
@@ -347,7 +362,7 @@ mod tests {
         captures.insert("capture1".to_string(), vec![path1]);
         captures.insert("capture2".to_string(), vec![path2]);
 
-        let actual = format_paths_with_captures(
+        let actual = format_paths_with_captures_opt(
             &paths,
             &captures,
             FormatPathsOpts::default(),
@@ -376,7 +391,7 @@ mod tests {
         let paths = vec![path1, path2];
 
         let captures = HashMap::new();
-        let formatted = format_paths_with_captures(
+        let formatted = format_paths_with_captures_opt(
             &paths,
             &captures,
             FormatPathsOpts::default(),
@@ -399,7 +414,7 @@ mod tests {
         captures.insert("alpha".to_string(), vec![path2]);
         captures.insert("beta".to_string(), vec![path3]);
 
-        let actual = format_paths_with_captures(
+        let actual = format_paths_with_captures_opt(
             &paths,
             &captures,
             FormatPathsOpts::default(),
@@ -435,7 +450,7 @@ mod tests {
         let opts = FormatPathsOpts::new()
             .element_format(PathElementFormat::EnvelopeUR);
 
-        let actual = format_paths_with_captures(&paths, &captures, opts);
+        let actual = format_paths_with_captures_opt(&paths, &captures, opts);
 
         // For this test, we need to check the structure but URs are long and
         // variable So we'll verify the structure exists
@@ -462,7 +477,7 @@ mod tests {
         let opts =
             FormatPathsOpts::new().element_format(PathElementFormat::DigestUR);
 
-        let actual = format_paths_with_captures(&paths, &captures, opts);
+        let actual = format_paths_with_captures_opt(&paths, &captures, opts);
 
         // For this test, we need to check the structure but digest URs are also
         // variable
@@ -485,7 +500,7 @@ mod tests {
 
         let opts = FormatPathsOpts::new().indent(false);
 
-        let actual = format_paths_with_captures(&paths, &captures, opts);
+        let actual = format_paths_with_captures_opt(&paths, &captures, opts);
 
         #[rustfmt::skip]
         let expected = indoc! {r#"

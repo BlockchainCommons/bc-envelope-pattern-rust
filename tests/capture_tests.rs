@@ -1,16 +1,26 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern};
+use bc_envelope_pattern::{Matcher, Pattern, format_paths_with_captures};
+use indoc::indoc;
 
 #[test]
 fn capture_simple_number() {
     let env = Envelope::new(42);
     let pat = Pattern::parse("@num(42)").unwrap();
+    assert_actual_expected!(pat.to_string(), "@num(42)");
+
     let (paths, caps) = pat.paths_with_captures(&env);
-    assert_eq!(paths.len(), 1);
-    assert_eq!(caps.get("num").unwrap().len(), 1);
-    assert_eq!(pat.to_string(), "@num(42)");
+    #[rustfmt::skip]
+    let expected = indoc! {r#"
+        @num
+            7f83f7bd LEAF 42
+        7f83f7bd LEAF 42
+    "#}.trim();
+    assert_actual_expected!(
+        format_paths_with_captures(&paths, &caps),
+        expected
+    );
 }
 
 #[test]
