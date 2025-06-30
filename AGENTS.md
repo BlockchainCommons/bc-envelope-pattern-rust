@@ -107,6 +107,7 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
     - Remember: once you've parsed `tagged` or `tagged(value, pattern)`, you are just a proxy for the functionality in `dcbor-pattern`. You do not need to implement any additional logic for the `tagged` pattern. There will be no envelope patterns inside the `tagged` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
     - `dcbor-pattern` can do everything including looking up tag names.
+    - Pay attention to how `dcbor-pattern` handles parsing both argumetnts to the `tagged` pattern. Look at `token.rs` and `tagged_parser.rs` in the `dcbor-pattern` crate. Only use it for inspiration: YOU ARE A PROXY, NOT A REIMPLEMENTATION.
     - You *do* need to call `bc_envelope::register_tags()` at the start of *every* test that may need tag name resolution.
     - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
