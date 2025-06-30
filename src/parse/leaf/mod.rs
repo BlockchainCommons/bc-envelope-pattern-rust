@@ -1,7 +1,6 @@
 // Parsers for leaf-level pattern syntax
 
 mod array_parser;
-mod byte_string_parser;
 mod cbor_parser;
 mod date_parser;
 mod known_value_parser;

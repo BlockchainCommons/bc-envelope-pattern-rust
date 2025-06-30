@@ -59,4 +59,4 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ### NEXT TASK:
 
-- All BSTR pattern updates are now complete. The pattern now uses dcbor-pattern's `bstr`, `h'hex'`, and `h'/regex/'` syntax.
+- Update the `TEXT pattern to use the `dcbor-pattern` crate's `text` syntax for matching text strings.
