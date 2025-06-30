@@ -132,9 +132,6 @@ pub enum Token {
     Text,
 
     // Meta Pattern Keywords
-    #[token("ANY")]
-    Any,
-
     #[token("NONE")]
     None,
 

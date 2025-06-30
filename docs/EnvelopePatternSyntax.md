@@ -186,8 +186,8 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Traversal, 
     - `pattern & pattern & pattern`…
         - Matches if all specified patterns match.
 - Any
-    - `ANY`
-        - Always matches.
+    - `*`
+        - Always matches. Uses the dcbor-pattern `*` syntax for consistency.
 - Capture
     - `@name ( pattern )`
         - Matches the specified pattern and captures the match for later use with the given name.

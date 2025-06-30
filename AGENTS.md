@@ -51,6 +51,10 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
 - Once you have completed the `NEXT TASK`, stop and let me run tests.
 
-### NEXT TASK:
+### COMPLETE:
 
 - Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax for matching any envelope.
+
+### NEXT TASK:
+
+- Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.

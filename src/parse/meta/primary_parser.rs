@@ -24,7 +24,7 @@ pub(crate) fn parse_primary(
     };
 
     match token {
-        Token::Any => Ok(Pattern::any()),
+        Token::RepeatZeroOrMore => Ok(Pattern::any()), // Support dcbor-pattern's * syntax
         Token::Array => leaf::parse_array(lexer),
         Token::Bool => leaf::parse_bool(lexer),
         Token::ByteString => leaf::parse_byte_string(lexer),

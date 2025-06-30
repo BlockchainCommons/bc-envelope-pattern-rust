@@ -59,7 +59,7 @@ fn parse_bool_traversal() {
 
 #[test]
 fn parse_operator_precedence() {
-    let expr = "ANY -> BOOL(true) & BOOL(false) -> NONE | ANY -> BOOL(true) & BOOL(false) -> ANY";
+    let expr = "* -> BOOL(true) & BOOL(false) -> NONE | * -> BOOL(true) & BOOL(false) -> *";
     let p = Pattern::parse(expr).unwrap();
 
     let left_seq = Pattern::traverse(vec![
@@ -77,7 +77,7 @@ fn parse_operator_precedence() {
     assert_eq!(p, expected);
     assert_eq!(
         p.to_string(),
-        "ANY->BOOL(true)&BOOL(false)->NONE|ANY->BOOL(true)&BOOL(false)->ANY"
+        "*->BOOL(true)&BOOL(false)->NONE|*->BOOL(true)&BOOL(false)->*"
     );
 }
 
@@ -87,14 +87,14 @@ fn parse_not_patterns() {
     assert_eq!(p, Pattern::not_matching(Pattern::text("hi")));
     assert_eq!(p.to_string(), r#"!TEXT("hi")"#);
 
-    let expr = "!ANY & NONE";
+    let expr = "!* & NONE";
     let p = Pattern::parse(expr).unwrap();
     let expected = Pattern::not_matching(Pattern::and(vec![
         Pattern::any(),
         Pattern::none(),
     ]));
     assert_eq!(p, expected);
-    assert_eq!(p.to_string(), "!ANY&NONE");
+    assert_eq!(p.to_string(), "!*&NONE");
 }
 
 #[test]
@@ -161,4 +161,20 @@ fn parse_capture_name_variants() {
     let p = Pattern::parse(src).unwrap();
     assert_eq!(p, Pattern::capture("cap_1", Pattern::number(42)));
     assert_eq!(p.to_string(), src);
+}
+
+#[test]
+fn parse_any_with_star_syntax() {
+    // Test that * parses as Pattern::any()
+    let p = Pattern::parse("*").unwrap();
+    assert_eq!(p, Pattern::any());
+    assert_eq!(p.to_string(), "*");
+
+    // Test in complex expressions
+    let complex = Pattern::parse("* & BOOL(true)").unwrap();
+    assert_eq!(
+        complex,
+        Pattern::and(vec![Pattern::any(), Pattern::bool(true)])
+    );
+    assert_eq!(complex.to_string(), "*&true");
 }
