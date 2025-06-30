@@ -6,7 +6,7 @@ fn main() {
     let cbor = 42.to_cbor();
 
     // Create a dcbor pattern with a capture
-    let pattern = DcborPattern::parse("@inner_num(NUMBER(42))").unwrap();
+    let pattern = DcborPattern::parse("@inner_num(42)").unwrap();
 
     println!("DCBOR Pattern: {}", pattern);
     println!("CBOR: {:?}", cbor);

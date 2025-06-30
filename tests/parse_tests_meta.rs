@@ -117,7 +117,7 @@ fn parse_repeat_patterns() {
     );
     assert_eq!(p.to_string(), "(text)+?");
 
-    let p = Pattern::parse("(NUMBER){2,4}+").unwrap();
+    let p = Pattern::parse("(number){2,4}+").unwrap();
     assert_eq!(
         p,
         Pattern::repeat(Pattern::any_number(), 2..=4, Reluctance::Possessive)
@@ -128,11 +128,11 @@ fn parse_repeat_patterns() {
 #[test]
 fn parse_capture_patterns() {
     let src = "@name(1)";
-    let p = Pattern::parse("@name(NUMBER(1))").unwrap();
+    let p = Pattern::parse("@name(1)").unwrap();
     assert_eq!(p, Pattern::capture("name", Pattern::number(1)));
     assert_eq!(p.to_string(), src);
 
-    let spaced = "@name ( NUMBER ( 1 ) )";
+    let spaced = "@name ( 1 )";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::capture("name", Pattern::number(1)));
     assert_eq!(p_spaced.to_string(), src);
@@ -155,7 +155,7 @@ fn parse_nested_capture_patterns() {
 #[test]
 fn parse_capture_name_variants() {
     let src = "@cap_1(42)";
-    let p = Pattern::parse("@cap_1(NUMBER(42))").unwrap();
+    let p = Pattern::parse("@cap_1(42)").unwrap();
     assert_eq!(p, Pattern::capture("cap_1", Pattern::number(42)));
     assert_eq!(p.to_string(), src);
 }

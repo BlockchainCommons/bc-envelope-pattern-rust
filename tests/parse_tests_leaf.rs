@@ -56,42 +56,52 @@ fn parse_text_dcbor_pattern_syntax() {
 
 #[test]
 fn parse_number_patterns() {
-    let p = Pattern::parse("NUMBER").unwrap();
+    // Test dcbor-pattern syntax
+    let p = Pattern::parse("number").unwrap();
     assert_eq!(p, Pattern::any_number());
     assert_eq!(p.to_string(), "number");
 
-    let p = Pattern::parse("NUMBER(42)").unwrap();
+    let p = Pattern::parse("42").unwrap();
     assert_eq!(p, Pattern::number(42));
     assert_eq!(p.to_string(), "42");
 
-    let spaced = "NUMBER ( 42 )";
-    let p_spaced = Pattern::parse(spaced).unwrap();
-    assert_eq!(p_spaced, Pattern::number(42));
-    assert_eq!(p_spaced.to_string(), "42");
+    let p = Pattern::parse("3.14").unwrap();
+    assert_eq!(p, Pattern::number(3.14));
+    assert_eq!(p.to_string(), "3.14");
 
-    let p = Pattern::parse("NUMBER(1...3)").unwrap();
-    assert_eq!(p, Pattern::number_range(1..=3));
+    let p = Pattern::parse("1...3").unwrap();
+    assert_eq!(p, Pattern::number_range(1.0..=3.0));
     assert_eq!(p.to_string(), "1...3");
 
-    let p = Pattern::parse("NUMBER(>5)").unwrap();
+    let p = Pattern::parse(">5").unwrap();
     assert_eq!(p, Pattern::number_greater_than(5));
     assert_eq!(p.to_string(), ">5");
 
-    let p = Pattern::parse("NUMBER(>=5)").unwrap();
+    let p = Pattern::parse(">=5").unwrap();
     assert_eq!(p, Pattern::number_greater_than_or_equal(5));
     assert_eq!(p.to_string(), ">=5");
 
-    let p = Pattern::parse("NUMBER(<5)").unwrap();
+    let p = Pattern::parse("<5").unwrap();
     assert_eq!(p, Pattern::number_less_than(5));
     assert_eq!(p.to_string(), "<5");
 
-    let p = Pattern::parse("NUMBER(<=5)").unwrap();
+    let p = Pattern::parse("<=5").unwrap();
     assert_eq!(p, Pattern::number_less_than_or_equal(5));
     assert_eq!(p.to_string(), "<=5");
 
-    let p = Pattern::parse("NUMBER(NaN)").unwrap();
+    let p = Pattern::parse("NaN").unwrap();
     assert_eq!(p, Pattern::number_nan());
     assert_eq!(p.to_string(), "NaN");
+
+    let p = Pattern::parse("Infinity").unwrap();
+    assert_eq!(p, Pattern::number(f64::INFINITY));
+    // Note: dcbor-pattern displays infinity as "inf"
+    assert_eq!(p.to_string(), "inf");
+
+    let p = Pattern::parse("-Infinity").unwrap();
+    assert_eq!(p, Pattern::number(f64::NEG_INFINITY));
+    // Note: dcbor-pattern displays negative infinity as "-inf"
+    assert_eq!(p.to_string(), "-inf");
 }
 
 #[test]

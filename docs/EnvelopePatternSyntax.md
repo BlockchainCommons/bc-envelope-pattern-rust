@@ -88,25 +88,25 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `null`
         - Matches the null value.
 - Number
-    - `NUMBER`
+    - `number`
         - Matches any number.
-    - `NUMBER ( value )`
+    - `value`
         - Matches the specified number.
-    - `NUMBER ( value ... value )`
+    - `value...value`
         - Matches a number within the specified range.
-    - `NUMBER ( >= value )`
+    - `>=value`
         - Matches a number greater than or equal to the specified value.
-    - `NUMBER ( <= value )`
+    - `<=value`
         - Matches a number less than or equal to the specified value.
-    - `NUMBER ( > value )`
+    - `>value`
         - Matches a number greater than the specified value.
-    - `NUMBER ( < value )`
+    - `<value`
         - Matches a number less than the specified value.
-    - `NUMBER ( NaN )`
+    - `NaN`
         - Matches the NaN (Not a Number) value.
-    - `NUMBER ( Infinity )`
+    - `Infinity`
         - Matches positive infinity.
-    - `NUMBER ( -Infinity )`
+    - `-Infinity`
         - Matches negative infinity.
 - Tagged
     - `TAG`

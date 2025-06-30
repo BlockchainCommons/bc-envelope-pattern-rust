@@ -27,7 +27,7 @@ When working on this crate:
 1. **Test thoroughly**: Run `cargo test` and `cargo clippy` before submitting changes
 2. **Follow established patterns**: New patterns should use the dcbor-pattern integration approach
 3. **Document changes**: Update both code documentation and this AGENTS.md file as needed
-4. **Validate dcbor-pattern syntax**: Use only valid dcbor-pattern expressions (e.g., `NUMBER`, not `uint`)
+4. **Validate dcbor-pattern syntax**: Use only valid dcbor-pattern expressions (e.g., `number`, not `uint`)
 
 ### Architecture Notes
 

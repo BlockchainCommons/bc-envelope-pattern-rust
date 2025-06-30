@@ -13,8 +13,8 @@ fn test_dcbor_pattern_extended_paths() {
             .unwrap();
     let envelope = Envelope::new(nested_cbor);
 
-    // Test SEARCH(NUMBER) - should find all numbers in the structure
-    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    // Test SEARCH(number) - should find all numbers in the structure
+    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 4 numbers: 1, 2, 3, and 42
@@ -54,7 +54,7 @@ fn test_dcbor_pattern_extended_paths() {
 fn test_dcbor_pattern_simple_leaf_paths() {
     // Test with a simple number - should have minimal path extension
     let envelope = Envelope::new(42);
-    let pattern = Pattern::parse("CBOR(/NUMBER/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/number/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     assert_eq!(paths.len(), 1, "Should find 1 number");
@@ -104,7 +104,7 @@ fn test_dcbor_pattern_array_elements() {
     let array_cbor = parse_dcbor_item("[1, 2, 3]").unwrap();
     let envelope = Envelope::new(array_cbor);
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 3 numbers: 1, 2, 3
@@ -145,8 +145,8 @@ fn test_cbor_pattern_multiple_paths() {
 
     let envelope = Envelope::new(cbor_data);
 
-    // Test SEARCH(NUMBER) pattern to find all numbers in the structure
-    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    // Test SEARCH(number) pattern to find all numbers in the structure
+    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // We should find 4 numbers: 1, 2, 3, 42
@@ -190,7 +190,7 @@ fn test_array_element_access() {
     let envelope = Envelope::new(array_data.clone());
 
     // Test our pattern
-    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     assert_eq!(paths.len(), 3, "Should find 3 numbers in the array");

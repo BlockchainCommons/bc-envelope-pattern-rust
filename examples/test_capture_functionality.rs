@@ -10,7 +10,7 @@ fn main() {
     println!("Test envelope: {}", envelope.format());
 
     // Create a CBOR pattern with a named capture
-    let cbor_pattern_str = "/@name(NUMBER)";
+    let cbor_pattern_str = "/@name(number)";
     let pattern = Pattern::cbor(cbor_pattern_str);
 
     println!("CBOR Pattern: {}", cbor_pattern_str);

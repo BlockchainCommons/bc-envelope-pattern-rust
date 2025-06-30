@@ -37,7 +37,7 @@ fn test_and_pattern() {
     assert!(number_range_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", number_range_pattern),
-        r#"NUMBER(>40)&NUMBER(<50)"#
+        r#">40&<50"#
     );
 
     // The path includes the assertion.
@@ -61,7 +61,7 @@ fn test_and_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", number_range_with_subject_pattern),
-        r#"NUMBER(>40)&NUMBER(<50)->SUBJECT"#,
+        r#">40&<50->SUBJECT"#,
     );
 }
 
@@ -86,7 +86,7 @@ fn test_or_pattern() {
     assert!(foo_or_greater_than_40_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", foo_or_greater_than_40_pattern),
-        r#""foo"|NUMBER(>40)"#
+        r#""foo"|>40"#
     );
 
     // The match path includes the assertion.
@@ -110,7 +110,7 @@ fn test_or_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", foo_or_greater_than_40_with_subject_pattern),
-        r#""foo"|NUMBER(>40)->SUBJECT"#
+        r#""foo"|>40->SUBJECT"#
     );
 }
 
@@ -118,7 +118,7 @@ fn test_or_pattern() {
 fn test_one_element_traversal_pattern() {
     // A pattern that matches a the number 42.
     let number_pattern = Pattern::number(42);
-    assert_eq!(format!("{}", number_pattern), r#"NUMBER(42)"#);
+    assert_eq!(format!("{}", number_pattern), r#"42"#);
 
     let envelope = Envelope::new(42);
     #[rustfmt::skip]
@@ -132,7 +132,7 @@ fn test_one_element_traversal_pattern() {
     let pattern = Pattern::traverse(vec![number_pattern]);
     let paths = pattern.paths(&envelope);
     assert_actual_expected!(format_paths(&paths), expected);
-    assert_eq!(format!("{}", pattern), r#"NUMBER(42)"#);
+    assert_eq!(format!("{}", pattern), r#"42"#);
 }
 
 #[test]
@@ -238,7 +238,7 @@ fn optional_wrapped_pattern() {
     ]);
     assert_eq!(
         format!("{}", optional_wrapped_pattern),
-        r#"(UNWRAP)?->NUMBER"#
+        r#"(UNWRAP)?->number"#
     );
 
     let inner = Envelope::new(42);
@@ -303,7 +303,7 @@ fn test_search_pattern() {
 
     // A pattern that searches for any number in the envelope
     let number_search_pattern = Pattern::search(Pattern::any_number());
-    assert_eq!(format!("{}", number_search_pattern), r#"SEARCH(NUMBER)"#);
+    assert_eq!(format!("{}", number_search_pattern), r#"SEARCH(number)"#);
     let number_search_paths = number_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -319,7 +319,7 @@ fn test_search_pattern() {
         Pattern::search(Pattern::assertion_with_object(Pattern::any_number()));
     assert_eq!(
         format!("{}", number_object_search_pattern),
-        r#"SEARCH(ASSERTOBJ(NUMBER))"#
+        r#"SEARCH(ASSERTOBJ(number))"#
     );
     let number_object_search_paths =
         number_object_search_pattern.paths(&envelope);
@@ -623,7 +623,7 @@ fn test_not_pattern() {
     ));
     assert_eq!(
         format!("{}", search_pattern),
-        r#"SEARCH(!OBJECT(NUMBER(42)))"#
+        r#"SEARCH(!OBJECT(42))"#
     );
     let not_patterns = search_pattern.paths(&envelope);
 
@@ -720,7 +720,7 @@ fn test_capture_pattern() {
     let inner = Pattern::number(42);
     let capture = Pattern::capture("num", inner.clone());
 
-    assert_eq!(format!("{}", capture), "@num(NUMBER(42))");
+    assert_eq!(format!("{}", capture), "@num(42)");
     assert!(capture.matches(&envelope));
 
     let inner_paths = inner.paths(&envelope);

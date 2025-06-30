@@ -20,6 +20,23 @@ pub(crate) fn parse_map(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
                 }
+                Some(Ok(Token::Integer(res))) => {
+                    let count = res?;
+                    if count < 0 {
+                        return Err(Error::InvalidNumberFormat(lexer.span()));
+                    }
+                    match lexer.next() {
+                        Some(Ok(Token::ParenClose)) => {
+                            Ok(Pattern::map_with_count(count as usize))
+                        }
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
+                        Some(Err(e)) => Err(e),
+                        None => Err(Error::ExpectedCloseParen(lexer.span())),
+                    }
+                }
                 Some(Ok(Token::Range(res))) => {
                     let range = res?;
                     let pat = if let Some(max) = range.max() {

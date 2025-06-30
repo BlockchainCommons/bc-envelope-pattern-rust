@@ -95,7 +95,7 @@ fn test_credential() {
 #[test]
 fn test_parsed_search_text_or_number() {
     let env = credential();
-    let pattern = Pattern::parse("SEARCH(ASSERTOBJ(text|NUMBER))").unwrap();
+    let pattern = Pattern::parse("SEARCH(ASSERTOBJ(text|number))").unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 11);
 }

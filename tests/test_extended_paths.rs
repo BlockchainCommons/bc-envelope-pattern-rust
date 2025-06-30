@@ -13,7 +13,7 @@ fn test_cbor_pattern_extended_paths() {
     let array_data = vec![1, 2, 3];
     let envelope = Envelope::new(array_data.clone());
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should return 3 paths, one for each number in the array
@@ -40,7 +40,7 @@ fn test_cbor_pattern_extended_paths_nested_structure() {
     let nested_cbor = parse_dcbor_item(r#"{"name": "Alice", "scores": [95, 87, 92]}"#).unwrap();
     let envelope = Envelope::new(nested_cbor.clone());
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(NUMBER)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should return 3 paths, one for each score in the array
@@ -69,7 +69,7 @@ fn test_cbor_pattern_extended_paths_single_match() {
     // Test with a pattern that matches the root element itself
     let envelope = Envelope::new(42);
 
-    let pattern = Pattern::parse("CBOR(/NUMBER/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/number/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should return 1 path

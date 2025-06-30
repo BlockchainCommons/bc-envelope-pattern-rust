@@ -12,8 +12,8 @@ fn test_simple_dcbor_capture() {
     // Create envelope with number 42
     let envelope = Envelope::new(42);
 
-    // Create CBOR pattern with dcbor capture: /@num(NUMBER(42))/
-    let pattern = Pattern::parse("CBOR(/@num(NUMBER(42))/)").unwrap();
+    // Create CBOR pattern with dcbor capture: /@num(42)/
+    let pattern = Pattern::parse("CBOR(/@num(42)/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -52,8 +52,8 @@ fn test_dcbor_capture_with_search() {
     // Create envelope with array [1, 2, 3]
     let envelope = Envelope::new(vec![1, 2, 3]);
 
-    // Create CBOR pattern with search: /@values(SEARCH(NUMBER))/
-    let pattern = Pattern::parse("CBOR(/@values(SEARCH(NUMBER))/)").unwrap();
+    // Create CBOR pattern with search: /@values(SEARCH(number))/
+    let pattern = Pattern::parse("CBOR(/@values(SEARCH(number))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -267,9 +267,9 @@ fn test_mixed_envelope_and_dcbor_captures() {
     let envelope = Envelope::new(42);
 
     // Create pattern with envelope capture wrapping CBOR pattern with dcbor
-    // capture @envelope_level(CBOR(/@dcbor_level(NUMBER(42))/))
+    // capture @envelope_level(CBOR(/@dcbor_level(42)/))
     let cbor_pattern =
-        Pattern::parse("CBOR(/@dcbor_level(NUMBER(42))/)").unwrap();
+        Pattern::parse("CBOR(/@dcbor_level(42)/)").unwrap();
     let pattern = Pattern::capture("envelope_level", cbor_pattern);
 
     // Execute pattern
@@ -328,9 +328,9 @@ fn test_capture_name_conflicts() {
     let envelope = Envelope::new(42);
 
     // Create pattern with same capture name at envelope and dcbor levels
-    // @same_name(CBOR(/@same_name(NUMBER(42))/))
+    // @same_name(CBOR(/@same_name(42)/))
     let cbor_pattern =
-        Pattern::parse("CBOR(/@same_name(NUMBER(42))/)").unwrap();
+        Pattern::parse("CBOR(/@same_name(42)/)").unwrap();
     let pattern = Pattern::capture("same_name", cbor_pattern);
 
     // Execute pattern
@@ -441,8 +441,8 @@ fn test_cbor_captures_no_match() {
     // Create envelope with text "hello"
     let envelope = Envelope::new("hello");
 
-    // Create CBOR pattern that won't match: /@num(NUMBER)/
-    let pattern = Pattern::parse("CBOR(/@num(NUMBER)/)").unwrap();
+    // Create CBOR pattern that won't match: /@num(number)/
+    let pattern = Pattern::parse("CBOR(/@num(number)/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -475,8 +475,8 @@ fn test_cbor_captures_performance() {
     let numbers: Vec<i32> = (1..=3).collect(); // Use just 3 numbers for clarity
     let envelope = Envelope::new(numbers);
 
-    // Create CBOR pattern that captures all numbers: /@nums(SEARCH(NUMBER))/
-    let pattern = Pattern::parse("CBOR(/@nums(SEARCH(NUMBER))/)").unwrap();
+    // Create CBOR pattern that captures all numbers: /@nums(SEARCH(number))/
+    let pattern = Pattern::parse("CBOR(/@nums(SEARCH(number))/)").unwrap();
 
     // Execute pattern with timing
     let start = std::time::Instant::now();

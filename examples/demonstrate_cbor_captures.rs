@@ -10,11 +10,11 @@ fn main() {
     // Example 1: Simple CBOR capture
     println!("📝 Example 1: Simple CBOR capture");
     let envelope = Envelope::new(42);
-    let dcbor_pattern = DcborPattern::parse("@number(NUMBER(42))").unwrap();
+    let dcbor_pattern = DcborPattern::parse("@number(42)").unwrap();
     let pattern = Pattern::cbor_pattern(dcbor_pattern);
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    println!("  Pattern: CBOR(/@number(NUMBER(42))/)");
+    println!("  Pattern: CBOR(/@number(42)/)");
     println!("  Envelope: {}", envelope);
     println!("  Paths found: {}", paths.len());
     println!("  Captures found: {}", captures.len());
@@ -26,11 +26,11 @@ fn main() {
     // Example 2: Search pattern with captures
     println!("📝 Example 2: Search pattern with captures");
     let envelope = Envelope::new(vec![1, 2, 3, 4, 5]);
-    let dcbor_pattern = DcborPattern::parse("@values(SEARCH(NUMBER))").unwrap();
+    let dcbor_pattern = DcborPattern::parse("@values(SEARCH(number))").unwrap();
     let pattern = Pattern::cbor_pattern(dcbor_pattern);
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    println!("  Pattern: CBOR(/@values(SEARCH(NUMBER))/)");
+    println!("  Pattern: CBOR(/@values(SEARCH(number))/)");
     println!("  Envelope: {}", envelope);
     println!("  Paths found: {}", paths.len());
     println!("  Captures found: {}", captures.len());

@@ -6,7 +6,7 @@ fn main() {
     println!("Testing dcbor capture integration in detail...\n");
 
     // Test the dcbor pattern directly first
-    let dcbor_pattern_str = "@inner_num(NUMBER(42))";
+    let dcbor_pattern_str = "@inner_num(42)";
     let dcbor_pattern = DcborPattern::parse(dcbor_pattern_str).unwrap();
 
     println!("Created dcbor pattern: {}", dcbor_pattern);
@@ -33,7 +33,7 @@ fn main() {
     println!();
 
     // Now test through bc-envelope-pattern
-    let pattern_str = "CBOR(/@inner_num(NUMBER(42))/)";
+    let pattern_str = "CBOR(/@inner_num(42)/)";
     let envelope_pattern = Pattern::parse(pattern_str).unwrap();
     let envelope = Envelope::new(42);
 

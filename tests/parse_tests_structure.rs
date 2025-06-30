@@ -60,7 +60,7 @@ fn parse_assert_patterns() {
     );
     assert_eq!(p_spaced.to_string(), r#"ASSERTPRED("hi")"#);
 
-    let p = Pattern::parse("ASSERTOBJ(NUMBER(1))").unwrap();
+    let p = Pattern::parse("ASSERTOBJ(1)").unwrap();
     assert_eq!(p, Pattern::assertion_with_object(Pattern::number(1)));
     assert_eq!(p.to_string(), "ASSERTOBJ(1)");
 }
@@ -87,11 +87,11 @@ fn parse_predicate_patterns() {
     assert_eq!(p, Pattern::any_predicate());
     assert_eq!(p.to_string(), "PRED");
 
-    let p = Pattern::parse("PRED(NUMBER(1))").unwrap();
+    let p = Pattern::parse("PRED(1)").unwrap();
     assert_eq!(p, Pattern::predicate(Pattern::number(1)));
     assert_eq!(p.to_string(), "PRED(1)");
 
-    let spaced = "PRED ( NUMBER(1) )";
+    let spaced = "PRED ( 1 )";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::predicate(Pattern::number(1)));
     assert_eq!(p_spaced.to_string(), "PRED(1)");

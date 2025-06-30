@@ -66,9 +66,9 @@ pub(crate) fn parse_primary(
         Token::Subject => structure::parse_subject(lexer),
         Token::None => Ok(Pattern::none()),
         Token::Null => leaf::parse_null(lexer),
-        Token::Number => leaf::parse_number(lexer),
-        Token::TextKeyword => Ok(Pattern::any_text()), /* New dcbor-pattern
-                                                         * text syntax */
+        Token::NumberKeyword => Ok(Pattern::any_number()), /* New dcbor-pattern number syntax */
+        Token::TextKeyword => Ok(Pattern::any_text()), /* New dcbor-pattern */
+        // text syntax
         Token::StringLiteral(Ok(s)) => Ok(Pattern::text(s)), /* New dcbor-pattern "string" syntax */
         Token::StringLiteral(Err(e)) => Err(e),
         Token::Regex(Ok(regex_str)) => {
@@ -77,6 +77,28 @@ pub(crate) fn parse_primary(
             Ok(Pattern::text_regex(regex))
         }
         Token::Regex(Err(e)) => Err(e),
+        Token::UnsignedInteger(Ok(n)) => {
+            // Check if this is part of a range (e.g., "1...10")
+            leaf::parse_number_range_or_comparison(lexer, n as f64)
+        }
+        Token::UnsignedInteger(Err(e)) => Err(e),
+        Token::Integer(Ok(i)) => {
+            // Check if this is part of a range (e.g., "-5...10")
+            leaf::parse_number_range_or_comparison(lexer, i as f64)
+        }
+        Token::Integer(Err(e)) => Err(e),
+        Token::Float(Ok(f)) => {
+            // Check if this is part of a range (e.g., "1.5...10.0")
+            leaf::parse_number_range_or_comparison(lexer, f)
+        }
+        Token::Float(Err(e)) => Err(e),
+        Token::GreaterThanOrEqual => leaf::parse_comparison_number(lexer, ">="),
+        Token::LessThanOrEqual => leaf::parse_comparison_number(lexer, "<="),
+        Token::GreaterThan => leaf::parse_comparison_number(lexer, ">"),
+        Token::LessThan => leaf::parse_comparison_number(lexer, "<"),
+        Token::NaN => Ok(Pattern::number_nan()), /* dcbor-pattern NaN */
+        Token::Infinity => Ok(Pattern::number(f64::INFINITY)), /* dcbor-pattern Infinity */
+        Token::NegativeInfinity => Ok(Pattern::number(f64::NEG_INFINITY)), /* dcbor-pattern -Infinity */
         t => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
     }
 }

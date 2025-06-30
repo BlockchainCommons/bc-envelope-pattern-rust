@@ -5,7 +5,7 @@ use bc_envelope_pattern::{Matcher, Pattern};
 fn test_cbor_pattern_dcbor_pattern_integration() {
     // Test basic dcbor-pattern expressions - these should work reliably
     let number_pattern = Pattern::parse(r#"CBOR(/number/)"#)
-        .expect("NUMBER pattern should parse successfully");
+        .expect("number pattern should parse successfully");
     let envelope = Envelope::new(42);
     assert!(
         number_pattern.matches(&envelope),
@@ -99,8 +99,8 @@ fn test_cbor_pattern_debug_parser() {
     assert!(Pattern::parse("CBOR([1, 2, 3])").is_ok());
 
     // Test dcbor-pattern syntax
-    let dcbor_result = Pattern::parse(r#"CBOR(/NUMBER/)"#);
-    println!("CBOR(/NUMBER/) parse result: {:?}", dcbor_result);
+    let dcbor_result = Pattern::parse(r#"CBOR(/number/)"#);
+    println!("CBOR(/number/) parse result: {:?}", dcbor_result);
 
     let dcbor_array_result = Pattern::parse(r#"CBOR(/ARRAY/)"#);
     println!("CBOR(/ARRAY/) parse result: {:?}", dcbor_array_result);
@@ -149,11 +149,11 @@ fn test_dcbor_patterns_work_directly() {
     // These should work without any fallbacks - dcbor-pattern integration is
     // complete
     let number_pattern = Pattern::parse(r#"CBOR(/number/)"#)
-        .expect("NUMBER pattern should parse");
+        .expect("number pattern should parse");
     let envelope = Envelope::new(42);
     assert!(
         number_pattern.matches(&envelope),
-        "NUMBER pattern should match integer"
+        "number pattern should match integer"
     );
 
     let array_pattern =
