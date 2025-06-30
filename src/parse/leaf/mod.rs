@@ -1,7 +1,6 @@
 // Parsers for leaf-level pattern syntax
 
 mod array_parser;
-mod bool_parser;
 mod byte_string_parser;
 mod cbor_parser;
 mod date_parser;
@@ -13,7 +12,6 @@ mod tag_parser;
 mod text_parser;
 
 pub(crate) use array_parser::parse_array;
-pub(crate) use bool_parser::parse_bool;
 pub(crate) use byte_string_parser::parse_byte_string;
 pub(crate) use cbor_parser::parse_cbor;
 pub(crate) use date_parser::parse_date;

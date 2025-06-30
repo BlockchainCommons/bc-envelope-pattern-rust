@@ -2,64 +2,64 @@ use bc_envelope_pattern::{Pattern, Reluctance};
 
 #[test]
 fn parse_bool_or() {
-    let src = "BOOL(true)|BOOL(false)";
+    let src = "true|false";
     let p = Pattern::parse(src).unwrap();
     assert_eq!(
         p,
         Pattern::or(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p.to_string(), src);
+    assert_eq!(p.to_string(), "true|false");
 
-    let spaced = "BOOL(true) | BOOL(false)";
+    let spaced = "true | false";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
         Pattern::or(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p_spaced.to_string(), src);
+    assert_eq!(p_spaced.to_string(), "true|false");
 }
 
 #[test]
 fn parse_bool_and() {
-    let src = "BOOL(true)&BOOL(false)";
+    let src = "true&false";
     let p = Pattern::parse(src).unwrap();
     assert_eq!(
         p,
         Pattern::and(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p.to_string(), src);
+    assert_eq!(p.to_string(), "true&false");
 
-    let spaced = "BOOL(true) & BOOL(false)";
+    let spaced = "true & false";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
         Pattern::and(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p_spaced.to_string(), src);
+    assert_eq!(p_spaced.to_string(), "true&false");
 }
 
 #[test]
 fn parse_bool_traversal() {
-    let src = "BOOL(true)->BOOL(false)";
+    let src = "true->false";
     let p = Pattern::parse(src).unwrap();
     assert_eq!(
         p,
         Pattern::traverse(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p.to_string(), src);
+    assert_eq!(p.to_string(), "true->false");
 
-    let spaced = "BOOL(true) -> BOOL(false)";
+    let spaced = "true -> false";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
         Pattern::traverse(vec![Pattern::bool(true), Pattern::bool(false)])
     );
-    assert_eq!(p_spaced.to_string(), src);
+    assert_eq!(p_spaced.to_string(), "true->false");
 }
 
 #[test]
 fn parse_operator_precedence() {
-    let expr = "* -> BOOL(true) & BOOL(false) -> NONE | * -> BOOL(true) & BOOL(false) -> *";
+    let expr = "* -> true & false -> NONE | * -> true & false -> *";
     let p = Pattern::parse(expr).unwrap();
 
     let left_seq = Pattern::traverse(vec![
@@ -75,10 +75,7 @@ fn parse_operator_precedence() {
     let expected = Pattern::or(vec![left_seq, right_seq]);
 
     assert_eq!(p, expected);
-    assert_eq!(
-        p.to_string(),
-        "*->BOOL(true)&BOOL(false)->NONE|*->BOOL(true)&BOOL(false)->*"
-    );
+    assert_eq!(p.to_string(), "*->true&false->NONE|*->true&false->*");
 }
 
 #[test]
@@ -171,7 +168,7 @@ fn parse_any_with_star_syntax() {
     assert_eq!(p.to_string(), "*");
 
     // Test in complex expressions
-    let complex = Pattern::parse("* & BOOL(true)").unwrap();
+    let complex = Pattern::parse("* & true").unwrap();
     assert_eq!(
         complex,
         Pattern::and(vec![Pattern::any(), Pattern::bool(true)])

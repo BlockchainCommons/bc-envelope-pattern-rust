@@ -98,9 +98,6 @@ pub enum Token {
     #[token("ARRAY")]
     Array,
 
-    #[token("BOOL")]
-    Bool,
-
     #[token("BSTR")]
     ByteString,
 
@@ -136,6 +133,9 @@ pub enum Token {
     None,
 
     // Special literals
+    #[token("bool")]
+    BoolKeyword,
+
     #[token("true")]
     BoolTrue,
 
@@ -341,11 +341,11 @@ mod tests {
 
         // Test leaf pattern keywords
         assert_eq!(Token::lexer("ARRAY").next(), Some(Ok(Token::Array)));
-        assert_eq!(Token::lexer("BOOL").next(), Some(Ok(Token::Bool)));
         assert_eq!(Token::lexer("TEXT").next(), Some(Ok(Token::Text)));
         assert_eq!(Token::lexer("NUMBER").next(), Some(Ok(Token::Number)));
 
         // Test literals
+        assert_eq!(Token::lexer("bool").next(), Some(Ok(Token::BoolKeyword)));
         assert_eq!(Token::lexer("true").next(), Some(Ok(Token::BoolTrue)));
         assert_eq!(Token::lexer("false").next(), Some(Ok(Token::BoolFalse)));
         assert_eq!(Token::lexer("NaN").next(), Some(Ok(Token::NaN)));

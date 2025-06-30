@@ -54,7 +54,8 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 ### COMPLETE:
 
 - Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax for matching any envelope.
+- Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.
 
 ### NEXT TASK:
 
-- Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.
+- Update the `NULL` pattern to use the `dcbor-pattern` crate's `null` syntax for matching null values.

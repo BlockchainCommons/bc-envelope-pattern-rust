@@ -4,7 +4,7 @@ This syntax is inspired by regular expressions but is specifically designed for 
 
 The patex syntax is designed to be flexible and expressive. Patterns can be composed of *leaf patterns*, *structure patterns*, and combinators known as *meta-patterns*.
 
-Keywords like `BOOL`, `ARRAY`, `MAP`, etc., are case-sensitive and must be written in uppercase. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
+Keywords like `bool`, `ARRAY`, `MAP`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
 
 Spaces may used to separate different parts of the pattern.
 
@@ -33,11 +33,11 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `ARRAY ( { n , } )`
         - Matches an array with at least `n` elements.
 - Boolean
-    - `BOOL`
+    - `bool`
         - Matches any boolean value.
-    - `BOOL ( true )`
+    - `true`
         - Matches the boolean value `true`.
-    - `BOOL ( false )`
+    - `false`
         - Matches the boolean value `false`.
 - ByteString
     - `BSTR`
