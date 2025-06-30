@@ -85,7 +85,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `MAP ( { n , m } )`
         - Matches a map with between `n` and `m` entries, inclusive.
 - Null
-    - `NULL`
+    - `null`
         - Matches the null value.
 - Number
     - `NUMBER`

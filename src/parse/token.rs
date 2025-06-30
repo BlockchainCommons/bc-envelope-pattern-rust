@@ -116,7 +116,7 @@ pub enum Token {
     #[token("MAP")]
     Map,
 
-    #[token("NULL")]
+    #[token("null")]
     Null,
 
     #[token("NUMBER")]

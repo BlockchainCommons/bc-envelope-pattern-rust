@@ -184,9 +184,9 @@ fn parse_map_patterns() {
 
 #[test]
 fn parse_null_pattern() {
-    let p = Pattern::parse("NULL").unwrap();
+    let p = Pattern::parse("null").unwrap();
     assert_eq!(p, Pattern::null());
-    assert_eq!(p.to_string(), "NULL");
+    assert_eq!(p.to_string(), "null");
 }
 
 #[test]

@@ -48,14 +48,16 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ## Current Status: update patterns.
 
-- This is de novo development, so DO NOT take any action to ensure backward-compatibility.
 - Once you have completed the `NEXT TASK`, stop and let me run tests.
 
 ### COMPLETE:
 
 - Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax for matching any envelope.
 - Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.
+- Update the `NULL` pattern to use the `dcbor-pattern` crate's `null` syntax for matching null values.
 
 ### NEXT TASK:
 
-- Update the `NULL` pattern to use the `dcbor-pattern` crate's `null` syntax for matching null values.
+- Update the `BSTR` pattern to use the `dcbor-pattern` crate's `bstr` syntax for matching byte strings.
+  - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
+  - REPEAT: Do not preserve the old `BSTR` pattern syntax. Use the new `dcbor-pattern` syntax only.
