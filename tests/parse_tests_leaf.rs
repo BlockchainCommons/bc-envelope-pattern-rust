@@ -116,18 +116,18 @@ fn parse_array_patterns() {
 
 #[test]
 fn parse_bstr_patterns() {
-    let p = Pattern::parse("BSTR").unwrap();
+    let p = Pattern::parse("bstr").unwrap();
     assert_eq!(p, Pattern::any_byte_string());
-    assert_eq!(p.to_string(), "BSTR");
+    assert_eq!(p.to_string(), "bstr");
 
-    let p = Pattern::parse("BSTR(h'0102')").unwrap();
+    let p = Pattern::parse("h'0102'").unwrap();
     assert_eq!(p, Pattern::byte_string(vec![1u8, 2]));
-    assert_eq!(p.to_string(), "BSTR(h'0102')");
+    assert_eq!(p.to_string(), "h'0102'");
 
-    let p = Pattern::parse("BSTR(/abc/)").unwrap();
+    let p = Pattern::parse("h'/abc/'").unwrap();
     let regex = regex::bytes::Regex::new("abc").unwrap();
     assert_eq!(p, Pattern::byte_string_binary_regex(regex));
-    assert_eq!(p.to_string(), "BSTR(/abc/)");
+    assert_eq!(p.to_string(), "h'/abc/'");
 }
 
 #[test]

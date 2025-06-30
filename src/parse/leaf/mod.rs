@@ -12,7 +12,6 @@ mod tag_parser;
 mod text_parser;
 
 pub(crate) use array_parser::parse_array;
-pub(crate) use byte_string_parser::parse_byte_string;
 pub(crate) use cbor_parser::parse_cbor;
 pub(crate) use date_parser::parse_date;
 pub(crate) use known_value_parser::parse_known_value;

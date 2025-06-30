@@ -24,12 +24,23 @@ pub(crate) fn parse_primary(
     };
 
     match token {
-        Token::RepeatZeroOrMore => Ok(Pattern::any()), // Support dcbor-pattern's * syntax
+        Token::RepeatZeroOrMore => Ok(Pattern::any()), /* Support dcbor-pattern's * syntax */
         Token::Array => leaf::parse_array(lexer),
-        Token::BoolKeyword => Ok(Pattern::any_bool()), // New dcbor-pattern bool syntax
-        Token::BoolTrue => Ok(Pattern::bool(true)), // New dcbor-pattern true syntax
-        Token::BoolFalse => Ok(Pattern::bool(false)), // New dcbor-pattern false syntax
-        Token::ByteString => leaf::parse_byte_string(lexer),
+        Token::BoolKeyword => Ok(Pattern::any_bool()), /* New dcbor-pattern
+                                                         * bool syntax */
+        Token::BoolTrue => Ok(Pattern::bool(true)), /* New dcbor-pattern
+                                                      * true syntax */
+        Token::BoolFalse => Ok(Pattern::bool(false)), /* New dcbor-pattern
+                                                        * false syntax */
+        Token::ByteString => Ok(Pattern::any_byte_string()), /* New dcbor-pattern bstr syntax */
+        Token::HexPattern(Ok(bytes)) => Ok(Pattern::byte_string(bytes)), /* New dcbor-pattern h'hex' syntax */
+        Token::HexPattern(Err(e)) => Err(e),
+        Token::HexBinaryRegex(Ok(regex_str)) => {
+            let regex = regex::bytes::Regex::new(&regex_str)
+                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
+            Ok(Pattern::byte_string_binary_regex(regex))
+        }
+        Token::HexBinaryRegex(Err(e)) => Err(e),
         Token::Date => leaf::parse_date(lexer),
         Token::Tag => leaf::parse_tag(lexer),
         Token::Known => leaf::parse_known_value(lexer),

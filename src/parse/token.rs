@@ -98,7 +98,7 @@ pub enum Token {
     #[token("ARRAY")]
     Array,
 
-    #[token("BSTR")]
+    #[token("bstr")]
     ByteString,
 
     #[token("LEAF")]
@@ -183,6 +183,12 @@ pub enum Token {
     #[token("/", parse_regex)]
     Regex(Result<String>),
 
+    #[token("h'", parse_hex_pattern)]
+    HexPattern(Result<Vec<u8>>),
+
+    #[token("h'/", parse_hex_binary_regex)]
+    HexBinaryRegex(Result<String>),
+
     #[token("{", parse_range)]
     Range(Result<Quantifier>),
 }
@@ -211,6 +217,57 @@ fn parse_regex(lex: &mut Lexer<Token>) -> Result<String> {
     // Unterminated literal – treat as lexing error
     Err(Error::UnterminatedRegex(lex.span()))
 }
+
+/// Callback used by the `HexPattern` variant above.
+fn parse_hex_pattern(lex: &mut Lexer<Token>) -> Result<Vec<u8>> {
+    let src = lex.remainder(); // everything after the first h'
+
+    // Parse hex digits until we find the closing '
+    for (i, ch) in src.char_indices() {
+        if ch == '\'' {
+            // Found the closing delimiter
+            let hex_str = &src[..i];
+            lex.bump(i + 1); // +1 to also eat the '
+            return hex::decode(hex_str)
+                .map_err(|_| Error::InvalidHexString(lex.span()));
+        }
+        if !ch.is_ascii_hexdigit() {
+            return Err(Error::InvalidHexString(lex.span()));
+        }
+    }
+
+    // Unterminated hex literal
+    Err(Error::InvalidHexString(lex.span()))
+}
+
+/// Callback used by the `HexBinaryRegex` variant above.
+fn parse_hex_binary_regex(lex: &mut Lexer<Token>) -> Result<String> {
+    let src = lex.remainder(); // everything after the first h'/
+    let mut escape = false;
+
+    for (i, ch) in src.char_indices() {
+        match (ch, escape) {
+            ('\\', false) => escape = true, // start of an escape
+            ('/', false) => {
+                // Found the closing delimiter
+                lex.bump(i + 1); // +1 to also eat the '/'
+                if i + 1 < src.len() && src.chars().nth(i + 1) == Some('\'') {
+                    lex.bump(1); // eat the closing '
+                }
+                let regex_str = &src[..i];
+                match regex::bytes::Regex::new(regex_str) {
+                    Ok(_) => return Ok(regex_str.to_string()),
+                    Err(_) => return Err(Error::InvalidRegex(lex.span())),
+                }
+            }
+            _ => escape = false, // any other char ends an escape
+        }
+    }
+
+    // Unterminated regex literal
+    Err(Error::UnterminatedRegex(lex.span()))
+}
+
 fn parse_range(lex: &mut Lexer<Token>) -> Result<Quantifier> {
     let src = lex.remainder(); // everything after the first '{'
 

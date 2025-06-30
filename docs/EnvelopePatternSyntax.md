@@ -40,11 +40,11 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `false`
         - Matches the boolean value `false`.
 - ByteString
-    - `BSTR`
+    - `bstr`
         - Matches any byte string.
-    - `BSTR ( h'hex' )`
+    - `h'hex'`
         - Matches a byte string with the specified hex value. Note that the `h'...'` syntax is used to denote hex strings in CBOR diagnostic notation, so we use it here for familiarity.
-    - `BSTR ( /regex/ )`
+    - `h'/regex/'`
         - Matches a byte string that matches the specified binary regex.
 - CBOR
     - `CBOR`

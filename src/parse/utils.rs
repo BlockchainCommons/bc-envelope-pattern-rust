@@ -46,65 +46,6 @@ pub(crate) fn parse_string_literal(src: &str) -> Result<(String, usize)> {
     Err(Error::UnexpectedEndOfInput)
 }
 
-pub(crate) fn parse_hex_string(src: &str) -> Result<(Vec<u8>, usize)> {
-    let mut pos = 0;
-    skip_ws(src, &mut pos);
-    if !src[pos..].starts_with("h'") {
-        return Err(Error::InvalidHexString(pos..pos));
-    }
-    pos += 2;
-    let start = pos;
-    while pos < src.len() {
-        let b = src.as_bytes()[pos];
-        if b == b'\'' {
-            let inner = &src[start..pos];
-            let bytes = hex::decode(inner)
-                .map_err(|_| Error::InvalidHexString(pos..pos))?;
-            pos += 1;
-            skip_ws(src, &mut pos);
-            return Ok((bytes, pos));
-        }
-        if !(b as char).is_ascii_hexdigit() {
-            return Err(Error::InvalidHexString(pos..pos));
-        }
-        pos += 1;
-    }
-    Err(Error::InvalidHexString(pos..pos))
-}
-
-pub(crate) fn parse_binary_regex(
-    src: &str,
-) -> Result<(regex::bytes::Regex, usize)> {
-    let mut pos = 0;
-    skip_ws(src, &mut pos);
-    if pos >= src.len() || src.as_bytes()[pos] != b'/' {
-        return Err(Error::UnterminatedRegex(pos..pos));
-    }
-    pos += 1;
-    let start = pos;
-    let mut escape = false;
-    while pos < src.len() {
-        let b = src.as_bytes()[pos];
-        pos += 1;
-        if escape {
-            escape = false;
-            continue;
-        }
-        if b == b'\\' {
-            escape = true;
-            continue;
-        }
-        if b == b'/' {
-            let inner = &src[start..pos - 1];
-            let regex = regex::bytes::Regex::new(inner)
-                .map_err(|_| Error::InvalidRegex(pos..pos))?;
-            skip_ws(src, &mut pos);
-            return Ok((regex, pos));
-        }
-    }
-    Err(Error::UnterminatedRegex(pos..pos))
-}
-
 pub(crate) fn parse_uint_digits(src: &str, pos: &mut usize) -> Result<f64> {
     let start = *pos;
     while let Some(ch) = src[*pos..].chars().next() {
