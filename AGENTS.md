@@ -59,57 +59,52 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - Update the `TEXT` pattern to use the `dcbor-pattern` crate's `text` syntax for matching text strings.
 - Update the `NUMBER` pattern to use the `dcbor-pattern` crate's `number` syntax for matching numbers.
 - Update the `DATE` pattern to use the `dcbor-pattern` crate's `date` syntax for matching dates.
-
-### COMPLETE:
-
-- Update the `ANY` pattern to use the `dcbor-pattern` crate's `*` syntax for matching any envelope.
-- Update the `BOOL` pattern to use the `dcbor-pattern` crate's `bool`, `true`, and `false` syntax for matching boolean values.
-- Update the `NULL` pattern to use the `dcbor-pattern` crate's `null` syntax for matching null values.
-- Update the `BSTR` pattern to use the `dcbor-pattern` crate's `bstr` syntax for matching byte strings.
-- Update the `TEXT` pattern to use the `dcbor-pattern` crate's `text` syntax for matching text strings.
-- Update the `NUMBER` pattern to use the `dcbor-pattern` crate's `number` syntax for matching numbers.
-- Update the `DATE` pattern to use the `dcbor-pattern` crate's `date` syntax for matching dates.
 - Update the `KNOWN` pattern to use the `dcbor-pattern` crate's `known` syntax for matching known values.
+- Update the `TAG` pattern to use the `dcbor-pattern` crate's `tagged` syntax for matching arrays.
 
 ### NEXT TASK:
 
-- Update the `TAG` pattern to use the `dcbor-pattern` crate's `tagged` syntax for matching arrays.
-
 #### Old Syntax:
 
-    - `TAG`
-        - Matches any CBOR tagged value.
-    - `TAG ( value )`
-        - Matches the specified CBOR tagged value. This is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
-    - `TAG ( name )`
-        - Matches the CBOR tagged value with the specified name. It is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
-    - `TAG ( /regex/ )`
-        - Matches a CBOR tagged value with a name that matches the specified regex.
+- Array
+    - `ARRAY`
+        - Matches any array.
+    - `ARRAY ( { n } )`
+        - Matches an array with exactly `n` elements.
+    - `ARRAY ( { n , m } )`
+        - Matches an array with between `n` and `m` elements, inclusive.
+    - `ARRAY ( { n , } )`
+        - Matches an array with at least `n` elements.
 
 #### New Syntax:
 
-    - `tagged`
-        - Matches any CBOR tagged value.
-    - `tagged ( value, pattern )`
-        - Matches the specified CBOR tagged value with content that matches the given pattern. The tag value is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
-    - `tagged ( name, pattern )`
-        - Matches the CBOR tagged value with the specified name and content that matches the given pattern. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
-    - `tagged ( /regex/, pattern )`
-        - Matches a CBOR tagged value with a name that matches the specified regex and content that matches the given pattern.
+- Array
+    - `[*]`
+        - Matches any array.
+    - `[{n}]`
+        - Matches an array with exactly `n` elements.
+    - `[{n,m}]`
+        - Matches an array with between `n` and `m` elements, inclusive.
+    - `[{n,}]`
+        - Matches an array with at least `n` elements.
+    - `[pattern]`
+        - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
+        - Examples:
+            - `[42]` - Array containing exactly one element: the number 42
+            - `["a", "b", "c"]` - Array containing exactly ["a", "b", "c"] in sequence
+            - `[(*)*, 42, (*)*]` - Array containing 42 anywhere within it
+            - `[42, (*)*]` - Array starting with 42, followed by any elements
+            - `[(*)*, 42]` - Array ending with 42, preceded by any elements
 
     - Examples:
-        - Old: `TAG` becomes `tagged`
-        - Old: `TAG ( 100 )` becomes `tagged ( 100, * )`
-        - Old: `TAG ( "date" )` becomes `tagged ( date, * )`
-        - Old: `TAG ( /da.*/ )` becomes `tagged ( /da.*/, * )`
+        - Old: `ARRAY` becomes `[*]`
+        - Old: `ARRAY(1, 2, 3)` becomes `[1, 2, 3]`
+        - Old: `ARRAY((number)*, 5)` becomes `[(*)*, 5]`
+        - Old: `ARRAY(1, (text)+)` becomes `[1, (text)+]`
 
 #### Important Notes:
 
-    - Remember: once you've parsed `tagged` or `tagged(value, pattern)`, you are just a proxy for the functionality in `dcbor-pattern`. You do not need to implement any additional logic for the `tagged` pattern. There will be no envelope patterns inside the `tagged` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
-    - The code has already has most of the changes from `TAG` to `tagged`. But you will still need to make some changes and additions to get the new syntax working.
-    - `dcbor-pattern` can do everything including looking up tag names.
-    - Pay attention to how `dcbor-pattern` handles parsing both argumetnts to the `tagged` pattern. Look at `token.rs` and `tagged_parser.rs` in the `dcbor-pattern` crate. Only use it for inspiration: YOU ARE A PROXY, NOT A REIMPLEMENTATION.
-    - You *do* need to call `bc_envelope::register_tags()` at the start of *every* test that may need tag name resolution.
+    - Remember: you are just a proxy for the functionality in `dcbor-pattern`. You do not need to implement any additional logic for the `array` pattern, just have `dcbor-pattern` parse from `[` through `]`. There will be no envelope patterns inside the `array` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
     - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
     - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
