@@ -98,7 +98,7 @@ impl std::fmt::Display for OrPattern {
                 .iter()
                 .map(|p| p.to_string())
                 .collect::<Vec<_>>()
-                .join("|")
+                .join(" | ")
         )
     }
 }
@@ -112,6 +112,6 @@ mod tests {
         let pattern1 = Pattern::text("Alice");
         let pattern2 = Pattern::text("Bob");
         let or_pattern = OrPattern::new(vec![pattern1, pattern2]);
-        assert_eq!(or_pattern.to_string(), r#""Alice"|"Bob""#);
+        assert_eq!(or_pattern.to_string(), r#""Alice" | "Bob""#);
     }
 }

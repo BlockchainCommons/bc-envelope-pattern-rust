@@ -25,7 +25,7 @@ fn test_and_pattern() {
     assert!(!impossible_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", impossible_pattern),
-        r#"42&"foo""#
+        r#"42 & "foo""#
     );
 
     // A pattern that requires the envelope to match both a number greater
@@ -37,7 +37,7 @@ fn test_and_pattern() {
     assert!(number_range_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", number_range_pattern),
-        r#">40&<50"#
+        r#">40 & <50"#
     );
 
     // The path includes the assertion.
@@ -61,7 +61,7 @@ fn test_and_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", number_range_with_subject_pattern),
-        r#">40&<50->SUBJECT"#,
+        r#">40 & <50 -> SUBJECT"#,
     );
 }
 
@@ -70,7 +70,7 @@ fn test_or_pattern() {
     // A pattern that requires the envelope to match either the string "foo" or
     // the string "bar".
     let pattern = Pattern::or(vec![Pattern::text("bar"), Pattern::text("baz")]);
-    assert_eq!(format!("{}", pattern), r#""bar"|"baz""#);
+    assert_eq!(format!("{}", pattern), r#""bar" | "baz""#);
 
     // An envelope that is a number, so it doesn't match the pattern.
     let envelope = Envelope::new(42).add_assertion("an", "assertion");
@@ -86,7 +86,7 @@ fn test_or_pattern() {
     assert!(foo_or_greater_than_40_pattern.matches(&envelope));
     assert_eq!(
         format!("{}", foo_or_greater_than_40_pattern),
-        r#""foo"|>40"#
+        r#""foo" | >40"#
     );
 
     // The match path includes the assertion.
@@ -110,7 +110,7 @@ fn test_or_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", foo_or_greater_than_40_with_subject_pattern),
-        r#""foo"|>40->SUBJECT"#
+        r#""foo" | >40 -> SUBJECT"#
     );
 }
 
@@ -225,7 +225,7 @@ fn test_wrapped_traversal() {
 
     assert_eq!(
         format!("{}", wrapped_4_pattern),
-        r#"UNWRAP->UNWRAP->UNWRAP->UNWRAP"#
+        r#"UNWRAP -> UNWRAP -> UNWRAP -> UNWRAP"#
     );
 }
 
@@ -238,7 +238,7 @@ fn optional_wrapped_pattern() {
     ]);
     assert_eq!(
         format!("{}", optional_wrapped_pattern),
-        r#"(UNWRAP)?->number"#
+        r#"(UNWRAP)? -> number"#
     );
 
     let inner = Envelope::new(42);
@@ -650,7 +650,7 @@ fn test_not_pattern() {
     ]);
     assert_eq!(
         format!("{}", complex_pattern),
-        r#"!"wrong_subject"&ASSERTPRED("key1")"#
+        r#"!"wrong_subject" & ASSERTPRED("key1")"#
     );
 
     let matches = complex_pattern.matches(&envelope);
