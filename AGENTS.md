@@ -65,7 +65,7 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ### NEXT TASK:
 
-- Update the `MAP` pattern to use the `dcbor-pattern` crate's new syntax for matching maps.
+- Write the development plan for updating the `MAP` pattern to use the `dcbor-pattern` crate's new syntax for matching maps.
 
 #### Old Syntax:
 
@@ -93,16 +93,20 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
     - Examples:
         - Old: `MAP` becomes `{*}`
-        - Old: `MAP({1})` becomes `{{1}}`
-        - Old: `MAP({1, 2})` becomes `{{1, 2}}`
-        - Old: `MAP({1,})` becomes `{{1,}}`
+        - Old: `MAP( { 1 } )` becomes `{ {1} }`
+        - Old: `MAP( {1, 2} )` becomes `{ {1, 2} }`
+        - Old: `MAP( { 1 , } )` becomes `{ {1 , } }`
         - Old: `MAP(key: value, ...)` becomes `{key: value, ...}`
 
 #### Important Notes:
 
     - Remember: The map pattern is just a proxy for the functionality in `dcbor-pattern`, and all you are doing is adapting the existing syntax. You do not need to implement any additional logic for the `map` pattern, just pass from `{` through `}` to `dcbor-pattern`. There will be no envelope patterns inside the `map` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
+    - Tip: We've already converted the `array` (`[*]`) pattern to use the new syntax, so you can use that as a reference for how to convert the `map` pattern.
+    - Tip: Intervals `{n, m}` are delimited by braces and so are maps. The key to differentiating them from the new map syntax is that intervals cannot appear by themselves. Finding a `{` token where a pattern is expected means you are looking at a map pattern. You need to "naively" parse the map pattern including balanced delimiters and ignoring everything else until you find the closing `}`. Then you need to have `dcbor-pattern` parse the map pattern, which will return a `dcbor-pattern::Pattern`.
     - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
     - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
-    - Tip: We've already converted the `array` (`[*]`) pattern to use the new syntax, so you can use that as a reference for how to convert the `map` pattern.
-    - Tip: Intervals `{n, m}` are delimited by braces and so are maps. The key to differentiating them is that intervals cannot appear by themselves. Finding a `{` token where a pattern is expected means you are looking at a map pattern. You need to stupidly parse the map pattern including balanced delimiters and ignoring everything else until you find the closing `}`. Then you need to have `dcbor-pattern` parse the map pattern, which will return a `dcbor-pattern::Pattern`.
+
+### Development Plan
+
+TBD
