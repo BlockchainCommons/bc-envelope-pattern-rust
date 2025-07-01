@@ -216,7 +216,7 @@ impl Pattern {
     /// Creates a new `Pattern` that matches Date (CBOR tag 1) values by their
     /// ISO-8601 string representation.
     pub fn date_iso8601(iso_string: impl Into<String>) -> Self {
-        Pattern::Leaf(LeafPattern::Date(DatePattern::iso8601(iso_string)))
+        Pattern::Leaf(LeafPattern::Date(DatePattern::string(iso_string)))
     }
 
     /// Creates a new `Pattern` that matches Date (CBOR tag 1) values whose
@@ -313,7 +313,9 @@ impl Pattern {
         Pattern::Leaf(LeafPattern::KnownValue(KnownValuePattern::regex(regex)))
     }
 
-    pub fn unit() -> Self { Self::known_value(known_values::UNIT) }
+    pub fn unit() -> Self {
+        Self::known_value(known_values::UNIT)
+    }
 }
 
 impl Pattern {
@@ -548,7 +550,9 @@ impl Pattern {
 
 impl Pattern {
     /// Creates a new `Pattern` that matches any element.
-    pub fn any() -> Self { Pattern::Meta(MetaPattern::Any(AnyPattern::new())) }
+    pub fn any() -> Self {
+        Pattern::Meta(MetaPattern::Any(AnyPattern::new()))
+    }
 
     /// Creates a new `Pattern` that never matches any element.
     pub fn none() -> Self {

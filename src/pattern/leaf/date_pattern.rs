@@ -11,19 +11,19 @@ use crate::{
 /// Pattern for matching dates. This is a wrapper around
 /// dcbor_pattern::DatePattern that provides envelope-specific integration.
 #[derive(Debug, Clone)]
-pub struct DatePattern {
-    inner: dcbor_pattern::DatePattern,
-}
+pub struct DatePattern(dcbor_pattern::DatePattern);
 
 impl PartialEq for DatePattern {
-    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
 }
 
 impl Eq for DatePattern {}
 
 impl std::hash::Hash for DatePattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state);
+        self.0.hash(state);
     }
 }
 
@@ -31,48 +31,50 @@ impl std::hash::Hash for DatePattern {
 // functions
 impl DatePattern {
     /// Creates a new `DatePattern` that matches any date.
-    pub fn any() -> Self { Self { inner: dcbor_pattern::DatePattern::any() } }
+    pub fn any() -> Self {
+        Self(dcbor_pattern::DatePattern::any())
+    }
 
     /// Creates a new `DatePattern` that matches a specific date.
     pub fn value(date: Date) -> Self {
-        Self { inner: dcbor_pattern::DatePattern::value(date) }
+        Self(dcbor_pattern::DatePattern::value(date))
     }
 
     /// Creates a new `DatePattern` that matches dates within a range
     /// (inclusive).
     pub fn range(range: RangeInclusive<Date>) -> Self {
-        Self { inner: dcbor_pattern::DatePattern::range(range) }
+        Self(dcbor_pattern::DatePattern::range(range))
     }
 
     /// Creates a new `DatePattern` that matches dates that are on or after the
     /// specified date.
     pub fn earliest(date: Date) -> Self {
-        Self { inner: dcbor_pattern::DatePattern::earliest(date) }
+        Self(dcbor_pattern::DatePattern::earliest(date))
     }
 
     /// Creates a new `DatePattern` that matches dates that are on or before the
     /// specified date.
     pub fn latest(date: Date) -> Self {
-        Self { inner: dcbor_pattern::DatePattern::latest(date) }
+        Self(dcbor_pattern::DatePattern::latest(date))
     }
 
     /// Creates a new `DatePattern` that matches a date by its ISO-8601 string
     /// representation.
-    pub fn iso8601(iso_string: impl Into<String>) -> Self {
-        Self {
-            inner: dcbor_pattern::DatePattern::iso8601(iso_string),
-        }
+    pub fn string(iso_string: impl Into<String>) -> Self {
+        Self(dcbor_pattern::DatePattern::string(iso_string))
     }
 
     /// Creates a new `DatePattern` that matches dates whose ISO-8601 string
     /// representation matches the given regex pattern.
     pub fn regex(regex: regex::Regex) -> Self {
-        Self { inner: dcbor_pattern::DatePattern::regex(regex) }
+        Self(dcbor_pattern::DatePattern::regex(regex))
     }
 
     /// Creates a new `DatePattern` from a dcbor-pattern DatePattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::DatePattern) -> Self {
-        Self { inner: dcbor_pattern }
+    pub fn from_dcbor_pattern(
+        dcbor_pattern: dcbor_pattern::DatePattern,
+    ) -> Self {
+        Self(dcbor_pattern)
     }
 }
 
@@ -86,7 +88,7 @@ impl Matcher for DatePattern {
         if let Some(cbor) = envelope.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // DatePattern doesn't support captures, so we only get paths
-            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
 
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
@@ -124,7 +126,7 @@ impl Matcher for DatePattern {
 
 impl std::fmt::Display for DatePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner)
+        write!(f, "{}", self.0)
     }
 }
 
@@ -204,12 +206,12 @@ mod tests {
         let date = Date::from_ymd(2023, 12, 25);
         let envelope = Envelope::new(date.clone());
 
-        let pattern = DatePattern::iso8601("2023-12-25");
+        let pattern = DatePattern::string("2023-12-25");
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
         // Test non-matching string
-        let pattern = DatePattern::iso8601("2023-12-24");
+        let pattern = DatePattern::string("2023-12-24");
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
 
@@ -217,7 +219,7 @@ mod tests {
         let date_with_time = Date::from_ymd_hms(2023, 12, 25, 15, 30, 45);
         let envelope_with_time = Envelope::new(date_with_time.clone());
 
-        let pattern = DatePattern::iso8601("2023-12-25T15:30:45Z");
+        let pattern = DatePattern::string("2023-12-25T15:30:45Z");
         let paths = pattern.paths(&envelope_with_time);
         assert_eq!(paths.len(), 1);
     }
@@ -286,7 +288,7 @@ mod tests {
         let pattern = DatePattern::latest(Date::from_ymd(2023, 12, 25));
         assert_eq!(pattern.to_string(), "date'...2023-12-25'");
 
-        let pattern = DatePattern::iso8601("2023-12-25");
+        let pattern = DatePattern::string("2023-12-25");
         assert_eq!(pattern.to_string(), "date'2023-12-25'");
 
         let pattern =
@@ -327,7 +329,7 @@ mod tests {
         assert!(!range_pattern.matches(&number_envelope));
 
         // Test ISO8601 patterns
-        let iso_pattern = DatePattern::iso8601("2023-12-25");
+        let iso_pattern = DatePattern::string("2023-12-25");
         assert!(iso_pattern.matches(&date_envelope));
         assert!(!iso_pattern.matches(&text_envelope));
 

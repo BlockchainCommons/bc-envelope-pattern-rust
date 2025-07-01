@@ -11,36 +11,30 @@ use crate::{
 /// dcbor_pattern::ByteStringPattern that provides envelope-specific
 /// integration.
 #[derive(Debug, Clone)]
-pub struct ByteStringPattern {
-    inner: dcbor_pattern::ByteStringPattern,
-}
+pub struct ByteStringPattern(dcbor_pattern::ByteStringPattern);
 
 // Re-export the dcbor-pattern ByteStringPattern methods through associated
 // functions
 impl ByteStringPattern {
     /// Creates a new `ByteStringPattern` that matches any byte string.
     pub fn any() -> Self {
-        Self { inner: dcbor_pattern::ByteStringPattern::any() }
+        Self(dcbor_pattern::ByteStringPattern::any())
     }
 
     /// Creates a new `ByteStringPattern` that matches a specific byte string.
     pub fn value(value: impl AsRef<[u8]>) -> Self {
-        Self {
-            inner: dcbor_pattern::ByteStringPattern::value(value),
-        }
+        Self(dcbor_pattern::ByteStringPattern::value(value))
     }
 
     /// Creates a new `ByteStringPattern` that matches the binary regex for a
     /// byte string.
     pub fn regex(regex: regex::bytes::Regex) -> Self {
-        Self {
-            inner: dcbor_pattern::ByteStringPattern::regex(regex),
-        }
+        Self(dcbor_pattern::ByteStringPattern::regex(regex))
     }
 
     /// Creates a new `ByteStringPattern` from a dcbor-pattern ByteStringPattern.
     pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::ByteStringPattern) -> Self {
-        Self { inner: dcbor_pattern }
+        Self(dcbor_pattern)
     }
 }
 
@@ -54,7 +48,7 @@ impl Matcher for ByteStringPattern {
         if let Some(cbor) = envelope.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // ByteStringPattern doesn't support captures, so we only get paths
-            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
 
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
@@ -92,19 +86,19 @@ impl Matcher for ByteStringPattern {
 
 impl std::fmt::Display for ByteStringPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner)
+        write!(f, "{}", self.0)
     }
 }
 
 impl PartialEq for ByteStringPattern {
-    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
 impl Eq for ByteStringPattern {}
 
 impl std::hash::Hash for ByteStringPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state);
+        self.0.hash(state);
     }
 }
 
