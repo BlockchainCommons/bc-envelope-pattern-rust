@@ -13,7 +13,7 @@ fn test_parser_envelope_patterns_take_precedence() {
         ("search(42)", "envelope search pattern"),
         ("NODE", "envelope node pattern"),
         ("ASSERTION", "envelope assertion pattern"),
-        ("DIGEST", "envelope digest pattern"),
+        ("digest", "envelope digest pattern"),
         ("@name(42)", "envelope capture pattern"),
         ("CBOR(42)", "envelope cbor pattern"),
     ];

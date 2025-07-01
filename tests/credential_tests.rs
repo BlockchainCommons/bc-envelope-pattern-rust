@@ -131,7 +131,7 @@ fn test_parsed_node_structure() {
 fn test_digest_and_not() {
     let env = credential();
     let digest = env.short_id(bc_envelope::DigestDisplayFormat::Short);
-    let pattern_str = format!("DIGEST({})&(!OBSCURED)", digest);
+    let pattern_str = format!("digest({})&(!OBSCURED)", digest);
     let pat = Pattern::parse(&pattern_str).unwrap();
     assert!(pat.matches(&env));
 }

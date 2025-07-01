@@ -118,17 +118,17 @@ fn parse_obscured_patterns() {
 
 #[test]
 fn parse_digest_patterns() {
-    let p = Pattern::parse("DIGEST(a1b2c3)").unwrap();
+    let p = Pattern::parse("digest(a1b2c3)").unwrap();
     assert_eq!(p, Pattern::digest_prefix(hex::decode("a1b2c3").unwrap()));
-    assert_eq!(p.to_string(), "DIGEST(a1b2c3)");
+    assert_eq!(p.to_string(), "digest(a1b2c3)");
 
-    let spaced = "DIGEST ( a1b2c3 )";
+    let spaced = "digest ( a1b2c3 )";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
         Pattern::digest_prefix(hex::decode("a1b2c3").unwrap())
     );
-    assert_eq!(p_spaced.to_string(), "DIGEST(a1b2c3)");
+    assert_eq!(p_spaced.to_string(), "digest(a1b2c3)");
 }
 
 #[test]
@@ -136,8 +136,8 @@ fn parse_digest_ur_pattern() {
     bc_envelope::register_tags();
     let digest = Digest::from_image(b"hello world");
     let ur = digest.ur_string();
-    let expr = format!("DIGEST({})", ur);
+    let expr = format!("digest({})", ur);
     let p = Pattern::parse(&expr).unwrap();
     assert_eq!(p, Pattern::digest(digest.clone()));
-    assert_eq!(p.to_string(), format!("DIGEST({})", digest));
+    assert_eq!(p.to_string(), format!("digest({})", digest));
 }

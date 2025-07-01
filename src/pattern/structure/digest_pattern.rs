@@ -115,12 +115,12 @@ impl Matcher for DigestPattern {
 impl std::fmt::Display for DigestPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DigestPattern::Digest(digest) => write!(f, "DIGEST({})", digest),
+            DigestPattern::Digest(digest) => write!(f, "digest({})", digest),
             DigestPattern::Prefix(prefix) => {
-                write!(f, "DIGEST({})", hex::encode(prefix))
+                write!(f, "digest({})", hex::encode(prefix))
             }
             DigestPattern::BinaryRegex(regex) => {
-                write!(f, "DIGEST(/{}/)", regex)
+                write!(f, "digest(/{}/)", regex)
             }
         }
     }
@@ -135,15 +135,15 @@ mod tests {
         let data: &[u8] = b"test";
         let digest = data.digest().into_owned();
         let pattern = DigestPattern::digest(digest.clone());
-        assert_eq!(format!("{}", pattern), format!("DIGEST({})", digest));
+        assert_eq!(format!("{}", pattern), format!("digest({})", digest));
         let prefix = vec![0x74, 0x65, 0x73]; // "tes"
         let pattern = DigestPattern::prefix(prefix.clone());
         assert_eq!(
             format!("{}", pattern),
-            format!("DIGEST({})", hex::encode(&prefix))
+            format!("digest({})", hex::encode(&prefix))
         );
         let regex = regex::bytes::Regex::new(r"^te.*").unwrap();
         let pattern = DigestPattern::binary_regex(regex.clone());
-        assert_eq!(format!("{}", pattern), format!("DIGEST(/{}/)", regex));
+        assert_eq!(format!("{}", pattern), format!("digest(/{}/)", regex));
     }
 }

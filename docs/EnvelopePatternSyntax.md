@@ -149,9 +149,9 @@ Structure patterns match parts of Gordian Envelope structures.
     - `assertobj ( pattern )`
         - Matches an assertion having an object that matches the specified pattern.
 - Digest
-    - `DIGEST ( hex )`
+    - `digest ( hex )`
         - Matches a digest whose value starts with the specified hex prefix. Up to 32 bytes can be specified, which is the length of the full SHA-256 digest.
-    - `DIGEST ( ur:digest/value )`
+    - `digest ( ur:digest/value )`
         - Matches the specified `ur:digest` value, parsed using the `bc-ur` crate.
 - Node
     - `NODE`
