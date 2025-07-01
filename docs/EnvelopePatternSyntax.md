@@ -183,7 +183,7 @@ Structure patterns match parts of Gordian Envelope structures.
     - `subj ( pattern )`
         - Matches a subject that matches the specified pattern.
 - Wrapped
-    - `WRAPPED`
+    - `wrapped`
         - Matches any wrapped Envelope.
     - `UNWRAP`
         - Matches on the content of a wrapped Envelope.

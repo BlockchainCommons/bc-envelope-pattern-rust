@@ -142,13 +142,13 @@ fn test_wrapped_repeat() {
     // See above for the full tree structure of the credential.
     let env = credential();
 
-    // A pattern that matches zero or more `WRAPPED` elements leading to a
+    // A pattern that matches zero or more `wrapped` elements leading to a
     // `node`.
-    let pat = Pattern::parse("(WRAPPED)*>node").unwrap();
+    let pat = Pattern::parse("(wrapped)*>node").unwrap();
     let paths = pat.paths(&env);
 
     // The pattern should match both the outer node and its unwrapped subject
-    // node since the `WRAPPED` repetition can consume the wrapper around the
+    // node since the `wrapped` repetition can consume the wrapper around the
     // subject.
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -172,8 +172,8 @@ fn test_search_wrapped_repeat() {
     // See above for the full tree structure of the credential.
     let env = credential();
     // A pattern that searches every element in the tree for those
-    // that start a path of zero or more `WRAPPED` elements leading to a `node`.
-    let pat = Pattern::parse("search((WRAPPED)*>node)").unwrap();
+    // that start a path of zero or more `wrapped` elements leading to a `node`.
+    let pat = Pattern::parse("search((wrapped)*>node)").unwrap();
     let paths = pat.paths(&env);
     // Every `node` in the tree should match the pattern, including the inner
     // `8122ffa9 NODE`. Consequently there are two matching paths: one that

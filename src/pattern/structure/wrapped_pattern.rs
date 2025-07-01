@@ -113,7 +113,7 @@ impl Matcher for WrappedPattern {
 impl std::fmt::Display for WrappedPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            WrappedPattern::Any => write!(f, "WRAPPED"),
+            WrappedPattern::Any => write!(f, "wrapped"),
             WrappedPattern::Unwrap(pattern) => {
                 if **pattern == Pattern::any() {
                     write!(f, "UNWRAP")

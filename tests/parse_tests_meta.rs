@@ -103,12 +103,12 @@ fn parse_search_pattern() {
 
 #[test]
 fn parse_repeat_patterns() {
-    let p = Pattern::parse("(WRAPPED)*").unwrap();
+    let p = Pattern::parse("(wrapped)*").unwrap();
     assert_eq!(
         p,
         Pattern::repeat(Pattern::wrapped(), 0.., Reluctance::Greedy)
     );
-    assert_eq!(p.to_string(), "(WRAPPED)*");
+    assert_eq!(p.to_string(), "(wrapped)*");
 
     let p = Pattern::parse("(text)+?").unwrap();
     assert_eq!(
