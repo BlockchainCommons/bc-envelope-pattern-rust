@@ -48,21 +48,21 @@ fn parse_assert_patterns() {
     assert_eq!(p, Pattern::any_assertion());
     assert_eq!(p.to_string(), "assert");
 
-    let p = Pattern::parse(r#"ASSERTPRED("hi")"#).unwrap();
+    let p = Pattern::parse(r#"assertpred("hi")"#).unwrap();
     assert_eq!(p, Pattern::assertion_with_predicate(Pattern::text("hi")));
-    assert_eq!(p.to_string(), r#"ASSERTPRED("hi")"#);
+    assert_eq!(p.to_string(), r#"assertpred("hi")"#);
 
-    let spaced = r#"ASSERTPRED ( "hi" )"#;
+    let spaced = r#"assertpred ( "hi" )"#;
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(
         p_spaced,
         Pattern::assertion_with_predicate(Pattern::text("hi"))
     );
-    assert_eq!(p_spaced.to_string(), r#"ASSERTPRED("hi")"#);
+    assert_eq!(p_spaced.to_string(), r#"assertpred("hi")"#);
 
-    let p = Pattern::parse("ASSERTOBJ(1)").unwrap();
+    let p = Pattern::parse("assertobj(1)").unwrap();
     assert_eq!(p, Pattern::assertion_with_object(Pattern::number(1)));
-    assert_eq!(p.to_string(), "ASSERTOBJ(1)");
+    assert_eq!(p.to_string(), "assertobj(1)");
 }
 
 #[test]

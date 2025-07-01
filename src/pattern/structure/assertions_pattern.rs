@@ -82,10 +82,10 @@ impl std::fmt::Display for AssertionsPattern {
         match self {
             AssertionsPattern::Any => write!(f, "assert"),
             AssertionsPattern::WithPredicate(pattern) => {
-                write!(f, "ASSERTPRED({})", pattern)
+                write!(f, "assertpred({})", pattern)
             }
             AssertionsPattern::WithObject(pattern) => {
-                write!(f, "ASSERTOBJ({})", pattern)
+                write!(f, "assertobj({})", pattern)
             }
         }
     }

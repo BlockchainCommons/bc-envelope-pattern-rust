@@ -52,10 +52,10 @@ pub enum Token {
     #[token("assert")]
     Assertion,
 
-    #[token("ASSERTPRED")]
+    #[token("assertpred")]
     AssertionPred,
 
-    #[token("ASSERTOBJ")]
+    #[token("assertobj")]
     AssertionObj,
 
     #[token("DIGEST")]

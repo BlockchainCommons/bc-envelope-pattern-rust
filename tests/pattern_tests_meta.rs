@@ -23,10 +23,7 @@ fn test_and_pattern() {
     let impossible_pattern =
         Pattern::and(vec![Pattern::number(42), Pattern::text("foo")]);
     assert!(!impossible_pattern.matches(&envelope));
-    assert_eq!(
-        format!("{}", impossible_pattern),
-        r#"42 & "foo""#
-    );
+    assert_eq!(format!("{}", impossible_pattern), r#"42 & "foo""#);
 
     // A pattern that requires the envelope to match both a number greater
     // than 40 and a number less than 50, which is possible.
@@ -35,10 +32,7 @@ fn test_and_pattern() {
         Pattern::number_less_than(50),
     ]);
     assert!(number_range_pattern.matches(&envelope));
-    assert_eq!(
-        format!("{}", number_range_pattern),
-        r#">40 & <50"#
-    );
+    assert_eq!(format!("{}", number_range_pattern), r#">40 & <50"#);
 
     // The path includes the assertion.
     let paths = number_range_pattern.paths(&envelope);
@@ -319,7 +313,7 @@ fn test_search_pattern() {
         Pattern::search(Pattern::assertion_with_object(Pattern::any_number()));
     assert_eq!(
         format!("{}", number_object_search_pattern),
-        r#"search(ASSERTOBJ(number))"#
+        r#"search(assertobj(number))"#
     );
     let number_object_search_paths =
         number_object_search_pattern.paths(&envelope);
@@ -621,10 +615,7 @@ fn test_not_pattern() {
     let search_pattern = Pattern::search(Pattern::not_matching(
         Pattern::object(Pattern::number(42)),
     ));
-    assert_eq!(
-        format!("{}", search_pattern),
-        r#"search(!OBJECT(42))"#
-    );
+    assert_eq!(format!("{}", search_pattern), r#"search(!OBJECT(42))"#);
     let not_patterns = search_pattern.paths(&envelope);
 
     // Should not match the assertion with object 42, but will match other
@@ -650,7 +641,7 @@ fn test_not_pattern() {
     ]);
     assert_eq!(
         format!("{}", complex_pattern),
-        r#"!"wrong_subject" & ASSERTPRED("key1")"#
+        r#"!"wrong_subject" & assertpred("key1")"#
     );
 
     let matches = complex_pattern.matches(&envelope);

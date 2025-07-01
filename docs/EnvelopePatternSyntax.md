@@ -144,9 +144,9 @@ Structure patterns match parts of Gordian Envelope structures.
 - Assertions
     - `assert`
         - Matches any assertion.
-    - `ASSERTPRED ( pattern )`
+    - `assertpred ( pattern )`
         - Matches an assertion having a predicate that matches the specified pattern.
-    - `ASSERTOBJ ( pattern )`
+    - `assertobj ( pattern )`
         - Matches an assertion having an object that matches the specified pattern.
 - Digest
     - `DIGEST ( hex )`
