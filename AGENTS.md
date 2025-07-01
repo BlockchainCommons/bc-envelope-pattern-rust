@@ -65,49 +65,42 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ### NEXT TASK:
 
-TBD - The array pattern update has been completed successfully!
+- Update the `MAP` pattern to use the `dcbor-pattern` crate's new syntax for matching maps.
 
 #### Old Syntax:
 
-- Array
-    - `ARRAY`
-        - Matches any array.
-    - `ARRAY ( { n } )`
-        - Matches an array with exactly `n` elements.
-    - `ARRAY ( { n , m } )`
-        - Matches an array with between `n` and `m` elements, inclusive.
-    - `ARRAY ( { n , } )`
-        - Matches an array with at least `n` elements.
+- Map
+    - `MAP`
+        - Matches any map.
+    - `MAP ( n )`
+        - Matches a map with exactly `n` entries.
+    - `MAP ( { n , m } )`
+        - Matches a map with between `n` and `m` entries, inclusive.
 
 #### New Syntax:
 
-- Array
-    - `[*]`
-        - Matches any array.
-    - `[{n}]`
-        - Matches an array with exactly `n` elements.
-    - `[{n,m}]`
-        - Matches an array with between `n` and `m` elements, inclusive.
-    - `[{n,}]`
-        - Matches an array with at least `n` elements.
-    - `[pattern]`
-        - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
-        - Examples:
-            - `[42]` - Array containing exactly one element: the number 42
-            - `["a", "b", "c"]` - Array containing exactly ["a", "b", "c"] in sequence
-            - `[(*)*, 42, (*)*]` - Array containing 42 anywhere within it
-            - `[42, (*)*]` - Array starting with 42, followed by any elements
-            - `[(*)*, 42]` - Array ending with 42, preceded by any elements
+- Map
+    - `{*}`
+        - Matches any map.
+    - `{{n}}`
+        - Matches a map with exactly `n` entries.
+    - `{{n,m}}`
+        - Matches a map with between `n` and `m` entries, inclusive.
+    - `{{n,}}`
+        - Matches a map with at least `n` entries.
+    - `{pattern: pattern, pattern: pattern, ...}`
+        - Matches if the specified patterns match the map's keys and values (order isn't important).
 
     - Examples:
-        - Old: `ARRAY` becomes `[*]`
-        - Old: `ARRAY(1, 2, 3)` becomes `[1, 2, 3]`
-        - Old: `ARRAY((number)*, 5)` becomes `[(*)*, 5]`
-        - Old: `ARRAY(1, (text)+)` becomes `[1, (text)+]`
+        - Old: `MAP` becomes `{*}`
+        - Old: `MAP({1})` becomes `{{1}}`
+        - Old: `MAP({1, 2})` becomes `{{1, 2}}`
+        - Old: `MAP({1,})` becomes `{{1,}}`
+        - Old: `MAP(key: value, ...)` becomes `{key: value, ...}`
 
 #### Important Notes:
 
-    - Remember: The array pattern is just a proxy for the functionality in `dcbor-pattern`, and all you are doing is adapting the existing syntax. You do not need to implement any additional logic for the `array` pattern, just pass from `[` through `]` to `dcbor-pattern`. There will be no envelope patterns inside the `array` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
+    - Remember: The map pattern is just a proxy for the functionality in `dcbor-pattern`, and all you are doing is adapting the existing syntax. You do not need to implement any additional logic for the `map` pattern, just pass from `{` through `}` to `dcbor-pattern`. There will be no envelope patterns inside the `map` pattern, so you do not need to worry about the envelope structure. You are just matching a CBOR value against a pattern, like every other leaf/value pattern. YOU ARE JUST A PROXY.
     - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
     - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
