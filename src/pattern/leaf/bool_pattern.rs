@@ -10,36 +10,34 @@ use crate::{
 /// Pattern for matching boolean values. This is a wrapper around
 /// dcbor_pattern::BoolPattern that provides envelope-specific integration.
 #[derive(Debug, Clone)]
-pub struct BoolPattern {
-    inner: dcbor_pattern::BoolPattern,
-}
+pub struct BoolPattern(dcbor_pattern::BoolPattern);
 
 // Re-export the dcbor-pattern BoolPattern methods through associated
 // functions
 impl BoolPattern {
     /// Creates a new `BoolPattern` that matches any boolean value.
-    pub fn any() -> Self { Self { inner: dcbor_pattern::BoolPattern::any() } }
+    pub fn any() -> Self { Self(dcbor_pattern::BoolPattern::any()) }
 
     /// Creates a new `BoolPattern` that matches the specific boolean value.
     pub fn value(value: bool) -> Self {
-        Self { inner: dcbor_pattern::BoolPattern::value(value) }
+        Self(dcbor_pattern::BoolPattern::value(value))
     }
 
     /// Creates a new `BoolPattern` from a dcbor-pattern BoolPattern.
     pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::BoolPattern) -> Self {
-        Self { inner: dcbor_pattern }
+        Self(dcbor_pattern)
     }
 }
 
 impl PartialEq for BoolPattern {
-    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
 impl Eq for BoolPattern {}
 
 impl std::hash::Hash for BoolPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state);
+        self.0.hash(state);
     }
 }
 
@@ -53,7 +51,7 @@ impl Matcher for BoolPattern {
         if let Some(cbor) = envelope.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // BoolPattern doesn't support captures, so we only get paths
-            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
 
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
@@ -91,7 +89,7 @@ impl Matcher for BoolPattern {
 
 impl std::fmt::Display for BoolPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner)
+        write!(f, "{}", self.0)
     }
 }
 
