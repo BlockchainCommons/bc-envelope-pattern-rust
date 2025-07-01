@@ -104,4 +104,4 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
     - This is de novo development, so DO NOT take any action to ensure backward-compatibility.
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
     - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
-    - Tip: We've already converted the `array` `[*]` pattern to use the new syntax, so you can use that as a reference for how to convert the `map` pattern.
+    - Tip: We've already converted the `array` (`[*]`) pattern to use the new syntax, so you can use that as a reference for how to convert the `map` pattern.
