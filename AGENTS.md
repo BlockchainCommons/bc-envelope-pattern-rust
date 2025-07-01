@@ -56,7 +56,7 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-envelope-pattern while maintaining full backward compatibility and envelope-specific functionality. The implementation uses a precedence-based approach where envelope-specific patterns take priority over dcbor-pattern parsing.
 
 **Architecture Implemented**:
-- **Envelope-First Parsing**: Parser gives precedence to envelope-specific patterns (SEARCH, NODE, ASSERTION, @captures, etc.)
+- **Envelope-First Parsing**: Parser gives precedence to envelope-specific patterns (search, NODE, ASSERTION, @captures, etc.)
 - **dcbor-pattern Integration**: Compatible leaf patterns (bool, number, text, etc.) use optimized dcbor-pattern parsing
 - **Conversion Layer**: Comprehensive conversion between dcbor-pattern and envelope-pattern types
 - **Graceful Fallback**: System degrades gracefully for unsupported patterns
@@ -73,7 +73,7 @@ Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-env
 2. **Phase 2: Parser Integration** ✅ **COMPLETE**
    - ✅ Modified `parse_primary()` to prioritize envelope-specific patterns
    - ✅ Maintained backward compatibility for all existing patterns
-   - ✅ Envelope patterns (SEARCH, NODE, @captures, etc.) take precedence
+   - ✅ Envelope patterns (search, NODE, @captures, etc.) take precedence
    - ✅ Compatible leaf patterns use existing dcbor-pattern-based implementations
    - ✅ All existing tests pass without modification
 
@@ -111,7 +111,7 @@ Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-env
 **Usage Examples**:
 ```rust
 // Envelope-specific patterns work unchanged
-let search_pattern = Pattern::parse("SEARCH(42)").unwrap();
+let search_pattern = Pattern::parse("search(42)").unwrap();
 let capture_pattern = Pattern::parse("@num(42)").unwrap();
 let node_pattern = Pattern::parse("NODE").unwrap();
 
@@ -121,7 +121,7 @@ let number_pattern = Pattern::parse("42").unwrap();
 let text_pattern = Pattern::parse("\"hello\"").unwrap();
 
 // Mixed syntax works correctly
-let mixed_pattern = Pattern::parse("true | SEARCH(42)").unwrap();
+let mixed_pattern = Pattern::parse("true | search(42)").unwrap();
 
 // Conversion layer accessible for advanced use
 use bc_envelope_pattern::dcbor_integration::convert_dcbor_pattern_to_envelope_pattern;

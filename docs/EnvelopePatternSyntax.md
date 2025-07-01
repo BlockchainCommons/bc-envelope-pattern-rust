@@ -230,7 +230,7 @@ Precedence: Repeat has the highest precedence, followed by And, Not, Traversal, 
         - `( pattern )++` (1 or more)
         - `( pattern ){ n , m }+` (`n` to `m` repeats, inclusive)
 - Search
-    - `SEARCH ( pattern )`
+    - `search ( pattern )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.
 - Traversal
     - `pattern -> pattern -> pattern`

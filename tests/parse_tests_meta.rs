@@ -96,9 +96,9 @@ fn parse_not_patterns() {
 
 #[test]
 fn parse_search_pattern() {
-    let p = Pattern::parse("SEARCH(text)").unwrap();
+    let p = Pattern::parse("search(text)").unwrap();
     assert_eq!(p, Pattern::search(Pattern::any_text()));
-    assert_eq!(p.to_string(), "SEARCH(text)");
+    assert_eq!(p.to_string(), "search(text)");
 }
 
 #[test]

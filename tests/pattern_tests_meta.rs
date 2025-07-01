@@ -264,7 +264,7 @@ fn optional_wrapped_pattern() {
 fn test_search_pattern() {
     // A pattern that searches for any text in the envelope
     let text_search_pattern = Pattern::search(Pattern::any_text());
-    assert_eq!(format!("{}", text_search_pattern), r#"SEARCH(text)"#);
+    assert_eq!(format!("{}", text_search_pattern), r#"search(text)"#);
 
     // Test searching for text in a simple envelope
     let envelope = Envelope::new("Alice")
@@ -291,7 +291,7 @@ fn test_search_pattern() {
 
     // A pattern that searches for the text "Bob" in the envelope
     let bob_search_pattern = Pattern::search(Pattern::text("Bob"));
-    assert_eq!(format!("{}", bob_search_pattern), r#"SEARCH("Bob")"#);
+    assert_eq!(format!("{}", bob_search_pattern), r#"search("Bob")"#);
     let bob_search_paths = bob_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -303,7 +303,7 @@ fn test_search_pattern() {
 
     // A pattern that searches for any number in the envelope
     let number_search_pattern = Pattern::search(Pattern::any_number());
-    assert_eq!(format!("{}", number_search_pattern), r#"SEARCH(number)"#);
+    assert_eq!(format!("{}", number_search_pattern), r#"search(number)"#);
     let number_search_paths = number_search_pattern.paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -319,7 +319,7 @@ fn test_search_pattern() {
         Pattern::search(Pattern::assertion_with_object(Pattern::any_number()));
     assert_eq!(
         format!("{}", number_object_search_pattern),
-        r#"SEARCH(ASSERTOBJ(number))"#
+        r#"search(ASSERTOBJ(number))"#
     );
     let number_object_search_paths =
         number_object_search_pattern.paths(&envelope);
@@ -338,7 +338,7 @@ fn test_search_pattern() {
 fn test_search_pattern_nested() {
     // A pattern that searches for any text in the envelope
     let text_search_pattern = Pattern::search(Pattern::any_text());
-    assert_eq!(format!("{}", text_search_pattern), r#"SEARCH(text)"#);
+    assert_eq!(format!("{}", text_search_pattern), r#"search(text)"#);
 
     // Test searching in a more complex nested envelope
     let inner_envelope =
@@ -408,7 +408,7 @@ fn test_search_pattern_with_wrapped() {
     let secret_text_search_pattern = Pattern::search(Pattern::text("secret"));
     assert_eq!(
         format!("{}", secret_text_search_pattern),
-        r#"SEARCH("secret")"#
+        r#"search("secret")"#
     );
 
     let inner =
@@ -437,7 +437,7 @@ fn test_search_pattern_with_wrapped() {
     ));
     assert_eq!(
         format!("{}", secret_regex_search_pattern),
-        r#"SEARCH(/secret/)"#
+        r#"search(/secret/)"#
     );
     let secret_regex_search_paths =
         secret_regex_search_pattern.paths(&envelope);
@@ -623,7 +623,7 @@ fn test_not_pattern() {
     ));
     assert_eq!(
         format!("{}", search_pattern),
-        r#"SEARCH(!OBJECT(42))"#
+        r#"search(!OBJECT(42))"#
     );
     let not_patterns = search_pattern.paths(&envelope);
 
@@ -680,7 +680,7 @@ fn test_not_pattern_with_search() {
 
     // Search for elements that are NOT obscured (everything in this case)
     let pattern = Pattern::search(Pattern::not_matching(Pattern::obscured()));
-    assert_eq!(format!("{}", pattern), r#"SEARCH(!OBSCURED)"#);
+    assert_eq!(format!("{}", pattern), r#"search(!OBSCURED)"#);
     let not_obscured_paths = pattern.paths(&outer_envelope);
 
     // We should find multiple matches (everything, since nothing is obscured)
@@ -696,7 +696,7 @@ fn test_not_pattern_with_search() {
 
     // Search for elements that are NOT elided
     let pattern = Pattern::search(Pattern::not_matching(Pattern::elided()));
-    assert_eq!(format!("{}", pattern), r#"SEARCH(!ELIDED)"#);
+    assert_eq!(format!("{}", pattern), r#"search(!ELIDED)"#);
     let not_elided_paths = pattern.paths(&envelope_with_elided);
 
     // Should find multiple elements that are not elided

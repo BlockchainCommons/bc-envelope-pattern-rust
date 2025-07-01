@@ -10,7 +10,7 @@ use bc_envelope_pattern::{Matcher, Pattern};
 fn test_parser_envelope_patterns_take_precedence() {
     // Envelope-specific patterns should be parsed by envelope-pattern parser
     let envelope_patterns = [
-        ("SEARCH(42)", "envelope search pattern"),
+        ("search(42)", "envelope search pattern"),
         ("NODE", "envelope node pattern"),
         ("ASSERTION", "envelope assertion pattern"),
         ("DIGEST", "envelope digest pattern"),
@@ -101,7 +101,7 @@ fn test_parser_mixed_envelope_and_dcbor_syntax() {
     let env = Envelope::new(42);
 
     // This should work - searching for a number using dcbor syntax
-    let search_number = Pattern::parse("SEARCH(42)").unwrap();
+    let search_number = Pattern::parse("search(42)").unwrap();
     assert!(search_number.paths_with_captures(&env).0.len() > 0);
 
     // Boolean OR with mixed syntax

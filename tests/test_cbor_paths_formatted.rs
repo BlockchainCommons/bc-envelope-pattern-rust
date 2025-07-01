@@ -14,8 +14,8 @@ fn test_cbor_pattern_simple_array_paths() {
     let array_data = vec![1, 2, 3];
     let envelope = Envelope::new(array_data);
 
-    // Use SEARCH(number) to find all numbers in the array
-    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
+    // Use `search(number)` to find all numbers in the array
+    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Format the paths for comparison
@@ -49,7 +49,7 @@ fn test_cbor_pattern_nested_structure_paths() {
     let envelope = Envelope::new(nested_cbor);
 
     // Search for all numbers in the structure
-    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 4 numbers: 42, 95, 87, 92
@@ -97,7 +97,7 @@ fn test_cbor_pattern_text_search_paths() {
     .unwrap();
     let envelope = Envelope::new(cbor_data);
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(text)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/search(text)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 6 text values: "Alice", "apple", "banana", "name", "items",
@@ -151,7 +151,7 @@ fn test_cbor_pattern_paths_preserve_order() {
     let array_cbor = parse_dcbor_item("[10, 20, 30]").unwrap();
     let envelope = Envelope::new(array_cbor);
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     assert_eq!(paths.len(), 3, "Should find 3 numbers");
@@ -193,7 +193,7 @@ fn test_cbor_pattern_complex_nested_paths() {
     .unwrap();
     let envelope = Envelope::new(complex_cbor);
 
-    let pattern = Pattern::parse("CBOR(/SEARCH(number)/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 3 numbers: 30, 25, 2

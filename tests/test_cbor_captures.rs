@@ -52,8 +52,7 @@ fn test_dcbor_capture_with_search() {
     // Create envelope with array [1, 2, 3]
     let envelope = Envelope::new(vec![1, 2, 3]);
 
-    // Create CBOR pattern with search: /@values(SEARCH(number))/
-    let pattern = Pattern::parse("CBOR(/@values(SEARCH(number))/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/@values(search(number))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -110,13 +109,12 @@ fn test_multiple_dcbor_captures() {
     // This simulates a map-like structure using alternating key-value pairs
     let envelope = Envelope::new(vec!["name", "Alice", "age", "30"]);
 
-    // Create CBOR pattern with text search: /@names(SEARCH(text))/
-    let pattern = Pattern::parse("CBOR(/@names(SEARCH(text))/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/@names(search(text))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    // Verify basic expectations - SEARCH returns multiple paths (one per text
+    // Verify basic expectations - `search` returns multiple paths (one per text
     // string)
     assert_eq!(
         paths.len(),
@@ -128,7 +126,7 @@ fn test_multiple_dcbor_captures() {
         captures.contains_key("names"),
         "Should have 'names' capture"
     );
-    // Due to SEARCH behavior, we get one capture per text string found
+    // Due to `search` behavior, we get one capture per text string found
     assert_eq!(
         captures["names"].len(),
         4,
@@ -180,14 +178,14 @@ fn test_nested_dcbor_captures() {
 
     // Create CBOR pattern with nested captures:
     let pattern = Pattern::parse(
-        "CBOR(/@users(SEARCH([@name(text), @score(text)]))/)",
+        "CBOR(/@users(search([@name(text), @score(text)]))/)",
     )
     .unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    // Verify basic expectations - SEARCH returns multiple paths
+    // Verify basic expectations - `search` returns multiple paths
     assert_eq!(
         paths.len(),
         2,
@@ -378,13 +376,12 @@ fn test_array_traversal_captures() {
     // Create envelope with mixed array ["hello", "42", "world", "123"]
     let envelope = Envelope::new(vec!["hello", "42", "world", "123"]); // All strings for simplicity
 
-    // Create CBOR pattern with search captures: /@text(SEARCH(text))/
-    let pattern = Pattern::parse("CBOR(/@text(SEARCH(text))/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/@text(search(text))/)").unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    // Verify basic expectations - SEARCH returns multiple paths (one per text
+    // Verify basic expectations - `search` returns multiple paths (one per text
     // element)
     assert_eq!(
         paths.len(),
@@ -431,7 +428,7 @@ fn test_array_traversal_captures() {
     assert_actual_expected!(
         actual,
         expected,
-        "CBOR pattern should capture all text elements via SEARCH"
+        "CBOR pattern should capture all text elements via `search`"
     );
 }
 
@@ -475,15 +472,14 @@ fn test_cbor_captures_performance() {
     let numbers: Vec<i32> = (1..=3).collect(); // Use just 3 numbers for clarity
     let envelope = Envelope::new(numbers);
 
-    // Create CBOR pattern that captures all numbers: /@nums(SEARCH(number))/
-    let pattern = Pattern::parse("CBOR(/@nums(SEARCH(number))/)").unwrap();
+    let pattern = Pattern::parse("CBOR(/@nums(search(number))/)").unwrap();
 
     // Execute pattern with timing
     let start = std::time::Instant::now();
     let (paths, captures) = pattern.paths_with_captures(&envelope);
     let duration = start.elapsed();
 
-    // Verify basic expectations - SEARCH pattern returns multiple paths (one
+    // Verify basic expectations - `search` pattern returns multiple paths (one
     // per number)
     assert_eq!(
         paths.len(),
@@ -492,7 +488,7 @@ fn test_cbor_captures_performance() {
     );
     assert_eq!(captures.len(), 1, "Should have exactly one capture group");
     assert!(captures.contains_key("nums"), "Should have 'nums' capture");
-    // Due to SEARCH behavior, we get one capture per number
+    // Due to `search` behavior, we get one capture per number
     assert_eq!(
         captures["nums"].len(),
         3,
@@ -527,7 +523,7 @@ fn test_cbor_captures_performance() {
     assert_actual_expected!(
         actual,
         expected,
-        "CBOR pattern should capture all numbers with SEARCH behavior"
+        "CBOR pattern should capture all numbers with `search` behavior"
     );
 
     println!(
@@ -544,13 +540,13 @@ fn test_comprehensive_cbor_captures() {
     let envelope = Envelope::new(vec!["Alice", "Bob", "Charlie"]);
 
     // Create comprehensive CBOR pattern with search captures
-    let cbor_pattern = Pattern::parse("CBOR(/@people(SEARCH(text))/)").unwrap();
+    let cbor_pattern = Pattern::parse("CBOR(/@people(search(text))/)").unwrap();
     let pattern = Pattern::capture("data", cbor_pattern);
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
 
-    // Verify basic expectations - SEARCH returns multiple paths (one per
+    // Verify basic expectations - `search` returns multiple paths (one per
     // person)
     assert_eq!(
         paths.len(),
@@ -609,6 +605,6 @@ fn test_comprehensive_cbor_captures() {
     assert_actual_expected!(
         actual,
         expected,
-        "Comprehensive CBOR pattern should capture via SEARCH at multiple levels"
+        "Comprehensive CBOR pattern should capture via `search` at multiple levels"
     );
 }

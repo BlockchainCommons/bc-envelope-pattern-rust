@@ -95,7 +95,7 @@ fn test_credential() {
 #[test]
 fn test_parsed_search_text_or_number() {
     let env = credential();
-    let pattern = Pattern::parse("SEARCH(ASSERTOBJ(text|number))").unwrap();
+    let pattern = Pattern::parse("search(ASSERTOBJ(text|number))").unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 11);
 }
@@ -104,7 +104,7 @@ fn test_parsed_search_text_or_number() {
 fn test_parsed_firstname_capture() {
     let env = credential();
     let pattern_str =
-        r#"SEARCH(ASSERTPRED("firstName")->OBJ("James"))"#;
+        r#"search(ASSERTPRED("firstName")->OBJ("James"))"#;
     let pattern = Pattern::parse(pattern_str).unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
@@ -114,7 +114,7 @@ fn test_parsed_firstname_capture() {
 fn test_search_capture_propagation() {
     let env = credential();
     let pattern_str =
-        r#"SEARCH(@cap(ASSERTPRED("firstName")->OBJ("James")))"#;
+        r#"search(@cap(ASSERTPRED("firstName")->OBJ("James")))"#;
     let pattern = Pattern::parse(pattern_str).unwrap();
     let (paths, caps) = pattern.paths_with_captures(&env);
     assert_eq!(paths.len(), 1);
@@ -124,7 +124,7 @@ fn test_search_capture_propagation() {
 #[test]
 fn test_parsed_node_structure() {
     let env = credential();
-    let pat = Pattern::parse("SEARCH(NODE({13}))").unwrap();
+    let pat = Pattern::parse("search(NODE({13}))").unwrap();
     let paths = pat.paths(&env);
     assert_eq!(paths.len(), 1);
 }
@@ -175,7 +175,7 @@ fn test_search_wrapped_repeat() {
     let env = credential();
     // A pattern that searches every element in the tree for those
     // that start a path of zero or more `WRAPPED` elements leading to a `NODE`.
-    let pat = Pattern::parse("SEARCH((WRAPPED)*>NODE)").unwrap();
+    let pat = Pattern::parse("search((WRAPPED)*>NODE)").unwrap();
     let paths = pat.paths(&env);
     // Every `NODE` in the tree should match the pattern, including the inner
     // `8122ffa9 NODE`. Consequently there are two matching paths: one that
@@ -263,7 +263,7 @@ fn test_redacted_credential() {
 #[test]
 fn test_search_elided() {
     let env = redacted_credential();
-    let pat = Pattern::parse("SEARCH(ELIDED)").unwrap();
+    let pat = Pattern::parse("search(ELIDED)").unwrap();
     let paths = pat.paths(&env);
     assert_eq!(paths.len(), 7);
 }

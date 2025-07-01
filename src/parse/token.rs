@@ -91,7 +91,7 @@ pub enum Token {
     #[token("UNWRAP")]
     Unwrap,
 
-    #[token("SEARCH")]
+    #[token("search")]
     Search,
 
     // Leaf Pattern Keywords
