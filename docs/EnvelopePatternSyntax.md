@@ -20,23 +20,6 @@ White space is ignored between tokens, so you can use it to make patterns more r
 
 All leaf patterns match Envelope leaves, which are CBOR values.
 
-- Array
-    - `[*]`
-        - Matches any array.
-    - `[{n}]`
-        - Matches an array with exactly `n` elements.
-    - `[{n,m}]`
-        - Matches an array with between `n` and `m` elements, inclusive.
-    - `[{n,}]`
-        - Matches an array with at least `n` elements.
-    - `[pattern]`
-        - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
-        - Examples:
-            - `[42]` - Array containing exactly one element: the number 42
-            - `["a", "b", "c"]` - Array containing exactly ["a", "b", "c"] in sequence
-            - `[(*)*, 42, (*)*]` - Array containing 42 anywhere within it
-            - `[42, (*)*]` - Array starting with 42, followed by any elements
-            - `[(*)*, 42]` - Array ending with 42, preceded by any elements
 - Boolean
     - `bool`
         - Matches any boolean value.
@@ -73,17 +56,6 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches the known value with the specified name. Again we use single quotes here for familiarity.
     - `'/regex/'`
         - Matches a known value with a name that matches the specified regex.
-- Map
-    - `{*}`
-        - Matches any map.
-    - `{{n}}`
-        - Matches a map with exactly `n` entries.
-    - `{{n,m}}`
-        - Matches a map with between `n` and `m` entries, inclusive.
-    - `{{n,}}`
-        - Matches a map with at least `n` entries.
-    - `{key: value, ...}`
-        - Matches a map with the specified key-value patterns.
 - Null
     - `null`
         - Matches the null value.
@@ -108,6 +80,41 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches positive infinity.
     - `-Infinity`
         - Matches negative infinity.
+- Text
+    - `text`
+        - Matches any text value.
+    - `"string"`
+        - Matches a text value with the specified string. Gordian Envelope and CBOR diagnostic notation use double quotes for text strings, so we use that syntax here for familiarity.
+    - `/regex/`
+        - Matches a text value that matches the specified regex. No double quotes are used here, as the regex is not a string but a pattern to match against the text value.
+- Array
+    - `[*]`
+        - Matches any array.
+    - `[{n}]`
+        - Matches an array with exactly `n` elements.
+    - `[{n,m}]`
+        - Matches an array with between `n` and `m` elements, inclusive.
+    - `[{n,}]`
+        - Matches an array with at least `n` elements.
+    - `[pattern]`
+        - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
+        - Examples:
+            - `[42]` - Array containing exactly one element: the number 42
+            - `["a", "b", "c"]` - Array containing exactly ["a", "b", "c"] in sequence
+            - `[(*)*, 42, (*)*]` - Array containing 42 anywhere within it
+            - `[42, (*)*]` - Array starting with 42, followed by any elements
+            - `[(*)*, 42]` - Array ending with 42, preceded by any elements
+- Map
+    - `{*}`
+        - Matches any map.
+    - `{{n}}`
+        - Matches a map with exactly `n` entries.
+    - `{{n,m}}`
+        - Matches a map with between `n` and `m` entries, inclusive.
+    - `{{n,}}`
+        - Matches a map with at least `n` entries.
+    - `{key: value, ...}`
+        - Matches a map with the specified key-value patterns.
 - Tagged
     - `tagged`
         - Matches any CBOR tagged value.
@@ -117,13 +124,6 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches the CBOR tagged value with the specified name and content that matches the given pattern. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
     - `tagged ( /regex/, pattern )`
         - Matches a CBOR tagged value with a name that matches the specified regex and content that matches the given pattern.
-- Text
-    - `text`
-        - Matches any text value.
-    - `"string"`
-        - Matches a text value with the specified string. Gordian Envelope and CBOR diagnostic notation use double quotes for text strings, so we use that syntax here for familiarity.
-    - `/regex/`
-        - Matches a text value that matches the specified regex. No double quotes are used here, as the regex is not a string but a pattern to match against the text value.
 - CBOR
     - `CBOR`
         - Matches any subject CBOR value.
