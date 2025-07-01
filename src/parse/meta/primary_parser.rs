@@ -47,13 +47,12 @@ pub(crate) fn parse_primary(
         Token::Leaf => Ok(Pattern::any_leaf()),
         Token::None => Ok(Pattern::none()),
 
-        // Map patterns might have envelope-specific extensions
-        Token::Map => leaf::parse_map(lexer),
+        // Patterns that might have envelope-specific extensions
         Token::Cbor => leaf::parse_cbor(lexer),
 
         // For simple leaf patterns, try dcbor-pattern first
-        Token::RepeatZeroOrMore => Ok(Pattern::any()), /* dcbor-pattern's *
-                                                         * syntax */
+        Token::RepeatZeroOrMore => Ok(Pattern::any()), /* dcbor-pattern's * */
+        // syntax
         Token::BoolKeyword => Ok(Pattern::any_bool()),
         Token::BoolTrue => Ok(Pattern::bool(true)),
         Token::BoolFalse => Ok(Pattern::bool(false)),

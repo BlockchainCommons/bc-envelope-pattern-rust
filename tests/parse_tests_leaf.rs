@@ -182,21 +182,21 @@ fn parse_date_patterns() {
 
 #[test]
 fn parse_map_patterns() {
-    let p = Pattern::parse("MAP").unwrap();
-    assert_eq!(p, Pattern::any_map());
-    assert_actual_expected!(p.to_string(), "MAP");
+    // dcbor-pattern map syntax - any map
+    let p = Pattern::parse("{*}").unwrap();
+    assert_actual_expected!(p.to_string(), "{*}");
 
-    let p = Pattern::parse("MAP(3)").unwrap();
-    assert_eq!(p, Pattern::map_with_count(3));
-    assert_actual_expected!(p.to_string(), "MAP({3})");
+    // dcbor-pattern map syntax - specific count
+    let p = Pattern::parse("{{3}}").unwrap();
+    assert_actual_expected!(p.to_string(), "{{3}}");
 
-    let p = Pattern::parse("MAP({2,4})").unwrap();
-    assert_eq!(p, Pattern::map_with_range(2..=4));
-    assert_actual_expected!(p.to_string(), "MAP({2,4})");
+    // dcbor-pattern map syntax - range
+    let p = Pattern::parse("{{2,4}}").unwrap();
+    assert_actual_expected!(p.to_string(), "{{2,4}}");
 
-    let p = Pattern::parse("MAP({2,})").unwrap();
-    assert_eq!(p, Pattern::map_with_range(2..));
-    assert_actual_expected!(p.to_string(), "MAP({2,})");
+    // dcbor-pattern map syntax - at least N
+    let p = Pattern::parse("{{2,}}").unwrap();
+    assert_actual_expected!(p.to_string(), "{{2,}}");
 }
 
 #[test]

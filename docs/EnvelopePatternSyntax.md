@@ -4,13 +4,13 @@ This syntax is inspired by regular expressions but is specifically designed for 
 
 The patex syntax is designed to be flexible and expressive. Patterns can be composed of *leaf patterns*, *structure patterns*, and combinators known as *meta-patterns*.
 
-Keywords like `bool`, `array`, `MAP`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
+Keywords like `bool`, `array`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
 
 Spaces may used to separate different parts of the pattern.
 
 Parentheses are used to group patterns or specify ranges. The syntax `(pattern)` is really just the repeat pattern with a repeat that matches the pattern exactly once.
 
-The syntax integrates the dCBOR diagnostic notation for matching CBOR values, so we will use the `dcbor-parse` crate to parse these values.
+The syntax integrates the dCBOR diagnostic notation for matching CBOR values, so we will use the `dcbor-parse` crate to parse these values. For patterns that don't match envelope-specific syntax, the parser will fall back to using dcbor-pattern syntax, providing seamless integration between the two pattern systems.
 
 The result of successful parsing is a `Pattern` object, which can be used to match against Gordian Envelope.
 
@@ -77,12 +77,16 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `'/regex/'`
         - Matches a known value with a name that matches the specified regex.
 - Map
-    - `MAP`
+    - `{*}`
         - Matches any map.
-    - `MAP ( n )`
+    - `{{n}}`
         - Matches a map with exactly `n` entries.
-    - `MAP ( { n , m } )`
+    - `{{n,m}}`
         - Matches a map with between `n` and `m` entries, inclusive.
+    - `{{n,}}`
+        - Matches a map with at least `n` entries.
+    - `{key: value, ...}`
+        - Matches a map with the specified key-value patterns.
 - Null
     - `null`
         - Matches the null value.

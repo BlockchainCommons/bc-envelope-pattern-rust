@@ -15,7 +15,6 @@ fn test_parser_envelope_patterns_take_precedence() {
         ("ASSERTION", "envelope assertion pattern"),
         ("DIGEST", "envelope digest pattern"),
         ("@name(42)", "envelope capture pattern"),
-        ("MAP", "envelope map pattern"),
         ("CBOR(42)", "envelope cbor pattern"),
     ];
 
@@ -163,10 +162,10 @@ fn test_parser_precedence_demonstration() {
         pattern_str
     );
 
-    // MAP should use envelope parsing
-    let map_pattern = Pattern::parse("MAP").unwrap();
+    // Map patterns should now use dcbor-pattern syntax
+    let map_pattern = Pattern::parse("{*}").unwrap();
     let map_str = map_pattern.to_string();
-    assert_eq!(map_str, "MAP", "MAP pattern should remain as envelope MAP");
+    assert_eq!(map_str, "{*}", "Map pattern should use dcbor-pattern syntax");
 }
 
 #[test]

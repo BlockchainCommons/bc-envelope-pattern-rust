@@ -1,5 +1,8 @@
 use crate::{Error, Pattern, Result, parse::Token};
 
+/// Legacy map parser - no longer used after migration to dcbor-pattern map syntax
+#[allow(dead_code)]
+#[deprecated(note = "Use dcbor-pattern map syntax instead: {*}, {{n}}, {{n,m}}, {{n,}}, {key: value}")]
 pub(crate) fn parse_map(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {

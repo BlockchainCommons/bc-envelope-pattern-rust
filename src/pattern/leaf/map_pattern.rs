@@ -111,7 +111,10 @@ impl std::fmt::Display for MapPattern {
         match self {
             MapPattern::Any => write!(f, "MAP"),
             MapPattern::Interval(range) => write!(f, "MAP({})", range),
-            MapPattern::Content(pattern) => write!(f, "MAP({})", pattern),
+            MapPattern::Content(pattern) => {
+                // For Content variants (dcbor-pattern integration), display the pattern directly
+                write!(f, "{}", pattern)
+            }
         }
     }
 }

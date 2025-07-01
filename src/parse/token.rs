@@ -110,9 +110,6 @@ pub enum Token {
     #[token("known")]
     Known,
 
-    #[token("MAP")]
-    Map,
-
     #[token("null")]
     Null,
 
