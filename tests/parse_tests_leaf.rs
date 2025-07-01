@@ -107,9 +107,9 @@ fn parse_number_patterns() {
 
 #[test]
 fn parse_leaf_pattern() {
-    let p = Pattern::parse("LEAF").unwrap();
+    let p = Pattern::parse("leaf").unwrap();
     assert_eq!(p, Pattern::leaf());
-    assert_actual_expected!(p.to_string(), "LEAF");
+    assert_actual_expected!(p.to_string(), "leaf");
 }
 
 #[test]

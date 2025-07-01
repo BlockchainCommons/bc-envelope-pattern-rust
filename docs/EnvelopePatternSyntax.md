@@ -126,20 +126,20 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a text value that matches the specified regex. No double quotes are used here, as the regex is not a string but a pattern to match against the text value.
 - CBOR
     - `CBOR`
-        - Matches any CBOR value.
+        - Matches any subject CBOR value.
     - `CBOR ( diagnostic-notation )`
-        - Matches a CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
+        - Matches a subject CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
     - `CBOR ( ur:type/value )`
-        - Matches a CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
+        - Matches a subject CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
     - `CBOR ( /patex/ )`
-        - Matches a CBOR value that matches the specified dcbor-pattern expression. This enables advanced pattern matching within CBOR structures including quantifiers, captures, and complex structural patterns. The pattern expression uses dcbor-pattern syntax.
+        - Matches a subject CBOR value that matches the specified dcbor-pattern expression. This enables advanced pattern matching within CBOR structures including quantifiers, captures, and complex structural patterns. The pattern expression uses dcbor-pattern syntax.
 
 ## Structure Patterns
 
 Structure patterns match parts of Gordian Envelope structures.
 
 - Leaf
-    - `LEAF`
+    - `leaf`
         - Matches any leaf envelope (terminal nodes in the envelope tree).
 - Assertions
     - `ASSERT`

@@ -4,21 +4,21 @@ mod test_leaf_parsing {
 
     #[test]
     fn test_leaf_pattern_parse() {
-        let pattern = Pattern::parse("LEAF").unwrap();
-        println!("Parsed LEAF pattern: {:?}", pattern);
+        let pattern = Pattern::parse("leaf").unwrap();
+        println!("Parsed `leaf` pattern: {:?}", pattern);
 
         // The pattern should be a structure pattern now
         match pattern {
             Pattern::Structure(_) => println!(
-                "✓ LEAF is correctly categorized as a structure pattern"
+                "✓ `leaf` is correctly categorized as a structure pattern"
             ),
             Pattern::Leaf(_) => {
-                panic!("✗ LEAF should not be a leaf pattern anymore")
+                panic!("✗ `leaf` should not be a leaf pattern anymore")
             }
-            Pattern::Meta(_) => panic!("✗ LEAF should not be a meta pattern"),
+            Pattern::Meta(_) => panic!("✗ `leaf` should not be a meta pattern"),
         }
 
-        // Test that it displays as "LEAF"
-        assert_eq!(pattern.to_string(), "LEAF");
+        // Test that it displays as "leaf"
+        assert_eq!(pattern.to_string(), "leaf");
     }
 }

@@ -98,7 +98,7 @@ pub enum Token {
     #[token("bstr")]
     ByteString,
 
-    #[token("LEAF")]
+    #[token("leaf")]
     Leaf,
 
     #[token("CBOR")]
