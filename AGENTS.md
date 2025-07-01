@@ -61,10 +61,11 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - Update the `DATE` pattern to use the `dcbor-pattern` crate's `date` syntax for matching dates.
 - Update the `KNOWN` pattern to use the `dcbor-pattern` crate's `known` syntax for matching known values.
 - Update the `TAG` pattern to use the `dcbor-pattern` crate's `tagged` syntax for matching arrays.
+- Update the `ARRAY` pattern to use the `dcbor-pattern` crate's new syntax for matching arrays.
 
 ### NEXT TASK:
 
-- Update the `ARRAY` pattern to use the `dcbor-pattern` crate's new syntax for matching arrays.
+TBD - The array pattern update has been completed successfully!
 
 #### Old Syntax:
 

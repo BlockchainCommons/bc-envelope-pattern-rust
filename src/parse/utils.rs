@@ -100,6 +100,99 @@ pub(crate) fn parse_cbor_inner(src: &str) -> Result<(Pattern, usize)> {
     Ok((Pattern::cbor(cbor), pos + consumed))
 }
 
+pub(crate) fn parse_array_inner(src: &str) -> Result<(Pattern, usize)> {
+    let mut pos = 0;
+    skip_ws(src, &mut pos);
+
+    // Check for the simple "*" pattern first - matches any array
+    if src[pos..].starts_with('*') {
+        pos += 1;
+        skip_ws(src, &mut pos);
+        return Ok((Pattern::any_array(), pos));
+    }
+
+    // Check for length patterns like {n}, {n,m}, {n,}
+    if src[pos..].starts_with('{') {
+        pos += 1;
+        skip_ws(src, &mut pos);
+
+        // Parse the first number
+        let start_pos = pos;
+        while pos < src.len() && src[pos..].chars().next().unwrap().is_ascii_digit() {
+            pos += 1;
+        }
+        if pos == start_pos {
+            return Err(Error::InvalidRange(pos..pos));
+        }
+
+        let first_num: usize = src[start_pos..pos].parse()
+            .map_err(|_| Error::InvalidNumberFormat(start_pos..pos))?;
+
+        skip_ws(src, &mut pos);
+
+        if pos >= src.len() {
+            return Err(Error::UnexpectedEndOfInput);
+        }
+
+        let ch = src[pos..].chars().next().unwrap();
+        match ch {
+            '}' => {
+                // {n} - exact count
+                pos += 1;
+                skip_ws(src, &mut pos);
+                return Ok((Pattern::array_with_count(first_num), pos));
+            }
+            ',' => {
+                pos += 1;
+                skip_ws(src, &mut pos);
+
+                if pos >= src.len() {
+                    return Err(Error::UnexpectedEndOfInput);
+                }
+
+                let ch = src[pos..].chars().next().unwrap();
+                if ch == '}' {
+                    // {n,} - at least n
+                    pos += 1;
+                    skip_ws(src, &mut pos);
+                    return Ok((Pattern::array_with_range(first_num..), pos));
+                } else if ch.is_ascii_digit() {
+                    // {n,m} - range
+                    let start_pos = pos;
+                    while pos < src.len() && src[pos..].chars().next().unwrap().is_ascii_digit() {
+                        pos += 1;
+                    }
+                    let second_num: usize = src[start_pos..pos].parse()
+                        .map_err(|_| Error::InvalidNumberFormat(start_pos..pos))?;
+
+                    skip_ws(src, &mut pos);
+                    if pos >= src.len() || !src[pos..].starts_with('}') {
+                        return Err(Error::UnexpectedEndOfInput);
+                    }
+                    pos += 1;
+                    skip_ws(src, &mut pos);
+                    return Ok((Pattern::array_with_range(first_num..=second_num), pos));
+                } else {
+                    return Err(Error::InvalidRange(pos..pos));
+                }
+            }
+            _ => return Err(Error::InvalidRange(pos..pos)),
+        }
+    }
+
+    // For any other pattern content, delegate to dcbor-pattern
+    // This is the key proxy functionality - just pass the content through
+    let pattern_str = format!("[{}]", &src[pos..]);
+    match dcbor_pattern::Pattern::parse(&pattern_str) {
+        Ok(dcbor_pattern) => {
+            // Create an array pattern that wraps the dcbor-pattern
+            let consumed = src.len() - pos; // Consume all remaining content
+            Ok((Pattern::array_from_dcbor_pattern(dcbor_pattern), consumed))
+        }
+        Err(_) => Err(Error::InvalidPattern(pos..src.len())),
+    }
+}
+
 pub(crate) fn parse_bare_word(src: &str) -> Result<(String, usize)> {
     let mut pos = 0;
     skip_ws(src, &mut pos);

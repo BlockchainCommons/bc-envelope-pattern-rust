@@ -114,21 +114,21 @@ fn parse_leaf_pattern() {
 
 #[test]
 fn parse_array_patterns() {
-    let p = Pattern::parse("ARRAY").unwrap();
+    let p = Pattern::parse("[*]").unwrap();
     assert_eq!(p, Pattern::any_array());
-    assert_actual_expected!(p.to_string(), "ARRAY");
+    assert_actual_expected!(p.to_string(), "[*]");
 
-    let p = Pattern::parse("ARRAY({3})").unwrap();
+    let p = Pattern::parse("[{3}]").unwrap();
     assert_eq!(p, Pattern::array_with_count(3));
-    assert_actual_expected!(p.to_string(), "ARRAY({3})");
+    assert_actual_expected!(p.to_string(), "[{3}]");
 
-    let p = Pattern::parse("ARRAY({2,4})").unwrap();
+    let p = Pattern::parse("[{2,4}]").unwrap();
     assert_eq!(p, Pattern::array_with_range(2..=4));
-    assert_actual_expected!(p.to_string(), "ARRAY({2,4})");
+    assert_actual_expected!(p.to_string(), "[{2,4}]");
 
-    let p = Pattern::parse("ARRAY({2,})").unwrap();
+    let p = Pattern::parse("[{2,}]").unwrap();
     assert_eq!(p, Pattern::array_with_range(2..));
-    assert_actual_expected!(p.to_string(), "ARRAY({2,})");
+    assert_actual_expected!(p.to_string(), "[{2,}]");
 }
 
 #[test]

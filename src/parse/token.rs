@@ -95,9 +95,6 @@ pub enum Token {
     Search,
 
     // Leaf Pattern Keywords
-    #[token("ARRAY")]
-    Array,
-
     #[token("bstr")]
     ByteString,
 
@@ -154,6 +151,12 @@ pub enum Token {
 
     #[token(")")]
     ParenClose,
+
+    #[token("[")]
+    BracketOpen,
+
+    #[token("]")]
+    BracketClose,
 
     #[token(",")]
     Comma,
@@ -541,7 +544,8 @@ mod tests {
         assert_eq!(Token::lexer("UNWRAP").next(), Some(Ok(Token::Unwrap)));
 
         // Test leaf pattern keywords
-        assert_eq!(Token::lexer("ARRAY").next(), Some(Ok(Token::Array)));
+        assert_eq!(Token::lexer("[").next(), Some(Ok(Token::BracketOpen)));
+        assert_eq!(Token::lexer("]").next(), Some(Ok(Token::BracketClose)));
         assert_eq!(
             Token::lexer("number").next(),
             Some(Ok(Token::NumberKeyword))

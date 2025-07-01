@@ -4,7 +4,7 @@ This syntax is inspired by regular expressions but is specifically designed for 
 
 The patex syntax is designed to be flexible and expressive. Patterns can be composed of *leaf patterns*, *structure patterns*, and combinators known as *meta-patterns*.
 
-Keywords like `bool`, `ARRAY`, `MAP`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
+Keywords like `bool`, `array`, `MAP`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
 
 Spaces may used to separate different parts of the pattern.
 
@@ -24,14 +24,22 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     -  `LEAF`
         - Matches any leaf value.
 - Array
-    - `ARRAY`
+    - `[*]`
         - Matches any array.
-    - `ARRAY ( { n } )`
+    - `[{n}]`
         - Matches an array with exactly `n` elements.
-    - `ARRAY ( { n , m } )`
+    - `[{n,m}]`
         - Matches an array with between `n` and `m` elements, inclusive.
-    - `ARRAY ( { n , } )`
+    - `[{n,}]`
         - Matches an array with at least `n` elements.
+    - `[pattern]`
+        - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
+        - Examples:
+            - `[42]` - Array containing exactly one element: the number 42
+            - `["a", "b", "c"]` - Array containing exactly ["a", "b", "c"] in sequence
+            - `[(*)*, 42, (*)*]` - Array containing 42 anywhere within it
+            - `[42, (*)*]` - Array starting with 42, followed by any elements
+            - `[(*)*, 42]` - Array ending with 42, preceded by any elements
 - Boolean
     - `bool`
         - Matches any boolean value.

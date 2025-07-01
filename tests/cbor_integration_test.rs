@@ -14,7 +14,7 @@ fn test_cbor_pattern_dcbor_pattern_integration() {
 
     // Test dcbor-pattern with array
     let array_pattern = Pattern::parse(r#"CBOR(/[*]/)"#)
-        .expect("ARRAY pattern should parse successfully");
+        .expect("array pattern should parse successfully");
     let array_envelope = Envelope::new(vec![1, 2, 3]);
     assert!(
         array_pattern.matches(&array_envelope),
@@ -102,8 +102,8 @@ fn test_cbor_pattern_debug_parser() {
     let dcbor_result = Pattern::parse(r#"CBOR(/number/)"#);
     println!("CBOR(/number/) parse result: {:?}", dcbor_result);
 
-    let dcbor_array_result = Pattern::parse(r#"CBOR(/ARRAY/)"#);
-    println!("CBOR(/ARRAY/) parse result: {:?}", dcbor_array_result);
+    let dcbor_array_result = Pattern::parse(r#"CBOR(/[*]/)"#);
+    println!("CBOR(/[*]/) parse result: {:?}", dcbor_array_result);
 }
 
 #[test]
@@ -161,7 +161,7 @@ fn test_dcbor_patterns_work_directly() {
     let array_envelope = Envelope::new(vec![1, 2, 3]);
     assert!(
         array_pattern.matches(&array_envelope),
-        "ARRAY pattern should match array"
+        "array pattern should match array"
     );
 
     let text_pattern =

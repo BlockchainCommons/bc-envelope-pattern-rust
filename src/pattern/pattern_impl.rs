@@ -331,7 +331,15 @@ impl Pattern {
     }
 
     pub fn array_with_count(count: usize) -> Self {
-        Pattern::Leaf(LeafPattern::Array(ArrayPattern::interval(count..=count)))
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::count(count)))
+    }
+
+    /// Creates an array pattern from a dcbor-pattern.
+    /// This is used internally by the parser to delegate to dcbor-pattern.
+    pub fn array_from_dcbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
+        Pattern::Leaf(LeafPattern::Array(ArrayPattern::from_dcbor_pattern(
+            pattern,
+        )))
     }
 }
 
@@ -360,47 +368,55 @@ impl Pattern {
     /// This is a proxy to dcbor-pattern's tagged functionality.
     pub fn any_tag() -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::any()
+            crate::pattern::leaf::TaggedPattern::any(),
         ))
     }
 
-    /// Creates a new `Pattern` that matches a specific tagged value with any content.
-    /// This is a proxy to dcbor-pattern's tagged functionality.
+    /// Creates a new `Pattern` that matches a specific tagged value with any
+    /// content. This is a proxy to dcbor-pattern's tagged functionality.
     pub fn tagged(tag: dcbor::Tag) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::value(tag.value())
+            crate::pattern::leaf::TaggedPattern::value(tag.value()),
         ))
     }
 
-    /// Creates a new `Pattern` that matches a tagged value with specific tag value and any content.
-    /// This is a proxy to dcbor-pattern's tagged functionality.
+    /// Creates a new `Pattern` that matches a tagged value with specific tag
+    /// value and any content. This is a proxy to dcbor-pattern's tagged
+    /// functionality.
     pub fn tagged_with_value(value: u64) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::value(value)
+            crate::pattern::leaf::TaggedPattern::value(value),
         ))
     }
 
-    /// Creates a new `Pattern` that matches a tagged value with specific tag name and any content.
-    /// This is a proxy to dcbor-pattern's tagged functionality.
+    /// Creates a new `Pattern` that matches a tagged value with specific tag
+    /// name and any content. This is a proxy to dcbor-pattern's tagged
+    /// functionality.
     pub fn tagged_with_name(name: impl Into<String>) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::named(name.into())
+            crate::pattern::leaf::TaggedPattern::named(name.into()),
         ))
     }
 
-    /// Creates a new `Pattern` that matches a tagged value with tag name matching regex and any content.
-    /// This is a proxy to dcbor-pattern's tagged functionality.
+    /// Creates a new `Pattern` that matches a tagged value with tag name
+    /// matching regex and any content. This is a proxy to dcbor-pattern's
+    /// tagged functionality.
     pub fn tagged_with_regex(regex: regex::Regex) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::regex(regex)
+            crate::pattern::leaf::TaggedPattern::regex(regex),
         ))
     }
 
-    /// Creates a new `Pattern` that matches a tagged value from a dcbor_pattern::TaggedPattern.
-    /// This is an internal helper for the parser.
-    pub(crate) fn tagged_from_dcbor_pattern(tagged_pattern: dcbor_pattern::TaggedPattern) -> Self {
+    /// Creates a new `Pattern` that matches a tagged value from a
+    /// dcbor_pattern::TaggedPattern. This is an internal helper for the
+    /// parser.
+    pub(crate) fn tagged_from_dcbor_pattern(
+        tagged_pattern: dcbor_pattern::TaggedPattern,
+    ) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::from_dcbor_pattern(tagged_pattern)
+            crate::pattern::leaf::TaggedPattern::from_dcbor_pattern(
+                tagged_pattern,
+            ),
         ))
     }
 }
