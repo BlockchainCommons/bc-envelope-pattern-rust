@@ -7,7 +7,6 @@ mod compressed_parser;
 mod digest_parser;
 mod elided_parser;
 mod encrypted_parser;
-mod leaf_parser;
 mod node_parser;
 mod object_parser;
 mod obscured_parser;

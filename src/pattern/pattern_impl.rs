@@ -74,9 +74,9 @@ use super::{
         OrPattern, SearchPattern, TraversePattern,
     },
     structure::{
-        AssertionsPattern, DigestPattern, LeafStructurePattern, NodePattern, ObjectPattern,
-        ObscuredPattern, PredicatePattern, StructurePattern, SubjectPattern,
-        WrappedPattern,
+        AssertionsPattern, DigestPattern, LeafStructurePattern, NodePattern,
+        ObjectPattern, ObscuredPattern, PredicatePattern, StructurePattern,
+        SubjectPattern, WrappedPattern,
     },
     vm,
 };
@@ -426,9 +426,7 @@ impl Pattern {
 
 impl Pattern {
     pub fn leaf() -> Self {
-        Pattern::Structure(StructurePattern::Leaf(
-            crate::pattern::structure::LeafStructurePattern::new(),
-        ))
+        Pattern::Structure(StructurePattern::Leaf(LeafStructurePattern::new()))
     }
 
     pub fn any_assertion() -> Self {
