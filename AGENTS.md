@@ -105,3 +105,4 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
     - REPEAT: REMOVE THE OLD SYNTAX AND REPLACE IT WITH THE NEW SYNTAX.
     - Only put debug examples in `examples/`. Put tests you want to be kept for regression in `tests/`. DO NOT use the root directory or other directories for temporary debug examples.
     - Tip: We've already converted the `array` (`[*]`) pattern to use the new syntax, so you can use that as a reference for how to convert the `map` pattern.
+    - Tip: Intervals `{n, m}` are delimited by braces and so are maps. The key to differentiating them is that intervals cannot appear by themselves. Finding a `{` token where a pattern is expected means you are looking at a map pattern. You need to stupidly parse the map pattern including balanced delimiters and ignoring everything else until you find the closing `}`. Then you need to have `dcbor-pattern` parse the map pattern, which will return a `dcbor-pattern::Pattern`.
