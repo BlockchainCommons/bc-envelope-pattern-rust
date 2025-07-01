@@ -1,38 +1,33 @@
 use std::{collections::HashMap, ops::RangeBounds};
 
 use bc_envelope::Envelope;
+use dcbor_pattern::Matcher as DcborMatcher;
 
 use crate::{
-    Interval, Pattern,
+    Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching maps.
+/// This delegates directly to dcbor-pattern for map matching.
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub enum MapPattern {
-    /// Matches any map.
-    Any,
-    /// Matches maps with a specific count of entries.
-    Interval(Interval),
-    /// Matches maps using dcbor-pattern's map syntax.
-    Content(dcbor_pattern::Pattern),
-}
+pub struct MapPattern(dcbor_pattern::MapPattern);
 
 impl MapPattern {
     /// Creates a new `MapPattern` that matches any map.
-    pub fn any() -> Self { MapPattern::Any }
+    pub fn any() -> Self {
+        MapPattern(dcbor_pattern::MapPattern::any())
+    }
 
     /// Creates a new `MapPattern` that matches maps with a specific count of
     /// entries.
     pub fn interval(interval: impl RangeBounds<usize>) -> Self {
-        MapPattern::Interval(Interval::new(interval))
+        MapPattern(dcbor_pattern::MapPattern::with_length_range(interval))
     }
 
     /// Creates a new `MapPattern` from a dcbor-pattern MapPattern.
     pub fn from_dcbor_pattern(map_pattern: dcbor_pattern::MapPattern) -> Self {
-        MapPattern::Content(dcbor_pattern::Pattern::Structure(
-            dcbor_pattern::StructurePattern::Map(map_pattern)
-        ))
+        MapPattern(map_pattern)
     }
 }
 
@@ -41,33 +36,19 @@ impl Matcher for MapPattern {
         &self,
         envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = if let Some(map) = envelope.subject().as_map() {
-            match self {
-                MapPattern::Any => vec![vec![envelope.clone()]],
-                MapPattern::Interval(range) => {
-                    if range.contains(map.len()) {
-                        vec![vec![envelope.clone()]]
-                    } else {
-                        vec![]
-                    }
-                }
-                MapPattern::Content(dcbor_pattern) => {
-                    // Delegate to dcbor-pattern for content matching
-                    if let Some(cbor) = envelope.subject().as_leaf() {
-                        let dcbor_paths = dcbor_pattern::Matcher::paths(dcbor_pattern, &cbor);
-                        if !dcbor_paths.is_empty() {
-                            vec![vec![envelope.clone()]]
-                        } else {
-                            vec![]
-                        }
-                    } else {
-                        vec![]
-                    }
-                }
+        let paths = if let Some(cbor_value) = envelope.subject().as_leaf() {
+            // Use dcbor-pattern to match against the CBOR value directly
+            if self.0.matches(&cbor_value) {
+                vec![vec![envelope.clone()]]
+            } else {
+                vec![]
             }
         } else {
             vec![]
         };
+
+        // For now, we don't support captures through the simple delegation
+        // This could be enhanced later if needed
         (paths, HashMap::new())
     }
 
@@ -88,34 +69,16 @@ impl Matcher for MapPattern {
 
 impl std::hash::Hash for MapPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            MapPattern::Any => {
-                0u8.hash(state);
-            }
-            MapPattern::Interval(range) => {
-                1u8.hash(state);
-                range.hash(state);
-            }
-            MapPattern::Content(pattern) => {
-                2u8.hash(state);
-                // Hash the string representation since dcbor_pattern::Pattern
-                // doesn't implement Hash
-                pattern.to_string().hash(state);
-            }
-        }
+        // Hash the string representation since dcbor_pattern::MapPattern
+        // doesn't implement Hash
+        self.0.to_string().hash(state);
     }
 }
 
 impl std::fmt::Display for MapPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            MapPattern::Any => write!(f, "MAP"),
-            MapPattern::Interval(range) => write!(f, "MAP({})", range),
-            MapPattern::Content(pattern) => {
-                // For Content variants (dcbor-pattern integration), display the pattern directly
-                write!(f, "{}", pattern)
-            }
-        }
+        // Delegate to dcbor-pattern's Display implementation
+        write!(f, "{}", self.0)
     }
 }
 
@@ -172,15 +135,15 @@ mod tests {
     #[test]
     fn test_map_pattern_display() {
         let pattern = MapPattern::any();
-        assert_eq!(pattern.to_string(), "MAP");
+        assert_eq!(pattern.to_string(), "{*}");
 
         let pattern = MapPattern::interval(2..=2);
-        assert_eq!(pattern.to_string(), "MAP({2})");
+        assert_eq!(pattern.to_string(), "{{2}}");
 
         let pattern = MapPattern::interval(1..=3);
-        assert_eq!(pattern.to_string(), "MAP({1,3})");
+        assert_eq!(pattern.to_string(), "{{1,3}}");
 
         let pattern = MapPattern::interval(1..);
-        assert_eq!(pattern.to_string(), "MAP({1,})");
+        assert_eq!(pattern.to_string(), "{{1,}}");
     }
 }

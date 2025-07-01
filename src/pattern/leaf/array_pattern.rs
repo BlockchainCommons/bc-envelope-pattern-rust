@@ -4,73 +4,50 @@ use bc_envelope::Envelope;
 use dcbor_pattern::Matcher as DcborMatcher;
 
 use crate::{
-    Interval, Pattern,
+    Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching arrays.
-/// This is now a proxy that delegates to dcbor-pattern for array matching.
+/// This delegates directly to dcbor-pattern for array matching.
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub enum ArrayPattern {
-    /// Matches any array using dcbor-pattern's [*] syntax.
-    Any,
-    /// Matches arrays with a specific count of elements using dcbor-pattern's
-    /// [{n}] syntax.
-    Count(usize),
-    /// Matches arrays with a count range using dcbor-pattern's [{n,m}] or
-    /// [{n,}] syntax.
-    Range(Interval),
-    /// Matches arrays with content using dcbor-pattern's [pattern] syntax.
-    Content(dcbor_pattern::Pattern),
-}
+pub struct ArrayPattern(dcbor_pattern::ArrayPattern);
 
 impl ArrayPattern {
     /// Creates a new `ArrayPattern` that matches any array.
-    pub fn any() -> Self { ArrayPattern::Any }
+    pub fn any() -> Self {
+        ArrayPattern(dcbor_pattern::ArrayPattern::any())
+    }
 
     /// Creates a new `ArrayPattern` that matches arrays with a count
     /// of elements in the specified range.
     pub fn interval(interval: impl RangeBounds<usize>) -> Self {
-        ArrayPattern::Range(Interval::new(interval))
+        ArrayPattern(dcbor_pattern::ArrayPattern::with_length_range(interval))
     }
 
     /// Creates a new `ArrayPattern` that matches arrays with exact count.
-    pub fn count(n: usize) -> Self { ArrayPattern::Count(n) }
+    pub fn count(n: usize) -> Self {
+        ArrayPattern(dcbor_pattern::ArrayPattern::with_length_range(n..=n))
+    }
 
     /// Creates a new `ArrayPattern` from a dcbor-pattern.
     pub fn from_dcbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
-        ArrayPattern::Content(pattern)
+        ArrayPattern(dcbor_pattern::ArrayPattern::with_elements(pattern))
     }
 
     /// Creates a new `ArrayPattern` from a dcbor-pattern ArrayPattern.
-    pub fn from_dcbor_array_pattern(array_pattern: dcbor_pattern::ArrayPattern) -> Self {
-        ArrayPattern::Content(dcbor_pattern::Pattern::Structure(
-            dcbor_pattern::StructurePattern::Array(array_pattern)
-        ))
+    pub fn from_dcbor_array_pattern(
+        array_pattern: dcbor_pattern::ArrayPattern,
+    ) -> Self {
+        ArrayPattern(array_pattern)
     }
 }
 
 impl std::hash::Hash for ArrayPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            ArrayPattern::Any => {
-                0u8.hash(state);
-            }
-            ArrayPattern::Count(n) => {
-                1u8.hash(state);
-                n.hash(state);
-            }
-            ArrayPattern::Range(range) => {
-                2u8.hash(state);
-                range.hash(state);
-            }
-            ArrayPattern::Content(pattern) => {
-                3u8.hash(state);
-                // Hash the string representation since dcbor_pattern::Pattern
-                // doesn't implement Hash
-                pattern.to_string().hash(state);
-            }
-        }
+        // Hash the string representation since dcbor_pattern::ArrayPattern
+        // doesn't implement Hash
+        self.0.to_string().hash(state);
     }
 }
 
@@ -80,41 +57,8 @@ impl Matcher for ArrayPattern {
         envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = if let Some(cbor_value) = envelope.subject().as_leaf() {
-            // Convert the envelope's CBOR value to dcbor format for pattern
-            // matching
-            let dcbor_pattern = match self {
-                ArrayPattern::Any => {
-                    // Use dcbor-pattern's [*] syntax
-                    match dcbor_pattern::Pattern::parse("[*]") {
-                        Ok(pattern) => pattern,
-                        Err(_) => return (vec![], HashMap::new()),
-                    }
-                }
-                ArrayPattern::Count(n) => {
-                    // Use dcbor-pattern's [{n}] syntax
-                    let pattern_str = format!("[{{{}}}]", n);
-                    match dcbor_pattern::Pattern::parse(&pattern_str) {
-                        Ok(pattern) => pattern,
-                        Err(_) => return (vec![], HashMap::new()),
-                    }
-                }
-                ArrayPattern::Range(range) => {
-                    // Use dcbor-pattern's [{n,m}] or [{n,}] syntax
-                    let pattern_str = if let Some(max) = range.max() {
-                        format!("[{{{},{}}}]", range.min(), max)
-                    } else {
-                        format!("[{{{},}}]", range.min())
-                    };
-                    match dcbor_pattern::Pattern::parse(&pattern_str) {
-                        Ok(pattern) => pattern,
-                        Err(_) => return (vec![], HashMap::new()),
-                    }
-                }
-                ArrayPattern::Content(pattern) => pattern.clone(),
-            };
-
-            // Use dcbor-pattern to match against the CBOR value
-            if dcbor_pattern.matches(&cbor_value) {
+            // Use dcbor-pattern to match against the CBOR value directly
+            if self.0.matches(&cbor_value) {
                 vec![vec![envelope.clone()]]
             } else {
                 vec![]
@@ -122,6 +66,9 @@ impl Matcher for ArrayPattern {
         } else {
             vec![]
         };
+
+        // For now, we don't support captures through the simple delegation
+        // This could be enhanced later if needed
         (paths, HashMap::new())
     }
 
@@ -142,29 +89,8 @@ impl Matcher for ArrayPattern {
 
 impl std::fmt::Display for ArrayPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ArrayPattern::Any => write!(f, "[*]"),
-            ArrayPattern::Count(n) => write!(f, "[{{{}}}]", n),
-            ArrayPattern::Range(range) => {
-                if let Some(max) = range.max() {
-                    write!(f, "[{{{},{}}}]", range.min(), max)
-                } else {
-                    write!(f, "[{{{},}}]", range.min())
-                }
-            }
-            ArrayPattern::Content(pattern) => {
-                // Extract the inner content from the dcbor pattern
-                let pattern_str = pattern.to_string();
-                if pattern_str.starts_with('[') && pattern_str.ends_with(']') {
-                    // Use the inner content without the brackets
-                    let inner = &pattern_str[1..pattern_str.len() - 1];
-                    write!(f, "[{}]", inner)
-                } else {
-                    // Fallback: wrap the pattern in brackets
-                    write!(f, "[{}]", pattern_str)
-                }
-            }
-        }
+        // Delegate to dcbor-pattern's Display implementation
+        write!(f, "{}", self.0)
     }
 }
 
