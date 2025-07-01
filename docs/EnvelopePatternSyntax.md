@@ -20,9 +20,6 @@ White space is ignored between tokens, so you can use it to make patterns more r
 
 All leaf patterns match Envelope leaves, which are CBOR values.
 
-- Leaf
-    -  `LEAF`
-        - Matches any leaf value.
 - Array
     - `[*]`
         - Matches any array.
@@ -141,6 +138,9 @@ All leaf patterns match Envelope leaves, which are CBOR values.
 
 Structure patterns match parts of Gordian Envelope structures.
 
+- Leaf
+    - `LEAF`
+        - Matches any leaf envelope (terminal nodes in the envelope tree).
 - Assertions
     - `ASSERT`
         - Matches any assertion.

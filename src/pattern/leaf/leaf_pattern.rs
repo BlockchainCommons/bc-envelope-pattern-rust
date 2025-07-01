@@ -9,14 +9,12 @@ use super::{
 };
 use crate::{
     Pattern,
-    pattern::{Matcher, Path, compile_as_atomic, vm::Instr},
+    pattern::{Matcher, Path, vm::Instr},
 };
 
 /// Pattern for matching leaf values.
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum LeafPattern {
-    /// Matches any leaf.
-    Any,
     /// Matches the specific CBOR.
     Cbor(CBORPattern),
     /// Matches a numeric value.
@@ -47,14 +45,6 @@ impl Matcher for LeafPattern {
         envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         match self {
-            LeafPattern::Any => {
-                let paths = if envelope.is_leaf() || envelope.is_known_value() {
-                    vec![vec![envelope.clone()]]
-                } else {
-                    vec![]
-                };
-                (paths, HashMap::new())
-            }
             LeafPattern::Cbor(pattern) => pattern.paths_with_captures(envelope),
             LeafPattern::Number(pattern) => {
                 pattern.paths_with_captures(envelope)
@@ -84,14 +74,6 @@ impl Matcher for LeafPattern {
         captures: &mut Vec<String>,
     ) {
         match self {
-            LeafPattern::Any => {
-                compile_as_atomic(
-                    &Pattern::Leaf(LeafPattern::Any),
-                    code,
-                    literals,
-                    captures,
-                );
-            }
             LeafPattern::Cbor(pattern) => {
                 pattern.compile(code, literals, captures);
             }
@@ -130,7 +112,6 @@ impl Matcher for LeafPattern {
 
     fn is_complex(&self) -> bool {
         match self {
-            LeafPattern::Any => false,
             LeafPattern::Cbor(pattern) => pattern.is_complex(),
             LeafPattern::Number(pattern) => pattern.is_complex(),
             LeafPattern::Text(pattern) => pattern.is_complex(),
@@ -149,7 +130,6 @@ impl Matcher for LeafPattern {
 impl std::fmt::Display for LeafPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LeafPattern::Any => write!(f, "LEAF"),
             LeafPattern::Cbor(pattern) => write!(f, "{}", pattern),
             LeafPattern::Number(pattern) => write!(f, "{}", pattern),
             LeafPattern::Text(pattern) => write!(f, "{}", pattern),

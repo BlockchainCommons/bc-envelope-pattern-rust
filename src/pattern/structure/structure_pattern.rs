@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use bc_envelope::Envelope;
 
 use super::{
-    AssertionsPattern, DigestPattern, NodePattern, ObjectPattern,
+    AssertionsPattern, DigestPattern, LeafStructurePattern, NodePattern, ObjectPattern,
     ObscuredPattern, PredicatePattern, SubjectPattern, WrappedPattern,
 };
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
@@ -15,6 +15,8 @@ pub enum StructurePattern {
     Assertions(AssertionsPattern),
     /// Matches digests.
     Digest(DigestPattern),
+    /// Matches leaf envelopes.
+    Leaf(LeafStructurePattern),
     /// Matches nodes.
     Node(NodePattern),
     /// Matches objects.
@@ -37,6 +39,7 @@ impl Matcher for StructurePattern {
         match self {
             StructurePattern::Assertions(pattern) => pattern.paths_with_captures(envelope),
             StructurePattern::Digest(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Leaf(pattern) => pattern.paths_with_captures(envelope),
             StructurePattern::Node(pattern) => pattern.paths_with_captures(envelope),
             StructurePattern::Object(pattern) => pattern.paths_with_captures(envelope),
             StructurePattern::Obscured(pattern) => pattern.paths_with_captures(envelope),
@@ -58,6 +61,7 @@ impl Matcher for StructurePattern {
             StructurePattern::Wrapped(s) => s.compile(code, lits, captures),
             StructurePattern::Object(s) => s.compile(code, lits, captures),
             StructurePattern::Digest(s) => s.compile(code, lits, captures),
+            StructurePattern::Leaf(s) => s.compile(code, lits, captures),
             StructurePattern::Node(s) => s.compile(code, lits, captures),
             StructurePattern::Obscured(s) => s.compile(code, lits, captures),
             StructurePattern::Predicate(s) => s.compile(code, lits, captures),
@@ -68,6 +72,7 @@ impl Matcher for StructurePattern {
         match self {
             StructurePattern::Assertions(pattern) => pattern.is_complex(),
             StructurePattern::Digest(pattern) => pattern.is_complex(),
+            StructurePattern::Leaf(pattern) => pattern.is_complex(),
             StructurePattern::Node(pattern) => pattern.is_complex(),
             StructurePattern::Object(pattern) => pattern.is_complex(),
             StructurePattern::Obscured(pattern) => pattern.is_complex(),
@@ -83,6 +88,7 @@ impl std::fmt::Display for StructurePattern {
         match self {
             StructurePattern::Assertions(pattern) => write!(f, "{}", pattern),
             StructurePattern::Digest(pattern) => write!(f, "{}", pattern),
+            StructurePattern::Leaf(pattern) => write!(f, "{}", pattern),
             StructurePattern::Node(pattern) => write!(f, "{}", pattern),
             StructurePattern::Object(pattern) => write!(f, "{}", pattern),
             StructurePattern::Obscured(pattern) => write!(f, "{}", pattern),

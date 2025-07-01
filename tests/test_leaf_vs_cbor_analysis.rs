@@ -30,7 +30,7 @@ mod leaf_vs_cbor_analysis {
             }),
         ];
 
-        let leaf_pattern = Pattern::any_leaf();
+        let leaf_pattern = Pattern::leaf();
         let cbor_pattern = Pattern::any_cbor();
 
         println!("Comparing LEAF vs CBOR patterns:");

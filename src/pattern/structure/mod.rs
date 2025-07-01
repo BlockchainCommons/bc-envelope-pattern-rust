@@ -2,6 +2,7 @@
 
 mod assertions_pattern;
 mod digest_pattern;
+mod leaf_structure_pattern;
 mod node_pattern;
 mod object_pattern;
 mod obscured_pattern;
@@ -12,6 +13,7 @@ mod wrapped_pattern;
 
 pub(crate) use assertions_pattern::AssertionsPattern;
 pub(crate) use digest_pattern::DigestPattern;
+pub(crate) use leaf_structure_pattern::LeafStructurePattern;
 pub(crate) use node_pattern::NodePattern;
 pub(crate) use object_pattern::ObjectPattern;
 pub(crate) use obscured_pattern::ObscuredPattern;

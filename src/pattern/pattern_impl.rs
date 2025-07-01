@@ -74,7 +74,7 @@ use super::{
         OrPattern, SearchPattern, TraversePattern,
     },
     structure::{
-        AssertionsPattern, DigestPattern, NodePattern, ObjectPattern,
+        AssertionsPattern, DigestPattern, LeafStructurePattern, NodePattern, ObjectPattern,
         ObscuredPattern, PredicatePattern, StructurePattern, SubjectPattern,
         WrappedPattern,
     },
@@ -135,11 +135,6 @@ impl Matcher for Pattern {
 // region: Leaf Patterns
 //
 //
-
-impl Pattern {
-    /// Creates a new `Pattern` that matches any leaf.
-    pub fn any_leaf() -> Self { Pattern::Leaf(LeafPattern::Any) }
-}
 
 impl Pattern {
     /// Creates a new `Pattern` that matches any CBOR value.
@@ -430,6 +425,12 @@ impl Pattern {
 //
 
 impl Pattern {
+    pub fn leaf() -> Self {
+        Pattern::Structure(StructurePattern::Leaf(
+            crate::pattern::structure::LeafStructurePattern::new(),
+        ))
+    }
+
     pub fn any_assertion() -> Self {
         Pattern::Structure(StructurePattern::Assertions(
             AssertionsPattern::any(),
