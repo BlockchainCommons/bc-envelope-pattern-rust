@@ -18,14 +18,16 @@ pub struct NumberPattern {
 // functions
 impl NumberPattern {
     /// Creates a new `NumberPattern` that matches any number.
-    pub fn any() -> Self { Self { inner: dcbor_pattern::NumberPattern::any() } }
+    pub fn any() -> Self {
+        Self { inner: dcbor_pattern::NumberPattern::any() }
+    }
 
     /// Creates a new `NumberPattern` that matches the exact number.
     pub fn exact<T>(value: T) -> Self
     where
         T: Into<f64>,
     {
-        Self { inner: dcbor_pattern::NumberPattern::exact(value) }
+        Self { inner: dcbor_pattern::NumberPattern::value(value) }
     }
 
     /// Creates a new `NumberPattern` that matches numbers within the specified
@@ -82,16 +84,22 @@ impl NumberPattern {
     }
 
     /// Creates a new `NumberPattern` that matches NaN values.
-    pub fn nan() -> Self { Self { inner: dcbor_pattern::NumberPattern::nan() } }
+    pub fn nan() -> Self {
+        Self { inner: dcbor_pattern::NumberPattern::nan() }
+    }
 
     /// Creates a new `NumberPattern` from a dcbor-pattern NumberPattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::NumberPattern) -> Self {
+    pub fn from_dcbor_pattern(
+        dcbor_pattern: dcbor_pattern::NumberPattern,
+    ) -> Self {
         Self { inner: dcbor_pattern }
     }
 }
 
 impl PartialEq for NumberPattern {
-    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
 }
 
 impl Eq for NumberPattern {}
@@ -160,20 +168,14 @@ mod tests {
     fn test_number_pattern_display() {
         assert_eq!(NumberPattern::any().to_string(), "number");
         assert_eq!(NumberPattern::exact(42.0).to_string(), "42");
-        assert_eq!(
-            NumberPattern::range(1.0..=10.0).to_string(),
-            "1...10"
-        );
+        assert_eq!(NumberPattern::range(1.0..=10.0).to_string(), "1...10");
         assert_eq!(NumberPattern::greater_than(5.0).to_string(), ">5");
         assert_eq!(
             NumberPattern::greater_than_or_equal(5.0).to_string(),
             ">=5"
         );
         assert_eq!(NumberPattern::less_than(5.0).to_string(), "<5");
-        assert_eq!(
-            NumberPattern::less_than_or_equal(5.0).to_string(),
-            "<=5"
-        );
+        assert_eq!(NumberPattern::less_than_or_equal(5.0).to_string(), "<=5");
         assert_eq!(NumberPattern::nan().to_string(), "NaN");
     }
 
