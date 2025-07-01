@@ -154,9 +154,9 @@ Structure patterns match parts of Gordian Envelope structures.
     - `digest ( ur:digest/value )`
         - Matches the specified `ur:digest` value, parsed using the `bc-ur` crate.
 - Node
-    - `NODE`
+    - `node`
         - Matches any Gordian Envelope node, which is an envelope with at least one assertion.
-    - `NODE ( { m, n } )`
+    - `node ( { m, n } )`
         - Matches a Gordian Envelope node with between `m` and `n` assertions, inclusive.
 - Objects
     - `OBJ`

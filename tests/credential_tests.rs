@@ -122,7 +122,7 @@ fn test_search_capture_propagation() {
 #[test]
 fn test_parsed_node_structure() {
     let env = credential();
-    let pat = Pattern::parse("search(NODE({13}))").unwrap();
+    let pat = Pattern::parse("search(node({13}))").unwrap();
     let paths = pat.paths(&env);
     assert_eq!(paths.len(), 1);
 }
@@ -143,8 +143,8 @@ fn test_wrapped_repeat() {
     let env = credential();
 
     // A pattern that matches zero or more `WRAPPED` elements leading to a
-    // `NODE`.
-    let pat = Pattern::parse("(WRAPPED)*>NODE").unwrap();
+    // `node`.
+    let pat = Pattern::parse("(WRAPPED)*>node").unwrap();
     let paths = pat.paths(&env);
 
     // The pattern should match both the outer node and its unwrapped subject
@@ -172,10 +172,10 @@ fn test_search_wrapped_repeat() {
     // See above for the full tree structure of the credential.
     let env = credential();
     // A pattern that searches every element in the tree for those
-    // that start a path of zero or more `WRAPPED` elements leading to a `NODE`.
-    let pat = Pattern::parse("search((WRAPPED)*>NODE)").unwrap();
+    // that start a path of zero or more `WRAPPED` elements leading to a `node`.
+    let pat = Pattern::parse("search((WRAPPED)*>node)").unwrap();
     let paths = pat.paths(&env);
-    // Every `NODE` in the tree should match the pattern, including the inner
+    // Every `node` in the tree should match the pattern, including the inner
     // `8122ffa9 NODE`. Consequently there are two matching paths: one that
     // descends through the wrapper and another that matches the inner node
     // directly.

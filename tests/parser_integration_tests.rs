@@ -11,7 +11,7 @@ fn test_parser_envelope_patterns_take_precedence() {
     // Envelope-specific patterns should be parsed by envelope-pattern parser
     let envelope_patterns = [
         ("search(42)", "envelope search pattern"),
-        ("NODE", "envelope node pattern"),
+        ("node", "envelope node pattern"),
         ("ASSERTION", "envelope assertion pattern"),
         ("digest", "envelope digest pattern"),
         ("@name(42)", "envelope capture pattern"),

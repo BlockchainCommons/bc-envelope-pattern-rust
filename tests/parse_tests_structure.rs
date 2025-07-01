@@ -4,13 +4,13 @@ use bc_envelope_pattern::Pattern;
 
 #[test]
 fn parse_node_patterns() {
-    let p = Pattern::parse("NODE").unwrap();
+    let p = Pattern::parse("node").unwrap();
     assert_eq!(p, Pattern::any_node());
-    assert_eq!(p.to_string(), "NODE");
+    assert_eq!(p.to_string(), "node");
 
-    let p = Pattern::parse("NODE({1,3})").unwrap();
+    let p = Pattern::parse("node({1,3})").unwrap();
     assert_eq!(p, Pattern::node_with_assertions_range(1..=3));
-    assert_eq!(p.to_string(), "NODE({1,3})");
+    assert_eq!(p.to_string(), "node({1,3})");
 }
 
 #[test]
@@ -26,9 +26,9 @@ fn parse_unwrap_pattern() {
     assert_eq!(p, Pattern::unwrap());
     assert_eq!(p.to_string(), "UNWRAP");
 
-    let p = Pattern::parse("UNWRAP(NODE)").unwrap();
+    let p = Pattern::parse("UNWRAP(node)").unwrap();
     assert_eq!(p, Pattern::unwrap_matching(Pattern::any_node()));
-    assert_eq!(p.to_string(), "UNWRAP(NODE)");
+    assert_eq!(p.to_string(), "UNWRAP(node)");
 }
 
 #[test]

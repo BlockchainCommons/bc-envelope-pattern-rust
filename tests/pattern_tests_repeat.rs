@@ -664,7 +664,7 @@ fn test_capture() {
 
     // Pattern only captures `WRAPPED` elements leading to a `NODE`,
     // but not the `NODE` itself.
-    let pat = Pattern::parse("@cap((WRAPPED->UNWRAP)*)->NODE").unwrap();
+    let pat = Pattern::parse("@cap( (WRAPPED -> UNWRAP)* ) -> node").unwrap();
     let (paths, captures) = pat.paths_with_captures(&env);
     // Pattern matches the `WRAPPED` elements leading to the `NODE`,
     // and the `NODE` itself.

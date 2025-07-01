@@ -11,7 +11,7 @@ This crate is now in preview release. You are likely to be asked for bug fixes, 
 - The basic structure of Gordian Envelope is defined in the [Envelope I-D](https://datatracker.ietf.org/doc/draft-mcnally-envelope/).
 - envelopes are structured as a tree.
 - Leaves of the tree are CBOR values.
-- Branches can happen at each NODE (a subject having one or more assertions).
+- Branches can happen at each node (a subject having one or more assertions).
 - Each assertion has a predicate and an object.
 - Every *part* of an Envelope is *itself* an Envelope, which can have assertions.
 
@@ -56,7 +56,7 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-envelope-pattern while maintaining full backward compatibility and envelope-specific functionality. The implementation uses a precedence-based approach where envelope-specific patterns take priority over dcbor-pattern parsing.
 
 **Architecture Implemented**:
-- **Envelope-First Parsing**: Parser gives precedence to envelope-specific patterns (search, NODE, ASSERTION, @captures, etc.)
+- **Envelope-First Parsing**: Parser gives precedence to envelope-specific patterns (search, node, ASSERTION, @captures, etc.)
 - **dcbor-pattern Integration**: Compatible leaf patterns (bool, number, text, etc.) use optimized dcbor-pattern parsing
 - **Conversion Layer**: Comprehensive conversion between dcbor-pattern and envelope-pattern types
 - **Graceful Fallback**: System degrades gracefully for unsupported patterns
@@ -73,7 +73,7 @@ Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-env
 2. **Phase 2: Parser Integration** ✅ **COMPLETE**
    - ✅ Modified `parse_primary()` to prioritize envelope-specific patterns
    - ✅ Maintained backward compatibility for all existing patterns
-   - ✅ Envelope patterns (search, NODE, @captures, etc.) take precedence
+   - ✅ Envelope patterns (search, node, @captures, etc.) take precedence
    - ✅ Compatible leaf patterns use existing dcbor-pattern-based implementations
    - ✅ All existing tests pass without modification
 
@@ -113,7 +113,7 @@ Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-env
 // Envelope-specific patterns work unchanged
 let search_pattern = Pattern::parse("search(42)").unwrap();
 let capture_pattern = Pattern::parse("@num(42)").unwrap();
-let node_pattern = Pattern::parse("NODE").unwrap();
+let node_pattern = Pattern::parse("node").unwrap();
 
 // dcbor-compatible patterns work seamlessly
 let bool_pattern = Pattern::parse("bool").unwrap();

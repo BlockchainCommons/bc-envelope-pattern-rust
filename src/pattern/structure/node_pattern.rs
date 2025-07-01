@@ -74,9 +74,9 @@ impl Matcher for NodePattern {
 impl std::fmt::Display for NodePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            NodePattern::Any => write!(f, "NODE"),
+            NodePattern::Any => write!(f, "node"),
             NodePattern::AssertionsInterval(range) => {
-                write!(f, "NODE({})", range)
+                write!(f, "node({})", range)
             }
         }
     }
@@ -89,9 +89,9 @@ mod tests {
     #[test]
     fn test_node_pattern_display() {
         let any_pattern = NodePattern::any();
-        assert_eq!(any_pattern.to_string(), "NODE");
+        assert_eq!(any_pattern.to_string(), "node");
 
         let count_pattern = NodePattern::interval(1..=3);
-        assert_eq!(count_pattern.to_string(), "NODE({1,3})");
+        assert_eq!(count_pattern.to_string(), "node({1,3})");
     }
 }
