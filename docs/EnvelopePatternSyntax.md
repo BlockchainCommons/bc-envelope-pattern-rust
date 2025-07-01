@@ -140,7 +140,7 @@ Structure patterns match parts of Gordian Envelope structures.
 
 - Leaf
     - `leaf`
-        - Matches any leaf envelope (terminal nodes in the envelope tree).
+        - Matches any leaf envelope (terminal nodes in the envelope tree), a "bare subject". This is distinct from the `node` pattern, which matches a subject with one or more assertions.
 - Assertions
     - `assert`
         - Matches any assertion.
@@ -156,8 +156,8 @@ Structure patterns match parts of Gordian Envelope structures.
 - Node
     - `node`
         - Matches any Gordian Envelope node, which is an envelope with at least one assertion.
-    - `node ( { m, n } )`
-        - Matches a Gordian Envelope node with between `m` and `n` assertions, inclusive.
+    - `node ( { n, m } )`
+        - Matches a Gordian Envelope node with between `n` and `m` assertions, inclusive. An `n` of zero will never match.
 - Objects
     - `obj`
         - Matches any object.
