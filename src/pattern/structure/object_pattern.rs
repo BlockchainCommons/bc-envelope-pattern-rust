@@ -62,8 +62,8 @@ impl Matcher for ObjectPattern {
 impl std::fmt::Display for ObjectPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ObjectPattern::Any => write!(f, "OBJECT"),
-            ObjectPattern::Pattern(pattern) => write!(f, "OBJECT({})", pattern),
+            ObjectPattern::Any => write!(f, "obj"),
+            ObjectPattern::Pattern(pattern) => write!(f, "obj({})", pattern),
         }
     }
 }

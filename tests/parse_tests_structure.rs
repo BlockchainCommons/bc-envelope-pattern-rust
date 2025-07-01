@@ -67,53 +67,53 @@ fn parse_assert_patterns() {
 
 #[test]
 fn parse_object_patterns() {
-    let p = Pattern::parse("OBJ").unwrap();
+    let p = Pattern::parse("obj").unwrap();
     assert_eq!(p, Pattern::any_object());
-    assert_eq!(p.to_string(), "OBJECT");
+    assert_eq!(p.to_string(), "obj");
 
-    let p = Pattern::parse(r#"OBJ("hi")"#).unwrap();
+    let p = Pattern::parse(r#"obj("hi")"#).unwrap();
     assert_eq!(p, Pattern::object(Pattern::text("hi")));
-    assert_eq!(p.to_string(), r#"OBJECT("hi")"#);
+    assert_eq!(p.to_string(), r#"obj("hi")"#);
 
-    let spaced = r#"OBJ ( "hi" )"#;
+    let spaced = r#"obj ( "hi" )"#;
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::object(Pattern::text("hi")));
-    assert_eq!(p_spaced.to_string(), r#"OBJECT("hi")"#);
+    assert_eq!(p_spaced.to_string(), r#"obj("hi")"#);
 }
 
 #[test]
 fn parse_predicate_patterns() {
-    let p = Pattern::parse("PRED").unwrap();
+    let p = Pattern::parse("pred").unwrap();
     assert_eq!(p, Pattern::any_predicate());
-    assert_eq!(p.to_string(), "PRED");
+    assert_eq!(p.to_string(), "pred");
 
-    let p = Pattern::parse("PRED(1)").unwrap();
+    let p = Pattern::parse("pred(1)").unwrap();
     assert_eq!(p, Pattern::predicate(Pattern::number(1)));
-    assert_eq!(p.to_string(), "PRED(1)");
+    assert_eq!(p.to_string(), "pred(1)");
 
-    let spaced = "PRED ( 1 )";
+    let spaced = "pred ( 1 )";
     let p_spaced = Pattern::parse(spaced).unwrap();
     assert_eq!(p_spaced, Pattern::predicate(Pattern::number(1)));
-    assert_eq!(p_spaced.to_string(), "PRED(1)");
+    assert_eq!(p_spaced.to_string(), "pred(1)");
 }
 
 #[test]
 fn parse_obscured_patterns() {
-    let p = Pattern::parse("OBSCURED").unwrap();
+    let p = Pattern::parse("obscured").unwrap();
     assert_eq!(p, Pattern::obscured());
-    assert_eq!(p.to_string(), "OBSCURED");
+    assert_eq!(p.to_string(), "obscured");
 
-    let p = Pattern::parse("ELIDED").unwrap();
+    let p = Pattern::parse("elided").unwrap();
     assert_eq!(p, Pattern::elided());
-    assert_eq!(p.to_string(), "ELIDED");
+    assert_eq!(p.to_string(), "elided");
 
-    let p = Pattern::parse("ENCRYPTED").unwrap();
+    let p = Pattern::parse("encrypted").unwrap();
     assert_eq!(p, Pattern::encrypted());
-    assert_eq!(p.to_string(), "ENCRYPTED");
+    assert_eq!(p.to_string(), "encrypted");
 
-    let p = Pattern::parse("COMPRESSED").unwrap();
+    let p = Pattern::parse("compressed").unwrap();
     assert_eq!(p, Pattern::compressed());
-    assert_eq!(p.to_string(), "COMPRESSED");
+    assert_eq!(p.to_string(), "compressed");
 }
 
 #[test]

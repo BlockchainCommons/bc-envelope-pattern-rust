@@ -615,7 +615,7 @@ fn test_not_pattern() {
     let search_pattern = Pattern::search(Pattern::not_matching(
         Pattern::object(Pattern::number(42)),
     ));
-    assert_eq!(format!("{}", search_pattern), r#"search(!OBJECT(42))"#);
+    assert_eq!(format!("{}", search_pattern), r#"search(!obj(42))"#);
     let not_patterns = search_pattern.paths(&envelope);
 
     // Should not match the assertion with object 42, but will match other
@@ -671,7 +671,7 @@ fn test_not_pattern_with_search() {
 
     // Search for elements that are NOT obscured (everything in this case)
     let pattern = Pattern::search(Pattern::not_matching(Pattern::obscured()));
-    assert_eq!(format!("{}", pattern), r#"search(!OBSCURED)"#);
+    assert_eq!(format!("{}", pattern), r#"search(!obscured)"#);
     let not_obscured_paths = pattern.paths(&outer_envelope);
 
     // We should find multiple matches (everything, since nothing is obscured)
@@ -687,7 +687,7 @@ fn test_not_pattern_with_search() {
 
     // Search for elements that are NOT elided
     let pattern = Pattern::search(Pattern::not_matching(Pattern::elided()));
-    assert_eq!(format!("{}", pattern), r#"search(!ELIDED)"#);
+    assert_eq!(format!("{}", pattern), r#"search(!elided)"#);
     let not_elided_paths = pattern.paths(&envelope_with_elided);
 
     // Should find multiple elements that are not elided

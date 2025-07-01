@@ -1,6 +1,5 @@
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Matcher, Pattern};
-use dcbor::prelude::*;
 
 fn main() {
     println!("Testing map patterns:");

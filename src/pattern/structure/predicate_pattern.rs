@@ -63,9 +63,9 @@ impl Matcher for PredicatePattern {
 impl std::fmt::Display for PredicatePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PredicatePattern::Any => write!(f, "PRED"),
+            PredicatePattern::Any => write!(f, "pred"),
             PredicatePattern::Pattern(pattern) => {
-                write!(f, "PRED({})", pattern)
+                write!(f, "pred({})", pattern)
             }
         }
     }

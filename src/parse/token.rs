@@ -64,22 +64,22 @@ pub enum Token {
     #[token("node")]
     Node,
 
-    #[token("OBJ")]
+    #[token("obj")]
     Obj,
 
-    #[token("OBSCURED")]
+    #[token("obscured")]
     Obscured,
 
-    #[token("ELIDED")]
+    #[token("elided")]
     Elided,
 
-    #[token("ENCRYPTED")]
+    #[token("encrypted")]
     Encrypted,
 
-    #[token("COMPRESSED")]
+    #[token("compressed")]
     Compressed,
 
-    #[token("PRED")]
+    #[token("pred")]
     Pred,
 
     #[token("SUBJECT")]

@@ -77,10 +77,10 @@ impl Matcher for ObscuredPattern {
 impl std::fmt::Display for ObscuredPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ObscuredPattern::Any => write!(f, "OBSCURED"),
-            ObscuredPattern::Elided => write!(f, "ELIDED"),
-            ObscuredPattern::Encrypted => write!(f, "ENCRYPTED"),
-            ObscuredPattern::Compressed => write!(f, "COMPRESSED"),
+            ObscuredPattern::Any => write!(f, "obscured"),
+            ObscuredPattern::Elided => write!(f, "elided"),
+            ObscuredPattern::Encrypted => write!(f, "encrypted"),
+            ObscuredPattern::Compressed => write!(f, "compressed"),
         }
     }
 }

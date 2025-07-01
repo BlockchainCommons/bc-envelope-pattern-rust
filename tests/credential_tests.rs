@@ -103,7 +103,7 @@ fn test_parsed_search_text_or_number() {
 #[test]
 fn test_parsed_firstname_capture() {
     let env = credential();
-    let pattern_str = r#"search(assertpred("firstName")->OBJ("James"))"#;
+    let pattern_str = r#"search(assertpred("firstName")->obj("James"))"#;
     let pattern = Pattern::parse(pattern_str).unwrap();
     let paths = pattern.paths(&env);
     assert_eq!(paths.len(), 1);
@@ -112,7 +112,7 @@ fn test_parsed_firstname_capture() {
 #[test]
 fn test_search_capture_propagation() {
     let env = credential();
-    let pattern_str = r#"search(@cap(assertpred("firstName")->OBJ("James")))"#;
+    let pattern_str = r#"search(@cap(assertpred("firstName")->obj("James")))"#;
     let pattern = Pattern::parse(pattern_str).unwrap();
     let (paths, caps) = pattern.paths_with_captures(&env);
     assert_eq!(paths.len(), 1);
@@ -131,7 +131,7 @@ fn test_parsed_node_structure() {
 fn test_digest_and_not() {
     let env = credential();
     let digest = env.short_id(bc_envelope::DigestDisplayFormat::Short);
-    let pattern_str = format!("digest({})&(!OBSCURED)", digest);
+    let pattern_str = format!("digest({})&(!obscured)", digest);
     let pat = Pattern::parse(&pattern_str).unwrap();
     assert!(pat.matches(&env));
 }
@@ -261,7 +261,7 @@ fn test_redacted_credential() {
 #[test]
 fn test_search_elided() {
     let env = redacted_credential();
-    let pat = Pattern::parse("search(ELIDED)").unwrap();
+    let pat = Pattern::parse("search(elided)").unwrap();
     let paths = pat.paths(&env);
     assert_eq!(paths.len(), 7);
 }
