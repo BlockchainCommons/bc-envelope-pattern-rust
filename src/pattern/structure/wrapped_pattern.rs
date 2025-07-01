@@ -116,9 +116,9 @@ impl std::fmt::Display for WrappedPattern {
             WrappedPattern::Any => write!(f, "wrapped"),
             WrappedPattern::Unwrap(pattern) => {
                 if **pattern == Pattern::any() {
-                    write!(f, "UNWRAP")
+                    write!(f, "unwrap")
                 } else {
-                    write!(f, "UNWRAP({})", pattern)
+                    write!(f, "unwrap({})", pattern)
                 }
             }
         }

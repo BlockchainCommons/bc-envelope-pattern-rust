@@ -575,9 +575,9 @@ fn repeat_range_order() {
 #[test]
 #[ignore]
 fn test_repeat() {
-    // A pattern that matches zero or more `UNWRAP` elements leading to a
+    // A pattern that matches zero or more `unwrap` elements leading to a
     // `node`.
-    let pat = Pattern::parse("(UNWRAP)*>node").unwrap();
+    let pat = Pattern::parse("(unwrap)*>node").unwrap();
 
     let env = Envelope::new("Alice");
     // There is no `node` in the envelope, so the pattern should not match.
@@ -607,7 +607,7 @@ fn test_repeat() {
     // does not make progress into the wrapped node to get to the `node`.
     assert!(!pat.matches(&wrapped_env));
 
-    let pat = Pattern::parse("@cap((wrapped)*)>UNWRAP>node").unwrap();
+    let pat = Pattern::parse("@cap((wrapped)*)>unwrap>node").unwrap();
     let (paths, captures) = pat.paths_with_captures(&wrapped_env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -624,7 +624,7 @@ fn test_repeat() {
     assert_actual_expected!(format_paths(caps), expected_cap);
 
     let wrapped_env = wrapped_env.wrap();
-    let pat = Pattern::parse("@cap((wrapped>UNWRAP)*)>node").unwrap();
+    let pat = Pattern::parse("@cap((wrapped>unwrap)*)>node").unwrap();
     let (paths, captures) = pat.paths_with_captures(&wrapped_env);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -664,7 +664,7 @@ fn test_capture() {
 
     // Pattern only captures `wrapped` elements leading to a `node`,
     // but not the `node` itself.
-    let pat = Pattern::parse("@cap( (wrapped -> UNWRAP)* ) -> node").unwrap();
+    let pat = Pattern::parse("@cap( (wrapped -> unwrap)* ) -> node").unwrap();
     let (paths, captures) = pat.paths_with_captures(&env);
     // Pattern matches the `wrapped` elements leading to the `node`,
     // and the `node` itself.

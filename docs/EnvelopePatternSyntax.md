@@ -185,7 +185,7 @@ Structure patterns match parts of Gordian Envelope structures.
 - Wrapped
     - `wrapped`
         - Matches any wrapped Envelope.
-    - `UNWRAP`
+    - `unwrap`
         - Matches on the content of a wrapped Envelope.
 
 ## Meta Patterns

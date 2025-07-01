@@ -22,13 +22,13 @@ fn parse_wrapped_pattern() {
 
 #[test]
 fn parse_unwrap_pattern() {
-    let p = Pattern::parse("UNWRAP").unwrap();
+    let p = Pattern::parse("unwrap").unwrap();
     assert_eq!(p, Pattern::unwrap());
-    assert_eq!(p.to_string(), "UNWRAP");
+    assert_eq!(p.to_string(), "unwrap");
 
-    let p = Pattern::parse("UNWRAP(node)").unwrap();
+    let p = Pattern::parse("unwrap(node)").unwrap();
     assert_eq!(p, Pattern::unwrap_matching(Pattern::any_node()));
-    assert_eq!(p.to_string(), "UNWRAP(node)");
+    assert_eq!(p.to_string(), "unwrap(node)");
 }
 
 #[test]

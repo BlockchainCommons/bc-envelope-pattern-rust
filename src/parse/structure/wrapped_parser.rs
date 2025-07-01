@@ -12,7 +12,7 @@ pub(crate) fn parse_unwrap(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {
         Some(Ok(Token::ParenOpen)) => {
-            // UNWRAP ( pattern )
+            // unwrap ( pattern )
             lexer.next();
             let pat = meta::parse_or(lexer)?;
             match lexer.next() {
@@ -27,7 +27,7 @@ pub(crate) fn parse_unwrap(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             }
         }
         _ => {
-            // Simple UNWRAP pattern without arguments
+            // Simple unwrap pattern without arguments
             Ok(Pattern::unwrap())
         }
     }

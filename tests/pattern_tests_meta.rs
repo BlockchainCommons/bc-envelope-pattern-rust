@@ -219,7 +219,7 @@ fn test_wrapped_traversal() {
 
     assert_eq!(
         format!("{}", wrapped_4_pattern),
-        r#"UNWRAP -> UNWRAP -> UNWRAP -> UNWRAP"#
+        r#"unwrap -> unwrap -> unwrap -> unwrap"#
     );
 }
 
@@ -232,7 +232,7 @@ fn optional_wrapped_pattern() {
     ]);
     assert_eq!(
         format!("{}", optional_wrapped_pattern),
-        r#"(UNWRAP)? -> number"#
+        r#"(unwrap)? -> number"#
     );
 
     let inner = Envelope::new(42);
