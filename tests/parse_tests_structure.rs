@@ -33,13 +33,13 @@ fn parse_unwrap_pattern() {
 
 #[test]
 fn parse_subject_patterns() {
-    let p = Pattern::parse("SUBJECT").unwrap();
+    let p = Pattern::parse("subj").unwrap();
     assert_eq!(p, Pattern::any_subject());
-    assert_eq!(p.to_string(), "SUBJECT");
+    assert_eq!(p.to_string(), "subj");
 
-    let p = Pattern::parse(r#"SUBJECT("hi")"#).unwrap();
+    let p = Pattern::parse(r#"subj("hi")"#).unwrap();
     assert_eq!(p, Pattern::subject(Pattern::text("hi")));
-    assert_eq!(p.to_string(), r#"SUBJECT("hi")"#);
+    assert_eq!(p.to_string(), r#"subj("hi")"#);
 }
 
 #[test]

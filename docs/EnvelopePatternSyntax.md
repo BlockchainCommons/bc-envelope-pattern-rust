@@ -159,28 +159,28 @@ Structure patterns match parts of Gordian Envelope structures.
     - `node ( { m, n } )`
         - Matches a Gordian Envelope node with between `m` and `n` assertions, inclusive.
 - Objects
-    - `OBJ`
+    - `obj`
         - Matches any object.
-    - `OBJ ( pattern )`
+    - `obj ( pattern )`
         - Matches an object that matches the specified pattern.
 - Obscured
-    - `OBSCURED`
+    - `obscured`
         - Matches any obscured (elided, encrypted, or compressed) branch of the Envelope tree.
-    - `ELIDED`
+    - `elided`
         - Matches any elided branch of the Envelope tree.
-    - `ENCRYPTED`
+    - `encrypted`
         - Matches any encrypted branch of the Envelope tree.
-    - `COMPRESSED`
+    - `compressed`
         - Matches any compressed branch of the Envelope tree.
 - Predicates
-    - `PRED`
+    - `pred`
         - Matches any predicate.
-    - `PRED ( pattern )`
+    - `pred ( pattern )`
         - Matches a predicate that matches the specified pattern.
 - Subjects
-    - `SUBJECT`
+    - `subj`
         - Matches any subject. If the envelope is not a NODE, then this is the identity function.
-    - `SUBJECT ( pattern )`
+    - `subj ( pattern )`
         - Matches a subject that matches the specified pattern.
 - Wrapped
     - `WRAPPED`

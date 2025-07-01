@@ -70,9 +70,9 @@ impl Matcher for SubjectPattern {
 impl std::fmt::Display for SubjectPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SubjectPattern::Any => write!(f, "SUBJECT"),
+            SubjectPattern::Any => write!(f, "subj"),
             SubjectPattern::Pattern(pattern) => {
-                write!(f, "SUBJECT({})", pattern)
+                write!(f, "subj({})", pattern)
             }
         }
     }

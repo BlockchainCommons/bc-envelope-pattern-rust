@@ -82,7 +82,7 @@ pub enum Token {
     #[token("pred")]
     Pred,
 
-    #[token("SUBJECT")]
+    #[token("subj")]
     Subject,
 
     #[token("WRAPPED")]
@@ -536,7 +536,7 @@ mod tests {
         // Test structure pattern keywords
         assert_eq!(Token::lexer("assert").next(), Some(Ok(Token::Assertion)));
         assert_eq!(Token::lexer("node").next(), Some(Ok(Token::Node)));
-        assert_eq!(Token::lexer("SUBJECT").next(), Some(Ok(Token::Subject)));
+        assert_eq!(Token::lexer("subj").next(), Some(Ok(Token::Subject)));
         assert_eq!(Token::lexer("WRAPPED").next(), Some(Ok(Token::Wrapped)));
         assert_eq!(Token::lexer("UNWRAP").next(), Some(Ok(Token::Unwrap)));
 

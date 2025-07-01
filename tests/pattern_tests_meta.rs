@@ -55,7 +55,7 @@ fn test_and_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", number_range_with_subject_pattern),
-        r#">40 & <50 -> SUBJECT"#,
+        r#">40 & <50 -> subj"#,
     );
 }
 
@@ -104,7 +104,7 @@ fn test_or_pattern() {
     assert_actual_expected!(format_paths(&paths), expected);
     assert_eq!(
         format!("{}", foo_or_greater_than_40_with_subject_pattern),
-        r#""foo" | >40 -> SUBJECT"#
+        r#""foo" | >40 -> subj"#
     );
 }
 
