@@ -64,6 +64,8 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 ### NEXT TASK:
 
+- Update the `ARRAY` pattern to use the `dcbor-pattern` crate's new syntax for matching arrays.
+
 #### Old Syntax:
 
 - Array
