@@ -44,9 +44,9 @@ fn parse_subject_patterns() {
 
 #[test]
 fn parse_assert_patterns() {
-    let p = Pattern::parse("ASSERT").unwrap();
+    let p = Pattern::parse("assert").unwrap();
     assert_eq!(p, Pattern::any_assertion());
-    assert_eq!(p.to_string(), "ASSERT");
+    assert_eq!(p.to_string(), "assert");
 
     let p = Pattern::parse(r#"ASSERTPRED("hi")"#).unwrap();
     assert_eq!(p, Pattern::assertion_with_predicate(Pattern::text("hi")));

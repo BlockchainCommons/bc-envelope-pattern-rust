@@ -142,7 +142,7 @@ Structure patterns match parts of Gordian Envelope structures.
     - `leaf`
         - Matches any leaf envelope (terminal nodes in the envelope tree).
 - Assertions
-    - `ASSERT`
+    - `assert`
         - Matches any assertion.
     - `ASSERTPRED ( pattern )`
         - Matches an assertion having a predicate that matches the specified pattern.

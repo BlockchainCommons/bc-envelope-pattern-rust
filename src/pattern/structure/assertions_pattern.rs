@@ -80,7 +80,7 @@ impl Matcher for AssertionsPattern {
 impl std::fmt::Display for AssertionsPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AssertionsPattern::Any => write!(f, "ASSERT"),
+            AssertionsPattern::Any => write!(f, "assert"),
             AssertionsPattern::WithPredicate(pattern) => {
                 write!(f, "ASSERTPRED({})", pattern)
             }

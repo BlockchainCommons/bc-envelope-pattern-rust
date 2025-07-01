@@ -49,7 +49,7 @@ pub enum Token {
     RepeatZeroOrOnePossessive,
 
     // Structure Pattern Keywords
-    #[token("ASSERT")]
+    #[token("assert")]
     Assertion,
 
     #[token("ASSERTPRED")]
@@ -534,7 +534,7 @@ mod tests {
         assert_eq!(Token::lexer("?").next(), Some(Ok(Token::RepeatZeroOrOne)));
 
         // Test structure pattern keywords
-        assert_eq!(Token::lexer("ASSERT").next(), Some(Ok(Token::Assertion)));
+        assert_eq!(Token::lexer("assert").next(), Some(Ok(Token::Assertion)));
         assert_eq!(Token::lexer("NODE").next(), Some(Ok(Token::Node)));
         assert_eq!(Token::lexer("SUBJECT").next(), Some(Ok(Token::Subject)));
         assert_eq!(Token::lexer("WRAPPED").next(), Some(Ok(Token::Wrapped)));
