@@ -37,6 +37,11 @@ impl ByteStringPattern {
             inner: dcbor_pattern::ByteStringPattern::regex(regex),
         }
     }
+
+    /// Creates a new `ByteStringPattern` from a dcbor-pattern ByteStringPattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::ByteStringPattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl Matcher for ByteStringPattern {

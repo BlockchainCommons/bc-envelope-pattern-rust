@@ -29,6 +29,11 @@ impl TextPattern {
     pub fn regex(regex: regex::Regex) -> Self {
         Self { inner: dcbor_pattern::TextPattern::regex(regex) }
     }
+
+    /// Creates a new `TextPattern` from a dcbor-pattern TextPattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::TextPattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl PartialEq for TextPattern {

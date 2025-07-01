@@ -46,6 +46,11 @@ impl KnownValuePattern {
             inner: dcbor_pattern::KnownValuePattern::regex(regex),
         }
     }
+
+    /// Creates a new `KnownValuePattern` from a dcbor-pattern KnownValuePattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::KnownValuePattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl PartialEq for KnownValuePattern {

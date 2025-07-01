@@ -9,4 +9,4 @@ pub use format::{
     FormatPathsOpts, PathElementFormat, format_path, format_path_opt,
     format_paths, format_paths_opt, format_paths_with_captures_opt, format_paths_with_captures,
 };
-pub use pattern::{Matcher, Path, Pattern};
+pub use pattern::{Matcher, Path, Pattern, dcbor_integration};

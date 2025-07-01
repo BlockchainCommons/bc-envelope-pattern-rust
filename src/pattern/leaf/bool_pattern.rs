@@ -24,6 +24,11 @@ impl BoolPattern {
     pub fn value(value: bool) -> Self {
         Self { inner: dcbor_pattern::BoolPattern::value(value) }
     }
+
+    /// Creates a new `BoolPattern` from a dcbor-pattern BoolPattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::BoolPattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl PartialEq for BoolPattern {

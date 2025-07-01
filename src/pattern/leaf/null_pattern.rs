@@ -21,6 +21,11 @@ pub struct NullPattern {
 impl NullPattern {
     /// Creates a new `NullPattern` that matches any null value.
     pub fn new() -> Self { NullPattern { inner: DcborNullPattern::new() } }
+
+    /// Creates a new `NullPattern` from a dcbor-pattern NullPattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: DcborNullPattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl Default for NullPattern {

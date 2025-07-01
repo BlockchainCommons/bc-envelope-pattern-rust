@@ -69,6 +69,11 @@ impl DatePattern {
     pub fn regex(regex: regex::Regex) -> Self {
         Self { inner: dcbor_pattern::DatePattern::regex(regex) }
     }
+
+    /// Creates a new `DatePattern` from a dcbor-pattern DatePattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::DatePattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl Matcher for DatePattern {

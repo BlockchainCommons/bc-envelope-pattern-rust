@@ -34,6 +34,11 @@ impl CBORPattern {
         CBORPattern::Pattern(pattern)
     }
 
+    /// Creates a new `CBORPattern` from a dcbor-pattern Pattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: DcborPattern) -> Self {
+        CBORPattern::Pattern(dcbor_pattern)
+    }
+
     /// Convert dcbor captures to envelope captures by converting dcbor paths
     /// to envelope paths.
     fn convert_dcbor_captures_to_envelope_captures(

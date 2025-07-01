@@ -26,53 +26,7 @@ pub(crate) fn parse_primary(
     };
 
     match token {
-        Token::RepeatZeroOrMore => Ok(Pattern::any()), /* Support dcbor-pattern's * syntax */
-        Token::BracketOpen => leaf::parse_array(lexer), /* New dcbor-pattern [*] syntax */
-        Token::BoolKeyword => Ok(Pattern::any_bool()), /* New dcbor-pattern */
-        // bool syntax
-        Token::BoolTrue => Ok(Pattern::bool(true)), /* New dcbor-pattern */
-        // true syntax
-        Token::BoolFalse => Ok(Pattern::bool(false)), /* New dcbor-pattern */
-        // false syntax
-        Token::ByteString => Ok(Pattern::any_byte_string()), /* New dcbor-pattern bstr syntax */
-        Token::HexPattern(Ok(bytes)) => Ok(Pattern::byte_string(bytes)), /* New dcbor-pattern h'hex' syntax */
-        Token::HexPattern(Err(e)) => Err(e),
-        Token::HexBinaryRegex(Ok(regex_str)) => {
-            let regex = regex::bytes::Regex::new(&regex_str)
-                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
-            Ok(Pattern::byte_string_binary_regex(regex))
-        }
-        Token::HexBinaryRegex(Err(e)) => Err(e),
-        Token::DateKeyword => Ok(Pattern::any_date()), /* New dcbor-pattern
-                                                         * date syntax */
-        Token::DatePattern(Ok(content)) => {
-            // Parse the dcbor-pattern date syntax
-            leaf::parse_date_content(content)
-        }
-        Token::DatePattern(Err(e)) => Err(e),
-        Token::Tagged => leaf::parse_tag(lexer),
-        Token::Known => Ok(Pattern::any_known_value()), /* New dcbor-pattern
-                                                          * known syntax */
-        Token::SingleQuotedPattern(Ok(content)) => {
-            // Parse single-quoted known value pattern
-            if let Ok(value) = content.parse::<u64>() {
-                Ok(Pattern::known_value(KnownValue::new(value)))
-            } else {
-                Ok(Pattern::known_value_named(content))
-            }
-        }
-        Token::SingleQuotedPattern(Err(e)) => Err(e),
-        Token::SingleQuotedRegex(Ok(regex_str)) => {
-            let regex = regex::Regex::new(&regex_str)
-                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
-            Ok(Pattern::known_value_regex(regex))
-        }
-        Token::SingleQuotedRegex(Err(e)) => Err(e),
-        Token::Leaf => Ok(Pattern::any_leaf()),
-        Token::Cbor => leaf::parse_cbor(lexer),
-        Token::Map => leaf::parse_map(lexer),
-        Token::ParenOpen => parse_group(lexer),
-        Token::GroupName(name) => parse_capture(lexer, name),
+        // Envelope-specific patterns first (these take precedence)
         Token::Search => parse_search(lexer),
         Token::Node => structure::parse_node(lexer),
         Token::Assertion => structure::parse_assertion(lexer),
@@ -88,19 +42,25 @@ pub(crate) fn parse_primary(
         Token::Wrapped => structure::parse_wrapped(lexer),
         Token::Unwrap => structure::parse_unwrap(lexer),
         Token::Subject => structure::parse_subject(lexer),
+        Token::GroupName(name) => parse_capture(lexer, name),
+        Token::ParenOpen => parse_group(lexer),
+        Token::Leaf => Ok(Pattern::any_leaf()),
         Token::None => Ok(Pattern::none()),
-        Token::Null => leaf::parse_null(lexer),
-        Token::NumberKeyword => Ok(Pattern::any_number()), /* New dcbor-pattern number syntax */
-        Token::TextKeyword => Ok(Pattern::any_text()), /* New dcbor-pattern */
-        // text syntax
-        Token::StringLiteral(Ok(s)) => Ok(Pattern::text(s)), /* New dcbor-pattern "string" syntax */
+
+        // Map patterns might have envelope-specific extensions
+        Token::Map => leaf::parse_map(lexer),
+        Token::Cbor => leaf::parse_cbor(lexer),
+
+        // For simple leaf patterns, try dcbor-pattern first
+        Token::RepeatZeroOrMore => Ok(Pattern::any()), /* dcbor-pattern's *
+                                                         * syntax */
+        Token::BoolKeyword => Ok(Pattern::any_bool()),
+        Token::BoolTrue => Ok(Pattern::bool(true)),
+        Token::BoolFalse => Ok(Pattern::bool(false)),
+        Token::NumberKeyword => Ok(Pattern::any_number()),
+        Token::TextKeyword => Ok(Pattern::any_text()),
+        Token::StringLiteral(Ok(s)) => Ok(Pattern::text(s)),
         Token::StringLiteral(Err(e)) => Err(e),
-        Token::Regex(Ok(regex_str)) => {
-            let regex = regex::Regex::new(&regex_str)
-                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
-            Ok(Pattern::text_regex(regex))
-        }
-        Token::Regex(Err(e)) => Err(e),
         Token::UnsignedInteger(Ok(n)) => {
             // Check if this is part of a range (e.g., "1...10")
             leaf::parse_number_range_or_comparison(lexer, n as f64)
@@ -120,9 +80,46 @@ pub(crate) fn parse_primary(
         Token::LessThanOrEqual => leaf::parse_comparison_number(lexer, "<="),
         Token::GreaterThan => leaf::parse_comparison_number(lexer, ">"),
         Token::LessThan => leaf::parse_comparison_number(lexer, "<"),
-        Token::NaN => Ok(Pattern::number_nan()), /* dcbor-pattern NaN */
-        Token::Infinity => Ok(Pattern::number(f64::INFINITY)), /* dcbor-pattern Infinity */
-        Token::NegativeInfinity => Ok(Pattern::number(f64::NEG_INFINITY)), /* dcbor-pattern -Infinity */
+        Token::NaN => Ok(Pattern::number_nan()),
+        Token::Infinity => Ok(Pattern::number(f64::INFINITY)),
+        Token::NegativeInfinity => Ok(Pattern::number(f64::NEG_INFINITY)),
+        Token::Regex(Ok(regex_str)) => {
+            let regex = regex::Regex::new(&regex_str)
+                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
+            Ok(Pattern::text_regex(regex))
+        }
+        Token::Regex(Err(e)) => Err(e),
+        Token::BracketOpen => leaf::parse_array(lexer),
+        Token::ByteString => Ok(Pattern::any_byte_string()),
+        Token::HexPattern(Ok(bytes)) => Ok(Pattern::byte_string(bytes)),
+        Token::HexPattern(Err(e)) => Err(e),
+        Token::HexBinaryRegex(Ok(regex_str)) => {
+            let regex = regex::bytes::Regex::new(&regex_str)
+                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
+            Ok(Pattern::byte_string_binary_regex(regex))
+        }
+        Token::HexBinaryRegex(Err(e)) => Err(e),
+        Token::DateKeyword => Ok(Pattern::any_date()),
+        Token::DatePattern(Ok(content)) => leaf::parse_date_content(content),
+        Token::DatePattern(Err(e)) => Err(e),
+        Token::Tagged => leaf::parse_tag(lexer),
+        Token::Known => Ok(Pattern::any_known_value()),
+        Token::SingleQuotedPattern(Ok(content)) => {
+            if let Ok(value) = content.parse::<u64>() {
+                Ok(Pattern::known_value(KnownValue::new(value)))
+            } else {
+                Ok(Pattern::known_value_named(content))
+            }
+        }
+        Token::SingleQuotedPattern(Err(e)) => Err(e),
+        Token::SingleQuotedRegex(Ok(regex_str)) => {
+            let regex = regex::Regex::new(&regex_str)
+                .map_err(|_| Error::InvalidRegex(lexer.span()))?;
+            Ok(Pattern::known_value_regex(regex))
+        }
+        Token::SingleQuotedRegex(Err(e)) => Err(e),
+        Token::Null => leaf::parse_null(lexer),
+
         t => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
     }
 }

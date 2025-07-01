@@ -8,6 +8,9 @@ mod leaf;
 mod meta;
 mod structure;
 
+// Integration modules
+pub mod dcbor_integration;
+
 // Re-export all types
 pub use matcher::{Matcher, Path, compile_as_atomic};
 pub use pattern_impl::Pattern;

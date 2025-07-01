@@ -41,6 +41,13 @@ impl ArrayPattern {
     pub fn from_dcbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
         ArrayPattern::Content(pattern)
     }
+
+    /// Creates a new `ArrayPattern` from a dcbor-pattern ArrayPattern.
+    pub fn from_dcbor_array_pattern(array_pattern: dcbor_pattern::ArrayPattern) -> Self {
+        ArrayPattern::Content(dcbor_pattern::Pattern::Structure(
+            dcbor_pattern::StructurePattern::Array(array_pattern)
+        ))
+    }
 }
 
 impl std::hash::Hash for ArrayPattern {

@@ -83,6 +83,11 @@ impl NumberPattern {
 
     /// Creates a new `NumberPattern` that matches NaN values.
     pub fn nan() -> Self { Self { inner: dcbor_pattern::NumberPattern::nan() } }
+
+    /// Creates a new `NumberPattern` from a dcbor-pattern NumberPattern.
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::NumberPattern) -> Self {
+        Self { inner: dcbor_pattern }
+    }
 }
 
 impl PartialEq for NumberPattern {
