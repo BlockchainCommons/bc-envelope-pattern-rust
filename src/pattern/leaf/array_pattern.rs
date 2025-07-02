@@ -1,6 +1,6 @@
 use std::{collections::HashMap, ops::RangeBounds};
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::{
     DCBORPattern, DCBORMatcher, Pattern,
@@ -95,9 +95,6 @@ impl std::fmt::Display for ArrayPattern {
 
 #[cfg(test)]
 mod tests {
-    use bc_envelope::Envelope;
-    use dcbor::prelude::*;
-
     use super::*;
 
     #[test]

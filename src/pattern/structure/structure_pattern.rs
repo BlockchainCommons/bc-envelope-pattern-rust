@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use super::{
     AssertionsPattern, DigestPattern, LeafStructurePattern, NodePattern, ObjectPattern,

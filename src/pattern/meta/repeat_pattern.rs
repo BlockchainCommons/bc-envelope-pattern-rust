@@ -3,10 +3,11 @@
 use std::collections::HashMap;
 
 use crate::{
-    pattern::{vm::Instr, Pattern}, Matcher, Path, Quantifier
+    Matcher, Path, Quantifier,
+    pattern::{Pattern, vm::Instr},
 };
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct GroupPattern {
@@ -31,10 +32,14 @@ impl GroupPattern {
     }
 
     /// Returns the sub-pattern of this group pattern.
-    pub fn pattern(&self) -> &Pattern { &self.pattern }
+    pub fn pattern(&self) -> &Pattern {
+        &self.pattern
+    }
 
     /// Returns the quantifier of this group pattern.
-    pub fn quantifier(&self) -> &Quantifier { &self.quantifier }
+    pub fn quantifier(&self) -> &Quantifier {
+        &self.quantifier
+    }
 }
 
 impl Matcher for GroupPattern {
@@ -42,7 +47,9 @@ impl Matcher for GroupPattern {
         &self,
         _envelope: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        panic!("GroupPattern does not support paths_with_captures directly; use compile instead");
+        panic!(
+            "GroupPattern does not support paths_with_captures directly; use compile instead"
+        );
     }
 
     /// Emit a high-level `Repeat` instruction for the VM.

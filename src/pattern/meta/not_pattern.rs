@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
@@ -11,9 +11,13 @@ pub struct NotPattern(Box<Pattern>);
 
 impl NotPattern {
     /// Creates a new `NotPattern` with the given pattern.
-    pub fn new(pattern: Pattern) -> Self { NotPattern(Box::new(pattern)) }
+    pub fn new(pattern: Pattern) -> Self {
+        NotPattern(Box::new(pattern))
+    }
 
-    pub fn pattern(&self) -> &Pattern { &self.0 }
+    pub fn pattern(&self) -> &Pattern {
+        &self.0
+    }
 }
 
 impl Matcher for NotPattern {

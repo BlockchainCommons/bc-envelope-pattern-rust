@@ -1,7 +1,7 @@
 use std::{cell::RefCell, collections::HashMap};
 
 use bc_components::DigestProvider;
-use bc_envelope::{EdgeType, Envelope};
+use bc_envelope::prelude::*;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
@@ -9,9 +9,13 @@ use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 pub struct SearchPattern(Box<Pattern>);
 
 impl SearchPattern {
-    pub fn new(pattern: Pattern) -> Self { SearchPattern(Box::new(pattern)) }
+    pub fn new(pattern: Pattern) -> Self {
+        SearchPattern(Box::new(pattern))
+    }
 
-    pub fn pattern(&self) -> &Pattern { &self.0 }
+    pub fn pattern(&self) -> &Pattern {
+        &self.0
+    }
 }
 
 impl Matcher for SearchPattern {
@@ -24,10 +28,10 @@ impl Matcher for SearchPattern {
 
             // State consists of the path from root to current node
             let visitor = |current_envelope: &Envelope,
-                        _level: usize,
-                        _incoming_edge: EdgeType,
-                        path_to_current: Vec<Envelope>|
-            -> (Vec<Envelope>, bool) {
+                           _level: usize,
+                           _incoming_edge: EdgeType,
+                           path_to_current: Vec<Envelope>|
+             -> (Vec<Envelope>, bool) {
                 // Create the path to this node
                 let mut new_path = path_to_current.clone();
                 new_path.push(current_envelope.clone());

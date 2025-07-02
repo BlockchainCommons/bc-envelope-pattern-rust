@@ -86,7 +86,6 @@ pub fn credential() -> Envelope {
     use std::{cell::RefCell, rc::Rc};
 
     use bc_components::ARID;
-    use bc_envelope::SigningOptions;
     use bc_rand::make_fake_random_number_generator;
 
     use crate::common::check_encoding::CheckEncoding;

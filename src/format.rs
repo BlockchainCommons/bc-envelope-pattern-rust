@@ -1,8 +1,4 @@
-#![allow(dead_code)]
-
-use bc_envelope::{
-    base::envelope::EnvelopeCase, format::EnvelopeSummary, prelude::*,
-};
+use bc_envelope::prelude::*;
 
 use crate::Path;
 
@@ -16,7 +12,9 @@ pub enum PathElementFormat {
 }
 
 impl Default for PathElementFormat {
-    fn default() -> Self { PathElementFormat::Summary(None) }
+    fn default() -> Self {
+        PathElementFormat::Summary(None)
+    }
 }
 
 /// Options for formatting paths.
@@ -52,7 +50,9 @@ impl Default for FormatPathsOpts {
 
 impl FormatPathsOpts {
     /// Creates a new FormatPathsOpts with default values.
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Sets whether to indent each path element.
     /// If true, each element will be indented by 4 spaces per level.
@@ -78,7 +78,9 @@ impl FormatPathsOpts {
 }
 
 impl AsRef<FormatPathsOpts> for FormatPathsOpts {
-    fn as_ref(&self) -> &FormatPathsOpts { self }
+    fn as_ref(&self) -> &FormatPathsOpts {
+        self
+    }
 }
 
 pub fn envelope_summary(env: &Envelope) -> String {
@@ -201,11 +203,7 @@ pub fn format_paths_with_captures(
     paths: &[Path],
     captures: &std::collections::HashMap<String, Vec<Path>>,
 ) -> String {
-    format_paths_with_captures_opt(
-        paths,
-        captures,
-        FormatPathsOpts::default(),
-    )
+    format_paths_with_captures_opt(paths, captures, FormatPathsOpts::default())
 }
 
 /// Format multiple paths with captures in a structured way.
@@ -295,8 +293,6 @@ mod tests {
     use indoc::indoc;
 
     use super::*;
-
-    fn create_test_envelope() -> Envelope { Envelope::new(42) }
 
     fn create_test_path() -> Path {
         vec![

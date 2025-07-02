@@ -1,4 +1,4 @@
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Pattern, Matcher, DCBORPattern, DCBORMatcher};
 
 fn main() {

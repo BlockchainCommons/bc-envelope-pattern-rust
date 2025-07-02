@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use bc_envelope::Envelope;
-use dcbor::prelude::*;
+use bc_envelope::prelude::*;
 use known_values::KnownValue;
 
 use crate::{
@@ -120,9 +119,7 @@ impl std::fmt::Display for KnownValuePattern {
 
 #[cfg(test)]
 mod tests {
-    use bc_envelope::Envelope;
-
-    use crate::{Matcher, pattern::leaf::KnownValuePattern};
+    use super::*;
 
     #[test]
     fn test_known_value_pattern_any() {

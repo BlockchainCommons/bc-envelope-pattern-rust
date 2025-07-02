@@ -1,5 +1,5 @@
 use bc_components::Digest;
-use bc_envelope::prelude::URDecodable;
+use bc_envelope::prelude::*;
 
 use super::super::Token;
 use crate::{Error, Pattern, Result};

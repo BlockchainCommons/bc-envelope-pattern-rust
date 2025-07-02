@@ -1,7 +1,7 @@
 //! Simple group wrapper.  For now we only emit SAVE instructions;
 //! future work can acquire captures and named captures.
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::{
     Matcher, Path,

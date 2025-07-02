@@ -1,6 +1,6 @@
 use std::{collections::HashMap, ops::RangeInclusive};
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 use dcbor::Date;
 
 use crate::{
@@ -132,8 +132,6 @@ impl std::fmt::Display for DatePattern {
 
 #[cfg(test)]
 mod tests {
-    use bc_envelope::Envelope;
-    use dcbor::prelude::*;
     use dcbor_parse::parse_dcbor_item;
 
     use super::*;

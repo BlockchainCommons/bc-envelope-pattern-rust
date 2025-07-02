@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::{
     Pattern,
@@ -149,7 +149,6 @@ impl std::fmt::Display for NumberPattern {
 
 #[cfg(test)]
 mod tests {
-    use bc_envelope::Envelope;
     use dcbor_parse::parse_dcbor_item;
 
     use super::*;

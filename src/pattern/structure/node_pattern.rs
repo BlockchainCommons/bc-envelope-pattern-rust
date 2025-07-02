@@ -1,6 +1,6 @@
 use std::{collections::HashMap, ops::RangeBounds};
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::{
     Interval, Pattern,

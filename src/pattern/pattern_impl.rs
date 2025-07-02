@@ -58,8 +58,7 @@ use std::{
     ops::{RangeBounds, RangeInclusive},
 };
 
-use bc_envelope::Envelope;
-use dcbor::prelude::*;
+use bc_envelope::prelude::*;
 use known_values::KnownValue;
 
 use super::{

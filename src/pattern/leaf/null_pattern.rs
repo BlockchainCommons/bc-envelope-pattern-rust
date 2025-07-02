@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::{
     DCBORMatcher, Pattern,
@@ -54,8 +54,6 @@ impl std::fmt::Display for NullPattern {
 
 #[cfg(test)]
 mod tests {
-    use bc_envelope::prelude::*;
-
     use super::*;
 
     #[test]

@@ -1,5 +1,4 @@
-use bc_envelope::Envelope;
-use dcbor::prelude::*;
+use bc_envelope::prelude::*;
 
 use crate::{
     DCBORMatcher, DCBORPattern, Pattern,
@@ -333,8 +332,6 @@ impl std::fmt::Display for CBORPattern {
 
 #[cfg(test)]
 mod tests {
-    use bc_envelope::Envelope;
-
     use super::*;
 
     #[test]

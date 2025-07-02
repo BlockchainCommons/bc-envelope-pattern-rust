@@ -2,11 +2,10 @@
 //!
 //! The VM runs byte-code produced by `Pattern::compile` (implemented later).
 
-use bc_components::DigestProvider;
-use bc_envelope::{EdgeType, Envelope};
-
 use super::{Matcher, Path, Pattern};
 use crate::{Quantifier, Reluctance};
+use bc_components::DigestProvider;
+use bc_envelope::prelude::*;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,33 +20,32 @@ pub enum Axis {
 impl Axis {
     /// Return `(child, EdgeType)` pairs reachable from `env` via this axis.
     pub fn children(&self, env: &Envelope) -> Vec<(Envelope, EdgeType)> {
-        use bc_envelope::base::envelope::EnvelopeCase::*;
         // println!("Axis::children called with axis: {:?}", self);
         // println!("Case: {:?}", env.case());
         // println!("Envelope: {}", env.format_flat());
         match (self, env.case()) {
-            (Axis::Subject, Node { subject, .. }) => {
+            (Axis::Subject, EnvelopeCase::Node { subject, .. }) => {
                 vec![(subject.clone(), EdgeType::Subject)]
             }
-            (Axis::Assertion, Node { assertions, .. }) => assertions
+            (Axis::Assertion, EnvelopeCase::Node { assertions, .. }) => assertions
                 .iter()
                 .cloned()
                 .map(|a| (a, EdgeType::Assertion))
                 .collect(),
-            (Axis::Predicate, Assertion(a)) => {
+            (Axis::Predicate, EnvelopeCase::Assertion(a)) => {
                 vec![(a.predicate().clone(), EdgeType::Predicate)]
             }
-            (Axis::Object, Assertion(a)) => {
+            (Axis::Object, EnvelopeCase::Assertion(a)) => {
                 vec![(a.object().clone(), EdgeType::Object)]
             }
-            (Axis::Wrapped, Node { subject, .. }) => {
+            (Axis::Wrapped, EnvelopeCase::Node { subject, .. }) => {
                 if subject.is_wrapped() {
                     vec![(subject.try_unwrap().unwrap(), EdgeType::Content)]
                 } else {
                     vec![]
                 }
             }
-            (Axis::Wrapped, Wrapped { envelope, .. }) => {
+            (Axis::Wrapped, EnvelopeCase::Wrapped { envelope, .. }) => {
                 vec![(envelope.clone(), EdgeType::Content)]
             }
             _ => Vec::new(),

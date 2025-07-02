@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bc_envelope::Envelope;
+use bc_envelope::prelude::*;
 
 use crate::pattern::{
     Matcher, Path, Pattern, compile_as_atomic, meta::MetaPattern, vm::Instr,
