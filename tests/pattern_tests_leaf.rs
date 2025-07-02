@@ -1,7 +1,7 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern, format_paths};
+use bc_envelope_pattern::{DCBORPattern, Matcher, Pattern, format_paths};
 use indoc::indoc;
 
 #[test]
@@ -619,7 +619,7 @@ fn test_tag_pattern() {
     // Does not match non-tagged subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_tag().matches(&envelope));
-    assert!(!Pattern::tagged_with_value(100).matches(&envelope));
+    assert!(!Pattern::tagged(100, DCBORPattern::any()).matches(&envelope));
 
     // Test with a tagged CBOR value
     let tagged_cbor = CBOR::to_tagged_value(100, "tagged_content");
@@ -632,20 +632,22 @@ fn test_tag_pattern() {
     assert!(Pattern::any_tag().matches(&envelope));
 
     // Matches specific tag value
-    assert!(Pattern::tagged_with_value(100).matches(&envelope));
-    assert!(!Pattern::tagged_with_value(200).matches(&envelope));
+    assert!(Pattern::tagged(100, DCBORPattern::any()).matches(&envelope));
+    assert!(!Pattern::tagged(200, DCBORPattern::any()).matches(&envelope));
 
     // Matches specific tag object
     let tag = Tag::with_value(100);
-    assert!(Pattern::tagged(tag).matches(&envelope));
+    assert!(Pattern::tagged(tag, DCBORPattern::any()).matches(&envelope));
 
     let different_tag = Tag::with_value(200);
-    assert!(!Pattern::tagged(different_tag).matches(&envelope));
+    assert!(
+        !Pattern::tagged(different_tag, DCBORPattern::any()).matches(&envelope)
+    );
 
     // Test with assertions
     let envelope = envelope.add_assertion("format", "tagged");
     assert!(Pattern::any_tag().matches(&envelope));
-    assert!(Pattern::tagged_with_value(100).matches(&envelope));
+    assert!(Pattern::tagged(100, DCBORPattern::any()).matches(&envelope));
 
     // The matched paths include the assertion
     let paths = Pattern::any_tag().paths(&envelope);
@@ -679,10 +681,15 @@ fn test_tag_pattern_named() {
     let envelope = Envelope::new(tagged_cbor);
 
     // Should match by name
-    assert!(Pattern::tagged_with_name("date").matches(&envelope));
+    assert!(
+        Pattern::tagged_name("date", DCBORPattern::any()).matches(&envelope)
+    );
 
     // Should not match with wrong name
-    assert!(!Pattern::tagged_with_name("unknown_tag").matches(&envelope));
+    assert!(
+        !Pattern::tagged_name("unknown_tag", DCBORPattern::any())
+            .matches(&envelope)
+    );
 
     // Test with unregistered tag
     let unregistered_tagged_cbor =
@@ -690,18 +697,25 @@ fn test_tag_pattern_named() {
     let unregistered_envelope = Envelope::new(unregistered_tagged_cbor);
 
     // Should not match by any name since tag 999 is not registered
-    assert!(!Pattern::tagged_with_name("date").matches(&unregistered_envelope));
     assert!(
-        !Pattern::tagged_with_name("unknown_tag")
+        !Pattern::tagged_name("date", DCBORPattern::any())
+            .matches(&unregistered_envelope)
+    );
+    assert!(
+        !Pattern::tagged_name("unknown_tag", DCBORPattern::any())
             .matches(&unregistered_envelope)
     );
 
     // Test with non-tagged content
     let text_envelope = Envelope::new("just text");
-    assert!(!Pattern::tagged_with_name("date").matches(&text_envelope));
+    assert!(
+        !Pattern::tagged_name("date", DCBORPattern::any())
+            .matches(&text_envelope)
+    );
 
     // Test paths for matched envelope
-    let paths = Pattern::tagged_with_name("date").paths(&envelope);
+    let paths =
+        Pattern::tagged_name("date", DCBORPattern::any()).paths(&envelope);
     // println!("{}", format_paths(&paths));
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -714,7 +728,7 @@ fn test_tag_pattern_named() {
 
     // Test in traversal pattern
     let paths = Pattern::traverse(vec![
-        Pattern::tagged_with_name("date"),
+        Pattern::tagged_name("date", DCBORPattern::any()),
         Pattern::any_subject(),
     ])
     .paths(&envelope);
@@ -734,15 +748,24 @@ fn test_tag_pattern_regex() {
 
     // Regex that should match "date"
     let regex = regex::Regex::new(r"^da.*").unwrap();
-    assert!(Pattern::tagged_with_regex(regex.clone()).matches(&envelope));
+    assert!(
+        Pattern::tagged_regex(regex.clone(), DCBORPattern::any())
+            .matches(&envelope)
+    );
 
     // Regex that should match names ending with "te"
     let regex = regex::Regex::new(r".*te$").unwrap();
-    assert!(Pattern::tagged_with_regex(regex.clone()).matches(&envelope));
+    assert!(
+        Pattern::tagged_regex(regex.clone(), DCBORPattern::any())
+            .matches(&envelope)
+    );
 
     // Regex that should not match "date"
     let regex = regex::Regex::new(r"^time.*").unwrap();
-    assert!(!Pattern::tagged_with_regex(regex.clone()).matches(&envelope));
+    assert!(
+        !Pattern::tagged_regex(regex.clone(), DCBORPattern::any())
+            .matches(&envelope)
+    );
 
     // Test with unregistered tag
     let unregistered_tagged_cbor =
@@ -752,18 +775,22 @@ fn test_tag_pattern_regex() {
     // Should not match any regex since tag 999 has no name in registry
     let regex = regex::Regex::new(r".*").unwrap(); // Match everything
     assert!(
-        !Pattern::tagged_with_regex(regex.clone())
+        !Pattern::tagged_regex(regex.clone(), DCBORPattern::any())
             .matches(&unregistered_envelope)
     );
 
     // Test with non-tagged content
     let text_envelope = Envelope::new("just text");
     let regex = regex::Regex::new(r".*").unwrap();
-    assert!(!Pattern::tagged_with_regex(regex.clone()).matches(&text_envelope));
+    assert!(
+        !Pattern::tagged_regex(regex.clone(), DCBORPattern::any())
+            .matches(&text_envelope)
+    );
 
     // Test paths for matched envelope
     let regex = regex::Regex::new(r"^da.*").unwrap();
-    let paths = Pattern::tagged_with_regex(regex).paths(&envelope);
+    let paths =
+        Pattern::tagged_regex(regex, DCBORPattern::any()).paths(&envelope);
     assert_eq!(paths.len(), 1);
     assert_eq!(paths[0].len(), 1);
     assert_eq!(paths[0][0], envelope);
@@ -771,7 +798,7 @@ fn test_tag_pattern_regex() {
     // Test in traversal pattern
     let regex = regex::Regex::new(r".*te$").unwrap();
     let paths = Pattern::traverse(vec![
-        Pattern::tagged_with_regex(regex),
+        Pattern::tagged_regex(regex, DCBORPattern::any()),
         Pattern::any_subject(),
     ])
     .paths(&envelope);
@@ -796,16 +823,19 @@ fn test_tag_pattern_with_bc_components_tags() {
     // Test tag name matching (assuming digest tag is registered with name
     // "digest") This will verify if the tag is properly registered in the
     // global registry
-    let pattern = Pattern::tagged_with_name("digest");
+    let pattern = Pattern::tagged_name("digest", DCBORPattern::any());
     let matches = pattern.matches(&envelope);
 
     // Also test regex matching for digest-related tags
     let regex = regex::Regex::new(r".*digest.*").unwrap();
-    let pattern_regex = Pattern::tagged_with_regex(regex);
+    let pattern_regex = Pattern::tagged_regex(regex, DCBORPattern::any());
     let matches_regex = pattern_regex.matches(&envelope);
 
     // At minimum, the specific tag value should work
-    assert!(Pattern::tagged_with_value(digest_tag_value).matches(&envelope));
+    assert!(
+        Pattern::tagged(digest_tag_value, DCBORPattern::any())
+            .matches(&envelope)
+    );
     assert!(Pattern::any_tag().matches(&envelope));
 
     // Print debug info for manual verification

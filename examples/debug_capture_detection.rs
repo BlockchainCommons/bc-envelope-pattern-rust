@@ -1,12 +1,11 @@
 use bc_envelope::Envelope;
-use bc_envelope_pattern::{Pattern, Matcher};
-use dcbor_pattern::{Pattern as DcborPattern, Matcher as DcborMatcher};
+use bc_envelope_pattern::{Pattern, Matcher, DCBORPattern, DCBORMatcher};
 
 fn main() {
     println!("Testing DCBOR capture detection...");
 
     // Create a dcbor pattern with capture
-    let dcbor_pattern: DcborPattern = "@num(42)".try_into().unwrap();
+    let dcbor_pattern: DCBORPattern = "@num(42)".try_into().unwrap();
     println!("DCBOR pattern: {}", dcbor_pattern);
 
     // Test it directly against a CBOR value

@@ -1,10 +1,9 @@
 use std::{collections::HashMap, ops::RangeBounds};
 
 use bc_envelope::Envelope;
-use dcbor_pattern::Matcher as DcborMatcher;
 
 use crate::{
-    Pattern,
+    DCBORMatcher, Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 

@@ -1,10 +1,9 @@
 use std::{collections::HashMap, ops::RangeBounds};
 
 use bc_envelope::Envelope;
-use dcbor_pattern::Matcher as DcborMatcher;
 
 use crate::{
-    Pattern,
+    DCBORPattern, DCBORMatcher, Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
@@ -31,7 +30,7 @@ impl ArrayPattern {
     }
 
     /// Creates a new `ArrayPattern` from a dcbor-pattern.
-    pub fn from_dcbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
+    pub fn from_dcbor_pattern(pattern: DCBORPattern) -> Self {
         ArrayPattern(dcbor_pattern::ArrayPattern::with_elements(pattern))
     }
 

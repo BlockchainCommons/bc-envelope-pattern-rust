@@ -4,7 +4,7 @@
 //! patterns and dcbor-pattern syntax, with envelope patterns taking precedence.
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern};
+use bc_envelope_pattern::{Matcher, Pattern, DCBORPattern};
 
 #[test]
 fn test_parser_envelope_patterns_take_precedence() {
@@ -174,7 +174,7 @@ fn test_conversion_layer_works_correctly() {
     use bc_envelope_pattern::dcbor_integration::convert_dcbor_pattern_to_envelope_pattern;
 
     // Test direct conversion
-    let dcbor_bool = dcbor_pattern::Pattern::bool(true);
+    let dcbor_bool = DCBORPattern::bool(true);
     let envelope_bool =
         convert_dcbor_pattern_to_envelope_pattern(dcbor_bool).unwrap();
 

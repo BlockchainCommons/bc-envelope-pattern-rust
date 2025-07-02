@@ -1,9 +1,8 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern, format_paths};
+use bc_envelope_pattern::{Matcher, Pattern, format_paths, DCBORMatcher, DCBORPattern};
 use dcbor_parse::parse_dcbor_item;
-use dcbor_pattern::{Matcher as _, Pattern as DcborPattern};
 use indoc::indoc;
 
 /// Test CBOR pattern path extension functionality using proper formatting and
@@ -285,7 +284,7 @@ fn test_cbor_pattern_map_key_value_paths() {
 fn test_search_array_order() {
     let cbor =
         dcbor_parse::parse_dcbor_item(r#"[[1, 2, 3], [4, 5, 6]]"#).unwrap();
-    let dcbor_pattern = DcborPattern::parse("search([*])").unwrap();
+    let dcbor_pattern = DCBORPattern::parse("search([*])").unwrap();
 
     let paths = dcbor_pattern.paths(&cbor);
     #[rustfmt::skip]
@@ -298,7 +297,7 @@ fn test_search_array_order() {
     "#}.trim();
     assert_actual_expected!(dcbor_pattern::format_paths(&paths), expected);
 
-    let pattern = DcborPattern::parse("search(number)").unwrap();
+    let pattern = DCBORPattern::parse("search(number)").unwrap();
     let paths = pattern.paths(&cbor);
     #[rustfmt::skip]
     let expected = indoc! {r#"

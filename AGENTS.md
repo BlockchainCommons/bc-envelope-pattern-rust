@@ -125,7 +125,7 @@ let mixed_pattern = Pattern::parse("true | search(42)").unwrap();
 
 // Conversion layer accessible for advanced use
 use bc_envelope_pattern::dcbor_integration::convert_dcbor_pattern_to_envelope_pattern;
-let dcbor_pat = dcbor_pattern::Pattern::bool(true);
+let dcbor_pat = DCBORPattern::bool(true);
 let envelope_pat = convert_dcbor_pattern_to_envelope_pattern(dcbor_pat).unwrap();
 ```
 

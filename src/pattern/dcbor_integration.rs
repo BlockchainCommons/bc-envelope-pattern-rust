@@ -5,7 +5,7 @@
 //! through conversion.
 
 use crate::{
-    Pattern, Result,
+    DCBORPattern, Pattern, Result,
     pattern::{
         leaf::{
             ArrayPattern, BoolPattern, ByteStringPattern, CBORPattern,
@@ -41,16 +41,16 @@ use crate::{
 /// let envelope_pattern = convert_dcbor_pattern_to_envelope_pattern(dcbor_bool).unwrap();
 /// ```
 pub fn convert_dcbor_pattern_to_envelope_pattern(
-    dcbor_pattern: dcbor_pattern::Pattern,
+    dcbor_pattern: DCBORPattern,
 ) -> Result<Pattern> {
     match dcbor_pattern {
-        dcbor_pattern::Pattern::Value(value_pattern) => {
+        DCBORPattern::Value(value_pattern) => {
             convert_value_pattern_to_envelope_pattern(value_pattern)
         }
-        dcbor_pattern::Pattern::Structure(structure_pattern) => {
+        DCBORPattern::Structure(structure_pattern) => {
             convert_structure_pattern_to_envelope_pattern(structure_pattern)
         }
-        dcbor_pattern::Pattern::Meta(meta_pattern) => {
+        DCBORPattern::Meta(meta_pattern) => {
             convert_meta_pattern_to_envelope_pattern(meta_pattern)
         }
     }
@@ -85,14 +85,12 @@ fn convert_value_pattern_to_envelope_pattern(
                 known_value_pattern,
             ))
         }
-        dcbor_pattern::ValuePattern::Null(_) => {
-            LeafPattern::Null(NullPattern)
-        }
+        dcbor_pattern::ValuePattern::Null(_) => LeafPattern::Null(NullPattern),
         dcbor_pattern::ValuePattern::Digest(digest_pattern) => {
             // Digest patterns don't have a direct envelope equivalent yet
             // For now, wrap as a generic CBOR pattern
             return Ok(Pattern::Leaf(LeafPattern::Cbor(
-                CBORPattern::from_dcbor_pattern(dcbor_pattern::Pattern::Value(
+                CBORPattern::from_dcbor_pattern(DCBORPattern::Value(
                     dcbor_pattern::ValuePattern::Digest(digest_pattern),
                 )),
             )));
@@ -164,7 +162,7 @@ fn convert_meta_pattern_to_envelope_pattern(
             // Capture patterns don't have a direct envelope equivalent yet
             // For now, wrap as a generic CBOR pattern
             Ok(Pattern::Leaf(LeafPattern::Cbor(
-                CBORPattern::from_dcbor_pattern(dcbor_pattern::Pattern::Meta(
+                CBORPattern::from_dcbor_pattern(DCBORPattern::Meta(
                     meta_pattern_clone,
                 )),
             )))
@@ -173,7 +171,7 @@ fn convert_meta_pattern_to_envelope_pattern(
             // Repeat patterns don't have a direct envelope equivalent
             // For now, wrap as a generic CBOR pattern
             Ok(Pattern::Leaf(LeafPattern::Cbor(
-                CBORPattern::from_dcbor_pattern(dcbor_pattern::Pattern::Meta(
+                CBORPattern::from_dcbor_pattern(DCBORPattern::Meta(
                     meta_pattern_clone,
                 )),
             )))
@@ -182,7 +180,7 @@ fn convert_meta_pattern_to_envelope_pattern(
             // Search patterns don't have a direct envelope equivalent
             // For now, wrap as a generic CBOR pattern
             Ok(Pattern::Leaf(LeafPattern::Cbor(
-                CBORPattern::from_dcbor_pattern(dcbor_pattern::Pattern::Meta(
+                CBORPattern::from_dcbor_pattern(DCBORPattern::Meta(
                     meta_pattern_clone,
                 )),
             )))
@@ -191,7 +189,7 @@ fn convert_meta_pattern_to_envelope_pattern(
             // Sequence patterns don't have a direct envelope equivalent
             // For now, wrap as a generic CBOR pattern
             Ok(Pattern::Leaf(LeafPattern::Cbor(
-                CBORPattern::from_dcbor_pattern(dcbor_pattern::Pattern::Meta(
+                CBORPattern::from_dcbor_pattern(DCBORPattern::Meta(
                     meta_pattern_clone,
                 )),
             )))

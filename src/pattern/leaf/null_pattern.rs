@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
 use bc_envelope::Envelope;
-use dcbor_pattern::{Matcher as DcborMatcher};
 
 use crate::{
-    Pattern,
+    DCBORMatcher, Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
@@ -17,7 +16,10 @@ use crate::{
 pub struct NullPattern;
 
 impl Matcher for NullPattern {
-    fn paths_with_captures(&self, envelope: &Envelope) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
+    fn paths_with_captures(
+        &self,
+        envelope: &Envelope,
+    ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         if let Some(cbor) = envelope.subject().as_leaf() {
             if dcbor_pattern::NullPattern.matches(&cbor) {
                 (vec![vec![envelope.clone()]], HashMap::new())

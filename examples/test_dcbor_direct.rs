@@ -1,12 +1,12 @@
 use dcbor::prelude::*;
-use dcbor_pattern::{Matcher as DcborMatcher, Pattern as DcborPattern};
+use bc_envelope_pattern::{DCBORPattern, DCBORMatcher};
 
 fn main() {
     // Test if dcbor-pattern captures work directly
     let cbor = 42.to_cbor();
 
     // Create a dcbor pattern with a capture
-    let pattern = DcborPattern::parse("@inner_num(42)").unwrap();
+    let pattern = DCBORPattern::parse("@inner_num(42)").unwrap();
 
     println!("DCBOR Pattern: {}", pattern);
     println!("CBOR: {:?}", cbor);

@@ -5,7 +5,8 @@
 
 use bc_envelope::Envelope;
 use bc_envelope_pattern::{
-    Matcher, dcbor_integration::convert_dcbor_pattern_to_envelope_pattern,
+    DCBORPattern, Matcher,
+    dcbor_integration::convert_dcbor_pattern_to_envelope_pattern,
 };
 use dcbor_parse::parse_dcbor_item;
 
@@ -18,9 +19,9 @@ fn envelope_from_cbor(diagnostic: &str) -> Envelope {
 #[test]
 fn test_integration_bool_patterns() {
     // Create dcbor patterns for boolean values
-    let dcbor_any_bool = dcbor_pattern::Pattern::any_bool();
-    let dcbor_true = dcbor_pattern::Pattern::bool(true);
-    let dcbor_false = dcbor_pattern::Pattern::bool(false);
+    let dcbor_any_bool = DCBORPattern::any_bool();
+    let dcbor_true = DCBORPattern::bool(true);
+    let dcbor_false = DCBORPattern::bool(false);
 
     // Convert to envelope patterns
     let env_any_bool =
@@ -53,10 +54,10 @@ fn test_integration_bool_patterns() {
 #[test]
 fn test_integration_number_patterns() {
     // Create dcbor number patterns
-    let dcbor_any_number = dcbor_pattern::Pattern::any_number();
-    let dcbor_specific = dcbor_pattern::Pattern::number(42);
-    let dcbor_range = dcbor_pattern::Pattern::number_range(1.0..=100.0);
-    let dcbor_greater = dcbor_pattern::Pattern::number_greater_than(50);
+    let dcbor_any_number = DCBORPattern::any_number();
+    let dcbor_specific = DCBORPattern::number(42);
+    let dcbor_range = DCBORPattern::number_range(1.0..=100.0);
+    let dcbor_greater = DCBORPattern::number_greater_than(50);
 
     // Convert to envelope patterns
     let env_any_number =
@@ -98,11 +99,10 @@ fn test_integration_number_patterns() {
 #[test]
 fn test_integration_text_patterns() {
     // Create dcbor text patterns
-    let dcbor_any_text = dcbor_pattern::Pattern::any_text();
-    let dcbor_specific = dcbor_pattern::Pattern::text("hello");
-    let dcbor_regex = dcbor_pattern::Pattern::text_regex(
-        regex::Regex::new(r"^h.*o$").unwrap(),
-    );
+    let dcbor_any_text = DCBORPattern::any_text();
+    let dcbor_specific = DCBORPattern::text("hello");
+    let dcbor_regex =
+        DCBORPattern::text_regex(regex::Regex::new(r"^h.*o$").unwrap());
 
     // Convert to envelope patterns
     let env_any_text =
@@ -138,14 +138,14 @@ fn test_integration_text_patterns() {
 #[test]
 fn test_integration_meta_patterns() {
     // Create dcbor meta patterns
-    let dcbor_and = dcbor_pattern::Pattern::and(vec![
-        dcbor_pattern::Pattern::number_greater_than(10),
-        dcbor_pattern::Pattern::number_less_than(50),
+    let dcbor_and = DCBORPattern::and(vec![
+        DCBORPattern::number_greater_than(10),
+        DCBORPattern::number_less_than(50),
     ]);
 
-    let dcbor_or = dcbor_pattern::Pattern::or(vec![
-        dcbor_pattern::Pattern::text("hello"),
-        dcbor_pattern::Pattern::number(42),
+    let dcbor_or = DCBORPattern::or(vec![
+        DCBORPattern::text("hello"),
+        DCBORPattern::number(42),
     ]);
 
     // Convert to envelope patterns
@@ -173,12 +173,12 @@ fn test_integration_meta_patterns() {
 fn test_integration_error_handling() {
     // Test patterns that should successfully convert
     let valid_patterns = vec![
-        dcbor_pattern::Pattern::any_bool(),
-        dcbor_pattern::Pattern::number(42),
-        dcbor_pattern::Pattern::text("hello"),
-        dcbor_pattern::Pattern::or(vec![
-            dcbor_pattern::Pattern::bool(true),
-            dcbor_pattern::Pattern::number(123),
+        DCBORPattern::any_bool(),
+        DCBORPattern::number(42),
+        DCBORPattern::text("hello"),
+        DCBORPattern::or(vec![
+            DCBORPattern::bool(true),
+            DCBORPattern::number(123),
         ]),
     ];
 
@@ -191,9 +191,9 @@ fn test_integration_error_handling() {
 #[test]
 fn test_integration_display_formatting() {
     // Test that converted patterns have reasonable string representations
-    let dcbor_bool = dcbor_pattern::Pattern::bool(true);
-    let dcbor_number = dcbor_pattern::Pattern::number(42);
-    let dcbor_text = dcbor_pattern::Pattern::text("hello");
+    let dcbor_bool = DCBORPattern::bool(true);
+    let dcbor_number = DCBORPattern::number(42);
+    let dcbor_text = DCBORPattern::text("hello");
 
     let env_bool =
         convert_dcbor_pattern_to_envelope_pattern(dcbor_bool).unwrap();

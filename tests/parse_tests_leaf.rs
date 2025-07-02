@@ -1,5 +1,5 @@
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::Pattern;
+use bc_envelope_pattern::{Pattern, DCBORPattern};
 use dcbor::Date;
 use known_values::KnownValue;
 mod common;
@@ -232,14 +232,14 @@ fn parse_tag_patterns() {
     let p = Pattern::any_tag();
     assert_actual_expected!(p.to_string(), "tagged");
 
-    let p = Pattern::tagged_with_value(100);
+    let p = Pattern::tagged(100, DCBORPattern::any());
     assert_actual_expected!(p.to_string(), "tagged(100, *)");
 
-    let p = Pattern::tagged_with_name("date");
+    let p = Pattern::tagged_name("date", DCBORPattern::any());
     assert_actual_expected!(p.to_string(), "tagged(date, *)");
 
     let regex = regex::Regex::new("da.*").unwrap();
-    let p = Pattern::tagged_with_regex(regex);
+    let p = Pattern::tagged_regex(regex, DCBORPattern::any());
     assert_actual_expected!(p.to_string(), "tagged(/da.*/, *)");
 }
 

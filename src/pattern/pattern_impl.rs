@@ -81,7 +81,7 @@ use super::{
     vm,
 };
 use crate::{
-    Quantifier, Reluctance,
+    DCBORPattern, Quantifier, Reluctance,
     pattern::{
         leaf::CBORPattern,
         meta::{AnyPattern, NonePattern},
@@ -149,7 +149,7 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches CBOR values using dcbor-pattern
     /// expressions.
-    pub fn cbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
+    pub fn cbor_pattern(pattern: DCBORPattern) -> Self {
         Pattern::Leaf(LeafPattern::Cbor(CBORPattern::pattern(pattern)))
     }
 }
@@ -333,7 +333,7 @@ impl Pattern {
 
     /// Creates an array pattern from a dcbor-pattern.
     /// This is used internally by the parser to delegate to dcbor-pattern.
-    pub fn array_from_dcbor_pattern(pattern: dcbor_pattern::Pattern) -> Self {
+    pub fn array_from_dcbor_pattern(pattern: DCBORPattern) -> Self {
         Pattern::Leaf(LeafPattern::Array(ArrayPattern::from_dcbor_pattern(
             pattern,
         )))
@@ -371,36 +371,30 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific tagged value with any
     /// content. This is a proxy to dcbor-pattern's tagged functionality.
-    pub fn tagged(tag: dcbor::Tag) -> Self {
+    pub fn tagged(tag: impl Into<dcbor::Tag>, pattern: DCBORPattern) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::with_tag_any(tag.value()),
-        ))
-    }
-
-    /// Creates a new `Pattern` that matches a tagged value with specific tag
-    /// value and any content. This is a proxy to dcbor-pattern's tagged
-    /// functionality.
-    pub fn tagged_with_value(value: u64) -> Self {
-        Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::with_tag_any(value),
+            crate::pattern::leaf::TaggedPattern::with_tag(tag, pattern),
         ))
     }
 
     /// Creates a new `Pattern` that matches a tagged value with specific tag
     /// name and any content. This is a proxy to dcbor-pattern's tagged
     /// functionality.
-    pub fn tagged_with_name(name: impl Into<String>) -> Self {
+    pub fn tagged_name(name: impl Into<String>, pattern: DCBORPattern) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::with_name_any(name.into()),
+            crate::pattern::leaf::TaggedPattern::with_name(
+                name.into(),
+                pattern,
+            ),
         ))
     }
 
     /// Creates a new `Pattern` that matches a tagged value with tag name
     /// matching regex and any content. This is a proxy to dcbor-pattern's
     /// tagged functionality.
-    pub fn tagged_with_regex(regex: regex::Regex) -> Self {
+    pub fn tagged_regex(regex: regex::Regex, pattern: DCBORPattern) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::with_regex_any(regex),
+            crate::pattern::leaf::TaggedPattern::with_regex(regex, pattern),
         ))
     }
 

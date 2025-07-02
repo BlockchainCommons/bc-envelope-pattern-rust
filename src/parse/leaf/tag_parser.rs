@@ -1,6 +1,7 @@
 use crate::{
     Error, Pattern, Result,
     parse::{Token, utils},
+    DCBORPattern,
 };
 
 pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
@@ -17,7 +18,7 @@ pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
             let tagged_expr = format!("tagged({})", inner_content);
 
             // Parse with dcbor-pattern
-            match dcbor_pattern::Pattern::parse(&tagged_expr) {
+            match DCBORPattern::parse(&tagged_expr) {
                 Ok(dcbor_pattern) => {
                     // Skip to the closing paren
                     lexer.bump(closing_paren_pos);
@@ -25,14 +26,27 @@ pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                     match lexer.next() {
                         Some(Ok(Token::ParenClose)) => {
                             // Extract the TaggedPattern from the dcbor_pattern
-                            if let dcbor_pattern::Pattern::Structure(dcbor_pattern::StructurePattern::Tagged(tagged_pattern)) = dcbor_pattern {
-                                Ok(Pattern::tagged_from_dcbor_pattern(tagged_pattern))
+                            if let DCBORPattern::Structure(
+                                dcbor_pattern::StructurePattern::Tagged(
+                                    tagged_pattern,
+                                ),
+                            ) = dcbor_pattern
+                            {
+                                Ok(Pattern::tagged_from_dcbor_pattern(
+                                    tagged_pattern,
+                                ))
                             } else {
                                 // This shouldn't happen if we constructed the expression correctly
-                                Err(Error::UnexpectedToken(Box::new(Token::ParenClose), lexer.span()))
+                                Err(Error::UnexpectedToken(
+                                    Box::new(Token::ParenClose),
+                                    lexer.span(),
+                                ))
                             }
                         }
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
@@ -43,7 +57,10 @@ pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                     lexer.bump(consumed);
                     match lexer.next() {
                         Some(Ok(Token::ParenClose)) => Ok(pattern),
-                        Some(Ok(t)) => Err(Error::UnexpectedToken(Box::new(t), lexer.span())),
+                        Some(Ok(t)) => Err(Error::UnexpectedToken(
+                            Box::new(t),
+                            lexer.span(),
+                        )),
                         Some(Err(e)) => Err(e),
                         None => Err(Error::ExpectedCloseParen(lexer.span())),
                     }
@@ -60,15 +77,15 @@ fn parse_tag_inner(src: &str) -> Result<(Pattern, usize)> {
     if src[pos..].starts_with('/') {
         let (regex, used) = utils::parse_text_regex(&src[pos..])?;
         pos += used;
-        return Ok((Pattern::tagged_with_regex(regex), pos));
+        return Ok((Pattern::tagged_regex(regex, DCBORPattern::any()), pos));
     }
 
     let (word, used) = utils::parse_bare_word(&src[pos..])?;
     pos += used;
     if let Ok(value) = word.parse::<u64>() {
-        Ok((Pattern::tagged_with_value(value), pos))
+        Ok((Pattern::tagged(value, DCBORPattern::any()), pos))
     } else {
-        Ok((Pattern::tagged_with_name(word), pos))
+        Ok((Pattern::tagged_name(word, DCBORPattern::any()), pos))
     }
 }
 

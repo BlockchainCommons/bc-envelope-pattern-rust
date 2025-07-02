@@ -1,6 +1,5 @@
 use logos::Span;
 use thiserror::Error;
-use dcbor_pattern::Error as DcborPatternError;
 
 use crate::parse::Token;
 
@@ -75,7 +74,7 @@ pub enum Error {
     Unknown,
 
     #[error(transparent)]
-    DcborPatternError(#[from] DcborPatternError),
+    DCBORPatternError(#[from] dcbor_pattern::Error),
 }
 
 /// A Result type specialized for envelope pattern parsing.

@@ -3,7 +3,7 @@ mod format;
 mod parse;
 mod pattern;
 
-pub use dcbor_pattern::{Interval, Quantifier, Reluctance};
+pub use dcbor_pattern::{Interval, Quantifier, Reluctance, Pattern as DCBORPattern, Matcher as DCBORMatcher};
 pub use error::{Error, Result};
 pub use format::{
     FormatPathsOpts, PathElementFormat, format_path, format_path_opt,

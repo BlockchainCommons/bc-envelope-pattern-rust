@@ -2,7 +2,7 @@
 
 use dcbor_parse::parse_dcbor_item_partial;
 
-use crate::{Error, Pattern, Result};
+use crate::{Error, Pattern, Result, DCBORPattern};
 
 pub(crate) fn skip_ws(src: &str, pos: &mut usize) {
     while let Some(ch) = src[*pos..].chars().next() {
@@ -71,7 +71,7 @@ pub(crate) fn parse_cbor_inner(src: &str) -> Result<(Pattern, usize)> {
                 let pattern_str = &src[start..pos - 1];
 
                 // Parse the dcbor-pattern expression
-                let dcbor_pattern = dcbor_pattern::Pattern::parse(pattern_str)
+                let dcbor_pattern = DCBORPattern::parse(pattern_str)
                     .map_err(|_| Error::InvalidPattern(start..pos - 1))?;
 
                 skip_ws(src, &mut pos);
@@ -183,7 +183,7 @@ pub(crate) fn parse_array_inner(src: &str) -> Result<(Pattern, usize)> {
     // For any other pattern content, delegate to dcbor-pattern
     // This is the key proxy functionality - just pass the content through
     let pattern_str = format!("[{}]", &src[pos..]);
-    match dcbor_pattern::Pattern::parse(&pattern_str) {
+    match DCBORPattern::parse(&pattern_str) {
         Ok(dcbor_pattern) => {
             // Create an array pattern that wraps the dcbor-pattern
             let consumed = src.len() - pos; // Consume all remaining content
