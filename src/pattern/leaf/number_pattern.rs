@@ -10,16 +10,14 @@ use crate::{
 /// Pattern for matching number values. This is a wrapper around
 /// dcbor_pattern::NumberPattern that provides envelope-specific integration.
 #[derive(Debug, Clone)]
-pub struct NumberPattern {
-    inner: dcbor_pattern::NumberPattern,
-}
+pub struct NumberPattern(dcbor_pattern::NumberPattern);
 
 // Re-export the dcbor-pattern NumberPattern methods through associated
 // functions
 impl NumberPattern {
     /// Creates a new `NumberPattern` that matches any number.
     pub fn any() -> Self {
-        Self { inner: dcbor_pattern::NumberPattern::any() }
+        Self(dcbor_pattern::NumberPattern::any())
     }
 
     /// Creates a new `NumberPattern` that matches the exact number.
@@ -27,7 +25,7 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        Self { inner: dcbor_pattern::NumberPattern::value(value) }
+        Self(dcbor_pattern::NumberPattern::value(value))
     }
 
     /// Creates a new `NumberPattern` that matches numbers within the specified
@@ -36,7 +34,7 @@ impl NumberPattern {
     where
         A: Into<f64> + Copy,
     {
-        Self { inner: dcbor_pattern::NumberPattern::range(range) }
+        Self(dcbor_pattern::NumberPattern::range(range))
     }
 
     /// Creates a new `NumberPattern` that matches numbers greater than the
@@ -45,9 +43,7 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        Self {
-            inner: dcbor_pattern::NumberPattern::greater_than(value),
-        }
+        Self(dcbor_pattern::NumberPattern::greater_than(value))
     }
 
     /// Creates a new `NumberPattern` that matches numbers greater than or
@@ -56,9 +52,7 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        Self {
-            inner: dcbor_pattern::NumberPattern::greater_than_or_equal(value),
-        }
+        Self(dcbor_pattern::NumberPattern::greater_than_or_equal(value))
     }
 
     /// Creates a new `NumberPattern` that matches numbers less than the
@@ -67,9 +61,7 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        Self {
-            inner: dcbor_pattern::NumberPattern::less_than(value),
-        }
+        Self(dcbor_pattern::NumberPattern::less_than(value))
     }
 
     /// Creates a new `NumberPattern` that matches numbers less than or equal
@@ -78,27 +70,25 @@ impl NumberPattern {
     where
         T: Into<f64>,
     {
-        Self {
-            inner: dcbor_pattern::NumberPattern::less_than_or_equal(value),
-        }
+        Self(dcbor_pattern::NumberPattern::less_than_or_equal(value))
     }
 
     /// Creates a new `NumberPattern` that matches NaN values.
     pub fn nan() -> Self {
-        Self { inner: dcbor_pattern::NumberPattern::nan() }
+        Self(dcbor_pattern::NumberPattern::nan())
     }
 
     /// Creates a new `NumberPattern` from a dcbor-pattern NumberPattern.
     pub fn from_dcbor_pattern(
         dcbor_pattern: dcbor_pattern::NumberPattern,
     ) -> Self {
-        Self { inner: dcbor_pattern }
+        Self(dcbor_pattern)
     }
 }
 
 impl PartialEq for NumberPattern {
     fn eq(&self, other: &Self) -> bool {
-        self.inner == other.inner
+        self.0 == other.0
     }
 }
 
@@ -106,7 +96,7 @@ impl Eq for NumberPattern {}
 
 impl std::hash::Hash for NumberPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state);
+        self.0.hash(state);
     }
 }
 
@@ -120,7 +110,7 @@ impl Matcher for NumberPattern {
         let paths = if let Some(cbor) = envelope.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // NumberPattern doesn't support captures, so we only get paths
-            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
 
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
@@ -153,7 +143,7 @@ impl Matcher for NumberPattern {
 
 impl std::fmt::Display for NumberPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner)
+        write!(f, "{}", self.0)
     }
 }
 

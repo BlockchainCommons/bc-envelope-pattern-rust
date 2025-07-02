@@ -1,6 +1,6 @@
 use bc_envelope::Envelope;
 use dcbor::prelude::*;
-use dcbor_pattern::{Matcher as DcborMatcher, Pattern as DcborPattern};
+use dcbor_pattern::{Matcher as DcborMatcher};
 
 use crate::{
     Pattern,
@@ -16,7 +16,7 @@ pub enum CBORPattern {
     /// Matches the specific CBOR value.
     Value(CBOR),
     /// Matches CBOR values using dcbor-pattern expressions.
-    Pattern(DcborPattern),
+    Pattern(dcbor_pattern::Pattern),
 }
 
 impl CBORPattern {
@@ -30,12 +30,12 @@ impl CBORPattern {
 
     /// Creates a new `CBORPattern` that matches CBOR values using dcbor-pattern
     /// expressions.
-    pub fn pattern(pattern: DcborPattern) -> Self {
+    pub fn pattern(pattern: dcbor_pattern::Pattern) -> Self {
         CBORPattern::Pattern(pattern)
     }
 
     /// Creates a new `CBORPattern` from a dcbor-pattern Pattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: DcborPattern) -> Self {
+    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::Pattern) -> Self {
         CBORPattern::Pattern(dcbor_pattern)
     }
 
@@ -97,7 +97,7 @@ impl CBORPattern {
     /// Collect capture names from a dcbor pattern
     fn collect_dcbor_capture_names(
         &self,
-        dcbor_pattern: &DcborPattern,
+        dcbor_pattern: &dcbor_pattern::Pattern,
         names: &mut Vec<String>,
     ) {
         // For now, parse the pattern string to extract capture names
@@ -136,7 +136,7 @@ impl std::hash::Hash for CBORPattern {
             }
             CBORPattern::Pattern(pattern) => {
                 2u8.hash(state);
-                // Hash the string representation since DcborPattern doesn't
+                // Hash the string representation since dcbor_pattern::Pattern doesn't
                 // implement Hash
                 pattern.to_string().hash(state);
             }
@@ -364,7 +364,7 @@ mod tests {
     #[test]
     fn test_cbor_pattern_dcbor_pattern() {
         // Test with a simple dcbor pattern that matches any number
-        let dcbor_pattern = DcborPattern::any_number();
+        let dcbor_pattern = dcbor_pattern::Pattern::any_number();
         let cbor_pattern = CBORPattern::pattern(dcbor_pattern);
 
         // Test with a number envelope
@@ -382,7 +382,7 @@ mod tests {
     #[test]
     fn test_cbor_pattern_dcbor_pattern_with_captures() {
         // Test with a dcbor pattern that has captures
-        let dcbor_pattern = DcborPattern::any_number();
+        let dcbor_pattern = dcbor_pattern::Pattern::any_number();
         let cbor_pattern = CBORPattern::pattern(dcbor_pattern);
 
         let number_envelope = Envelope::new(42);
