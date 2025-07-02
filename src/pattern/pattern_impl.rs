@@ -190,25 +190,25 @@ impl Pattern {
     }
 
     /// Creates a new `Pattern` that matches a specific Date (CBOR tag 1) value.
-    pub fn date(date: dcbor::Date) -> Self {
+    pub fn date(date: Date) -> Self {
         Pattern::Leaf(LeafPattern::Date(DatePattern::value(date)))
     }
 
     /// Creates a new `Pattern` that matches Date (CBOR tag 1) values within a
     /// specified range (inclusive).
-    pub fn date_range(range: RangeInclusive<dcbor::Date>) -> Self {
+    pub fn date_range(range: RangeInclusive<Date>) -> Self {
         Pattern::Leaf(LeafPattern::Date(DatePattern::range(range)))
     }
 
     /// Creates a new `Pattern` that matches Date (CBOR tag 1) values that are
     /// on or after the specified date.
-    pub fn date_earliest(date: dcbor::Date) -> Self {
+    pub fn date_earliest(date: Date) -> Self {
         Pattern::Leaf(LeafPattern::Date(DatePattern::earliest(date)))
     }
 
     /// Creates a new `Pattern` that matches Date (CBOR tag 1) values that are
     /// on or before the specified date.
-    pub fn date_latest(date: dcbor::Date) -> Self {
+    pub fn date_latest(date: Date) -> Self {
         Pattern::Leaf(LeafPattern::Date(DatePattern::latest(date)))
     }
 
@@ -370,7 +370,7 @@ impl Pattern {
 
     /// Creates a new `Pattern` that matches a specific tagged value with any
     /// content. This is a proxy to dcbor-pattern's tagged functionality.
-    pub fn tagged(tag: impl Into<dcbor::Tag>, pattern: DCBORPattern) -> Self {
+    pub fn tagged(tag: impl Into<Tag>, pattern: DCBORPattern) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
             crate::pattern::leaf::TaggedPattern::with_tag(tag, pattern),
         ))

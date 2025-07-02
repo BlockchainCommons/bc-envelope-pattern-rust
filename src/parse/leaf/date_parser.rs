@@ -1,4 +1,5 @@
 use crate::{Error, Pattern, Result};
+use bc_envelope::prelude::*;
 
 pub(crate) fn parse_date_content(content: String) -> Result<Pattern> {
     // Parse the dcbor-pattern date syntax: iso-8601, iso-8601...iso-8601, etc.
@@ -20,19 +21,19 @@ pub(crate) fn parse_date_content(content: String) -> Result<Pattern> {
 
             if start_str.is_empty() {
                 // ...iso-8601 (latest)
-                let date = dcbor::Date::from_string(end_str)
+                let date = Date::from_string(end_str)
                     .map_err(|_| Error::InvalidDateFormat(0..content.len()))?;
                 return Ok(Pattern::date_latest(date));
             } else if end_str.is_empty() {
                 // iso-8601... (earliest)
-                let date = dcbor::Date::from_string(start_str)
+                let date = Date::from_string(start_str)
                     .map_err(|_| Error::InvalidDateFormat(0..content.len()))?;
                 return Ok(Pattern::date_earliest(date));
             } else {
                 // iso-8601...iso-8601 (range)
-                let start_date = dcbor::Date::from_string(start_str)
+                let start_date = Date::from_string(start_str)
                     .map_err(|_| Error::InvalidDateFormat(0..content.len()))?;
-                let end_date = dcbor::Date::from_string(end_str)
+                let end_date = Date::from_string(end_str)
                     .map_err(|_| Error::InvalidDateFormat(0..content.len()))?;
                 return Ok(Pattern::date_range(start_date..=end_date));
             }
@@ -40,7 +41,7 @@ pub(crate) fn parse_date_content(content: String) -> Result<Pattern> {
     }
 
     // Single ISO-8601 date
-    let date = dcbor::Date::from_string(&content)
+    let date = Date::from_string(&content)
         .map_err(|_| Error::InvalidDateFormat(0..content.len()))?;
     Ok(Pattern::date(date))
 }

@@ -1,7 +1,6 @@
 use std::{collections::HashMap, ops::RangeInclusive};
 
 use bc_envelope::prelude::*;
-use dcbor::Date;
 
 use crate::{
     Pattern,

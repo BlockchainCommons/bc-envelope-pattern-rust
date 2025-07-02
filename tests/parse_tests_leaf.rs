@@ -1,6 +1,5 @@
 use bc_envelope::prelude::*;
 use bc_envelope_pattern::{Pattern, DCBORPattern};
-use dcbor::Date;
 use known_values::KnownValue;
 mod common;
 
@@ -311,7 +310,7 @@ fn parse_cbor_patterns_2() {
     assert_eq!(p, Pattern::cbor(CBOR::to_tagged_value(1, "hi")));
     assert_actual_expected!(p.to_string(), r#"CBOR(1("hi"))"#);
 
-    let date = dcbor::Date::from_ymd(2025, 5, 15);
+    let date = Date::from_ymd(2025, 5, 15);
     let ur = date.ur_string();
     let expr = format!(r#"CBOR({})"#, ur);
     let p = Pattern::parse(&expr).unwrap();

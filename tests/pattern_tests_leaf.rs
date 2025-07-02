@@ -150,8 +150,6 @@ fn test_text_pattern() {
 
 #[test]
 fn test_date_pattern() {
-    use dcbor::Date;
-
     // Does not match non-date subjects.
     let envelope = Envelope::new("2023-12-25");
     assert!(!Pattern::any_date().matches(&envelope));
@@ -349,8 +347,6 @@ fn test_known_value_regex_pattern() {
 
 #[test]
 fn test_byte_string_pattern() {
-    use dcbor::prelude::*;
-
     // Does not match non-byte-string subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_byte_string().matches(&envelope));
@@ -455,8 +451,6 @@ fn test_byte_string_pattern() {
 
 #[test]
 fn test_array_pattern() {
-    use dcbor::prelude::*;
-
     // Does not match non-array subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_array().matches(&envelope));
@@ -514,8 +508,6 @@ fn test_array_pattern() {
 
 #[test]
 fn test_map_pattern() {
-    use dcbor::prelude::*;
-
     // Does not match non-map subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_map().matches(&envelope));
@@ -614,8 +606,6 @@ fn test_null_pattern() {
 
 #[test]
 fn test_tag_pattern() {
-    use dcbor::prelude::*;
-
     // Does not match non-tagged subjects.
     let envelope = Envelope::new("string");
     assert!(!Pattern::any_tag().matches(&envelope));
@@ -671,13 +661,11 @@ fn test_tag_pattern() {
 
 #[test]
 fn test_tag_pattern_named() {
-    use dcbor::prelude::*;
-
     // Ensure tags are registered for testing
     bc_envelope::register_tags();
 
     // Test with registered tag (date tag = 1)
-    let tagged_cbor = dcbor::Date::from_ymd(2023, 12, 25).to_cbor();
+    let tagged_cbor = Date::from_ymd(2023, 12, 25).to_cbor();
     let envelope = Envelope::new(tagged_cbor);
 
     // Should match by name
@@ -737,13 +725,11 @@ fn test_tag_pattern_named() {
 
 #[test]
 fn test_tag_pattern_regex() {
-    use dcbor::prelude::*;
-
     // Ensure tags are registered for testing
     bc_envelope::register_tags();
 
     // Test with registered tag (date tag = 1)
-    let tagged_cbor = dcbor::Date::from_ymd(2023, 12, 25).to_cbor();
+    let tagged_cbor = Date::from_ymd(2023, 12, 25).to_cbor();
     let envelope = Envelope::new(tagged_cbor);
 
     // Regex that should match "date"
@@ -809,8 +795,6 @@ fn test_tag_pattern_regex() {
 
 #[test]
 fn test_tag_pattern_with_bc_components_tags() {
-    use dcbor::prelude::*;
-
     // Ensure all tags are registered
     bc_envelope::register_tags();
 
