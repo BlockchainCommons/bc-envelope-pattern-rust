@@ -10,41 +10,39 @@ use crate::{
 /// Pattern for matching text values. This is a wrapper around
 /// dcbor_pattern::TextPattern that provides envelope-specific integration.
 #[derive(Debug, Clone)]
-pub struct TextPattern {
-    inner: dcbor_pattern::TextPattern,
-}
+pub struct TextPattern(dcbor_pattern::TextPattern);
 
 // Re-export the dcbor-pattern TextPattern enum variants through associated
 // functions
 impl TextPattern {
     /// Creates a new `TextPattern` that matches any text.
-    pub fn any() -> Self { Self { inner: dcbor_pattern::TextPattern::any() } }
+    pub fn any() -> Self { Self(dcbor_pattern::TextPattern::any()) }
 
     /// Creates a new `TextPattern` that matches the specific text.
     pub fn value<T: Into<String>>(value: T) -> Self {
-        Self { inner: dcbor_pattern::TextPattern::value(value) }
+        Self(dcbor_pattern::TextPattern::value(value))
     }
 
     /// Creates a new `TextPattern` that matches the regex for a text.
     pub fn regex(regex: regex::Regex) -> Self {
-        Self { inner: dcbor_pattern::TextPattern::regex(regex) }
+        Self(dcbor_pattern::TextPattern::regex(regex))
     }
 
     /// Creates a new `TextPattern` from a dcbor-pattern TextPattern.
     pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::TextPattern) -> Self {
-        Self { inner: dcbor_pattern }
+        Self(dcbor_pattern)
     }
 }
 
 impl PartialEq for TextPattern {
-    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
 impl Eq for TextPattern {}
 
 impl std::hash::Hash for TextPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state);
+        self.0.hash(state);
     }
 }
 
@@ -58,7 +56,7 @@ impl Matcher for TextPattern {
         if let Some(cbor) = envelope.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // TextPattern doesn't support captures, so we only get paths
-            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.inner, &cbor);
+            let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
 
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
@@ -92,7 +90,7 @@ impl Matcher for TextPattern {
 
 impl std::fmt::Display for TextPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner)
+        write!(f, "{}", self.0)
     }
 }
 
