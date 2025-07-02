@@ -6,8 +6,6 @@ This file contains general information for contributors to the `bc-envelope-patt
 
 This crate is now in preview release. You are likely to be asked for bug fixes, enhancements, and documentation improvements. Always make sure that `cargo test` and `cargo clippy` pass before you're done with your changes.
 
-**Important Note:** The `NONE` pattern has been removed from this crate as it can now be represented more clearly with `!*` (not-any). If you encounter legacy code or documentation referencing `NONE`, replace it with `!*` which provides equivalent "never matches" semantics.
-
 ## Intro to Gordian Envelope
 
 - The basic structure of Gordian Envelope is defined in the [Envelope I-D](https://datatracker.ietf.org/doc/draft-mcnally-envelope/).

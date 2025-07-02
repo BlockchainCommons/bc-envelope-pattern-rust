@@ -96,7 +96,7 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches an array with between `n` and `m` elements, inclusive.
     - `[{n,}]`
         - Matches an array with at least `n` elements.
-    - `[pattern]`
+    - `[dcbor-patex, dcbor-patex, ...]`
         - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
         - Examples:
             - `[42]` - Array containing exactly one element: the number 42
@@ -113,25 +113,25 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a map with between `n` and `m` entries, inclusive.
     - `{{n,}}`
         - Matches a map with at least `n` entries.
-    - `{key: value, ...}`
+    - `{key-dcbor-patex: value-dcbor-patex, ...}`
         - Matches a map with the specified key-value patterns.
 - Tagged
     - `tagged`
         - Matches any CBOR tagged value.
-    - `tagged ( value, pattern )`
+    - `tagged ( value, dcbor-patex )`
         - Matches the specified CBOR tagged value with content that matches the given pattern. The tag value is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
-    - `tagged ( name, pattern )`
+    - `tagged ( name, dcbor-patex )`
         - Matches the CBOR tagged value with the specified name and content that matches the given pattern. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
-    - `tagged ( /regex/, pattern )`
+    - `tagged ( /regex/, dcbor-patex )`
         - Matches a CBOR tagged value with a name that matches the specified regex and content that matches the given pattern.
 - CBOR
-    - `CBOR`
+    - `cbor`
         - Matches any subject CBOR value.
-    - `CBOR ( diagnostic-notation )`
+    - `cbor ( dcbor-diagnostic-notation )`
         - Matches a subject CBOR value that matches the specified diagnostic notation, parsed using the `dcbor-parse` crate, which uses the `logos` crate for parsing.
-    - `CBOR ( ur:type/value )`
+    - `cbor ( ur:type/value )`
         - Matches a subject CBOR value that matches the specified `ur`, parsed using the `bc-ur` crate.
-    - `CBOR ( /patex/ )`
+    - `cbor ( /dcbor-patex/ )`
         - Matches a subject CBOR value that matches the specified dcbor-pattern expression. This enables advanced pattern matching within CBOR structures including quantifiers, captures, and complex structural patterns. The pattern expression uses dcbor-pattern syntax.
 
 ## Structure Patterns
@@ -144,9 +144,9 @@ Structure patterns match parts of Gordian Envelope structures.
 - Assertions
     - `assert`
         - Matches any assertion.
-    - `assertpred ( pattern )`
+    - `assertpred ( patex )`
         - Matches an assertion having a predicate that matches the specified pattern.
-    - `assertobj ( pattern )`
+    - `assertobj ( patex )`
         - Matches an assertion having an object that matches the specified pattern.
 - Digest
     - `digest ( hex )`
@@ -161,7 +161,7 @@ Structure patterns match parts of Gordian Envelope structures.
 - Objects
     - `obj`
         - Matches any object.
-    - `obj ( pattern )`
+    - `obj ( patex )`
         - Matches an object that matches the specified pattern.
 - Obscured
     - `obscured`
@@ -175,12 +175,12 @@ Structure patterns match parts of Gordian Envelope structures.
 - Predicates
     - `pred`
         - Matches any predicate.
-    - `pred ( pattern )`
+    - `pred ( patex )`
         - Matches a predicate that matches the specified pattern.
 - Subjects
     - `subj`
         - Matches any subject. If the envelope is not a NODE, then this is the identity function.
-    - `subj ( pattern )`
+    - `subj ( patex )`
         - Matches a subject that matches the specified pattern.
 - Wrapped
     - `wrapped`
@@ -195,41 +195,41 @@ The following meta patterns are available to combine or modify other patterns.
 Precedence: Repeat has the highest precedence, followed by And, Not, Traversal, and then Or. Parentheses can be used to group patterns and change precedence.
 
 - And
-    - `pattern & pattern & pattern`…
+    - `patex & patex & patex...`
         - Matches if all specified patterns match.
 - Any
     - `*`
-        - Always matches. Uses the dcbor-pattern `*` syntax for consistency.
+        - Always matches.
 - Capture
-    - `@name ( pattern )`
+    - `@name ( patex )`
         - Matches the specified pattern and captures the match for later use with the given name.
 - Not
-    - `! pattern`
-        - Matches if the specified pattern does not match.
+    - `! patex`
+        - Matches if the specified patex does not match.
         - A pattern that never matches can be represented as `!*`.
 - Or
-    - `pattern | pattern | pattern…`
+    - `patex | patex | pattern…`
         - Matches if any of the specified patterns match.
 - Repeat
-    - Greedy — grabs as many repetitions as possible, then backtracks if the rest of the pattern cannot match.
-        - `( pattern )` (exactly once, this is used to group patterns)
-        - `( pattern )*` (0 or more)
-        - `( pattern )?` (0 or 1)
-        - `( pattern )+` (1 or more)
-        - `( pattern ){ n , m }` (`n` to `m` repeats, inclusive)
+    - Greedy — grabs as many repetitions as possible, then backtracks if the rest of the patex cannot match.
+        - `( patex )` (exactly once, this is used to group patterns)
+        - `( patex )*` (0 or more)
+        - `( patex )?` (0 or 1)
+        - `( patex )+` (1 or more)
+        - `( patex ){ n , m }` (`n` to `m` repeats, inclusive)
     - Lazy — starts with as few repetitions as possible, adding more only if the rest of the pattern cannot match.
-        - `( pattern )*?` (0 or more)
-        - `( pattern )??` (0 or 1)
-        - `( pattern )+?` (1 or more)
-        - `( pattern ){ n , m }?` (`n` to `m` repeats, inclusive)
+        - `( patex )*?` (0 or more)
+        - `( patex )??` (0 or 1)
+        - `( patex )+?` (1 or more)
+        - `( patex ){ n , m }?` (`n` to `m` repeats, inclusive)
     - Possessive — grabs as many repetitions as possible and never backtracks; if the rest of the pattern cannot match, the whole match fails.
-        - `( pattern )*+` (0 or more)
-        - `( pattern )?+` (0 or 1)
-        - `( pattern )++` (1 or more)
-        - `( pattern ){ n , m }+` (`n` to `m` repeats, inclusive)
+        - `( patex )*+` (0 or more)
+        - `( patex )?+` (0 or 1)
+        - `( patex )++` (1 or more)
+        - `( patex ){ n , m }+` (`n` to `m` repeats, inclusive)
 - Search
-    - `search ( pattern )`
+    - `search ( patex )`
       - Visits every node in the Envelope tree, matching the specified pattern against each node.
 - Traversal
-    - `pattern -> pattern -> pattern`
+    - `patex -> patex -> patex`
         - Matches if the specified patterns match a traversal path, with no other nodes in between.
