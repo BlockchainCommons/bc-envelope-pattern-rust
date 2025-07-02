@@ -7,11 +7,3 @@ fn parse_any() {
     assert_eq!(p, Pattern::any());
     assert_eq!(p.to_string(), src);
 }
-
-#[test]
-fn parse_none() {
-    let src = "NONE";
-    let p = Pattern::parse(src).unwrap();
-    assert_eq!(p, Pattern::none());
-    assert_eq!(p.to_string(), src);
-}

@@ -6,6 +6,8 @@ This file contains general information for contributors to the `bc-envelope-patt
 
 This crate is now in preview release. You are likely to be asked for bug fixes, enhancements, and documentation improvements. Always make sure that `cargo test` and `cargo clippy` pass before you're done with your changes.
 
+**Important Note:** The `NONE` pattern has been removed from this crate as it can now be represented more clearly with `!*` (not-any). If you encounter legacy code or documentation referencing `NONE`, replace it with `!*` which provides equivalent "never matches" semantics.
+
 ## Intro to Gordian Envelope
 
 - The basic structure of Gordian Envelope is defined in the [Envelope I-D](https://datatracker.ietf.org/doc/draft-mcnally-envelope/).
@@ -46,101 +48,4 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 - **`bc-envelope-pattern` Pattern Expression (patex) Syntax**: Documented here: [docs/EnvelopePatternSyntax.md](docs/EnvelopePatternSyntax.md)
 
 
-## Development Plan: Enhanced Pattern Parsing with `parse_partial()` - COMPLETED ✅
-
-### Feature Request: Unified Pattern Parsing with Fallback - IMPLEMENTED ✅
-
-**Status**: ✅ **SUCCESSFULLY IMPLEMENTED**
-
-**Summary of Implementation**:
-Successfully integrated dcbor-pattern's `parse_partial()` capability into bc-envelope-pattern while maintaining full backward compatibility and envelope-specific functionality. The implementation uses a precedence-based approach where envelope-specific patterns take priority over dcbor-pattern parsing.
-
-**Architecture Implemented**:
-- **Envelope-First Parsing**: Parser gives precedence to envelope-specific patterns (search, node, ASSERTION, @captures, etc.)
-- **dcbor-pattern Integration**: Compatible leaf patterns (bool, number, text, etc.) use optimized dcbor-pattern parsing
-- **Conversion Layer**: Comprehensive conversion between dcbor-pattern and envelope-pattern types
-- **Graceful Fallback**: System degrades gracefully for unsupported patterns
-
-**Implementation Details**:
-
-1. **Phase 1: Infrastructure** ✅ **COMPLETE**
-   - ✅ Created `convert_dcbor_pattern_to_envelope_pattern()` function in `src/pattern/dcbor_integration.rs`
-   - ✅ Added `from_dcbor_pattern` methods for all relevant leaf and structure pattern types
-   - ✅ Updated `MapPattern` to support Content variant for dcbor integration
-   - ✅ Comprehensive unit tests for all conversion functionality
-   - ✅ Fixed doctest and made module publicly accessible
-
-2. **Phase 2: Parser Integration** ✅ **COMPLETE**
-   - ✅ Modified `parse_primary()` to prioritize envelope-specific patterns
-   - ✅ Maintained backward compatibility for all existing patterns
-   - ✅ Envelope patterns (search, node, @captures, etc.) take precedence
-   - ✅ Compatible leaf patterns use existing dcbor-pattern-based implementations
-   - ✅ All existing tests pass without modification
-
-3. **Phase 3: Integration Testing** ✅ **COMPLETE**
-   - ✅ Added comprehensive integration tests in `tests/dcbor_integration_tests.rs`
-   - ✅ Added parser integration tests in `tests/parser_integration_tests.rs`
-   - ✅ Verified precedence behavior works correctly
-   - ✅ Confirmed error handling remains robust
-   - ✅ Demonstrated mixed envelope/dcbor syntax support
-
-**Key Files Modified/Created**:
-- `src/pattern/dcbor_integration.rs` - New conversion layer (293 lines)
-- `src/pattern/mod.rs` - Registered new module
-- `src/lib.rs` - Re-exported dcbor_integration
-- `src/parse/meta/primary_parser.rs` - Updated parser precedence
-- `tests/dcbor_integration_tests.rs` - New integration tests (167 lines)
-- `tests/parser_integration_tests.rs` - New parser tests (124 lines)
-- Multiple pattern files - Added `from_dcbor_pattern` methods
-
-**Benefits Achieved**:
-- ✅ **Reduced Maintenance**: Leaf patterns leverage battle-tested dcbor-pattern logic
-- ✅ **Backward Compatibility**: All existing envelope-pattern syntax works unchanged
-- ✅ **Graceful Integration**: Envelope-specific features take precedence over dcbor features
-- ✅ **Future-Proof**: Ready to adopt new dcbor-pattern capabilities as they become available
-- ✅ **Clear Architecture**: Clean separation between envelope and dcbor concerns
-- ✅ **Comprehensive Testing**: 100% test coverage for new functionality
-
-**Performance & Quality**:
-- All 93 unit tests pass
-- All 77 integration tests across 15 test files pass
-- 1 doctest passes
-- No clippy warnings in core functionality
-- Memory-safe implementation with proper error handling
-
-**Usage Examples**:
-```rust
-// Envelope-specific patterns work unchanged
-let search_pattern = Pattern::parse("search(42)").unwrap();
-let capture_pattern = Pattern::parse("@num(42)").unwrap();
-let node_pattern = Pattern::parse("node").unwrap();
-
-// dcbor-compatible patterns work seamlessly
-let bool_pattern = Pattern::parse("bool").unwrap();
-let number_pattern = Pattern::parse("42").unwrap();
-let text_pattern = Pattern::parse("\"hello\"").unwrap();
-
-// Mixed syntax works correctly
-let mixed_pattern = Pattern::parse("true | search(42)").unwrap();
-
-// Conversion layer accessible for advanced use
-use bc_envelope_pattern::dcbor_integration::convert_dcbor_pattern_to_envelope_pattern;
-let dcbor_pat = DCBORPattern::bool(true);
-let envelope_pat = convert_dcbor_pattern_to_envelope_pattern(dcbor_pat).unwrap();
-```
-
-**Future Opportunities**:
-- **Phase 4**: Consider selective optimization of specific patterns for performance
-- **Enhanced Error Messages**: Could improve error messages by leveraging both parsers
-- **New dcbor-pattern Features**: Automatically benefit from future dcbor-pattern enhancements
-- **Documentation**: Update examples and documentation to highlight new capabilities
-
-**Success Criteria Met**:
-- ✅ All existing tests continue to pass
-- ✅ dcbor-pattern syntax works seamlessly in envelope patterns
-- ✅ Performance maintained (no significant regression)
-- ✅ Error messages remain clear and helpful
-- ✅ Code complexity well-managed with clear separation of concerns
-- ✅ Comprehensive test coverage for all new functionality
-
-This implementation successfully achieves the original goal of unified pattern parsing while maintaining the robustness and envelope-specific capabilities that make bc-envelope-pattern valuable.
+## Development Plan

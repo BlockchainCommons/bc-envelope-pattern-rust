@@ -69,7 +69,7 @@ use super::{
         TextPattern,
     },
     meta::{
-        AndPattern, CapturePattern, GroupPattern, MetaPattern, NotPattern,
+        AndPattern, AnyPattern, CapturePattern, GroupPattern, MetaPattern, NotPattern,
         OrPattern, SearchPattern, TraversePattern,
     },
     structure::{
@@ -83,7 +83,6 @@ use crate::{
     DCBORPattern, Quantifier, Reluctance,
     pattern::{
         leaf::CBORPattern,
-        meta::{AnyPattern, NonePattern},
         vm::Instr,
     },
 };
@@ -545,11 +544,6 @@ impl Pattern {
     /// Creates a new `Pattern` that matches any element.
     pub fn any() -> Self {
         Pattern::Meta(MetaPattern::Any(AnyPattern::new()))
-    }
-
-    /// Creates a new `Pattern` that never matches any element.
-    pub fn none() -> Self {
-        Pattern::Meta(MetaPattern::None(NonePattern::new()))
     }
 }
 

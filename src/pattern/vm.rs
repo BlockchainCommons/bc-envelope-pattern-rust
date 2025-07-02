@@ -143,9 +143,6 @@ pub(crate) fn atomic_paths_with_captures(
             crate::pattern::meta::MetaPattern::Any(a) => {
                 a.paths_with_captures(env)
             }
-            crate::pattern::meta::MetaPattern::None(n) => {
-                n.paths_with_captures(env)
-            }
             crate::pattern::meta::MetaPattern::Search(_) => {
                 panic!(
                     "SearchPattern should be compiled to Search instruction, not MatchPredicate"

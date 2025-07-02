@@ -120,8 +120,6 @@ pub enum Token {
     Tagged,
 
     // Meta Pattern Keywords
-    #[token("NONE")]
-    None,
 
     // Special literals
     #[token("bool")]

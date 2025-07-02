@@ -45,7 +45,6 @@ pub(crate) fn parse_primary(
         Token::GroupName(name) => parse_capture(lexer, name),
         Token::ParenOpen => parse_group(lexer),
         Token::Leaf => Ok(Pattern::leaf()),
-        Token::None => Ok(Pattern::none()),
 
         // Patterns that might have envelope-specific extensions
         Token::Cbor => leaf::parse_cbor(lexer),

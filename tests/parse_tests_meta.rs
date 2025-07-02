@@ -59,13 +59,13 @@ fn parse_bool_traversal() {
 
 #[test]
 fn parse_operator_precedence() {
-    let expr = "* -> true & false -> NONE | * -> true & false -> *";
+    let expr = "* -> true & false -> !* | * -> true & false -> *";
     let p = Pattern::parse(expr).unwrap();
 
     let left_seq = Pattern::traverse(vec![
         Pattern::any(),
         Pattern::and(vec![Pattern::bool(true), Pattern::bool(false)]),
-        Pattern::none(),
+        Pattern::not_matching(Pattern::any()),
     ]);
     let right_seq = Pattern::traverse(vec![
         Pattern::any(),
@@ -75,7 +75,7 @@ fn parse_operator_precedence() {
     let expected = Pattern::or(vec![left_seq, right_seq]);
 
     assert_eq!(p, expected);
-    assert_eq!(p.to_string(), "* -> true & false -> NONE | * -> true & false -> *");
+    assert_eq!(p.to_string(), "* -> true & false -> !* | * -> true & false -> *");
 }
 
 #[test]
@@ -84,14 +84,14 @@ fn parse_not_patterns() {
     assert_eq!(p, Pattern::not_matching(Pattern::text("hi")));
     assert_eq!(p.to_string(), r#"!"hi""#);
 
-    let expr = "!* & NONE";
+    let expr = "!* & !*";
     let p = Pattern::parse(expr).unwrap();
-    let expected = Pattern::not_matching(Pattern::and(vec![
-        Pattern::any(),
-        Pattern::none(),
-    ]));
+    let expected = Pattern::and(vec![
+        Pattern::not_matching(Pattern::any()),
+        Pattern::not_matching(Pattern::any()),
+    ]);
     assert_eq!(p, expected);
-    assert_eq!(p.to_string(), "!* & NONE");
+    assert_eq!(p.to_string(), "!* & !*");
 }
 
 #[test]

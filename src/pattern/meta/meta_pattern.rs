@@ -8,11 +8,7 @@ use super::{
 };
 use crate::{
     Pattern,
-    pattern::{
-        Matcher, Path,
-        meta::{AnyPattern, NonePattern},
-        vm::Instr,
-    },
+    pattern::{Matcher, Path, meta::AnyPattern, vm::Instr},
 };
 
 /// Pattern for combining and modifying other patterns.
@@ -20,8 +16,6 @@ use crate::{
 pub enum MetaPattern {
     /// Always matches.
     Any(AnyPattern),
-    /// Never matches.
-    None(NonePattern),
     /// Matches if all contained patterns match.
     And(AndPattern),
     /// Matches if any contained pattern matches.
@@ -45,14 +39,21 @@ impl Matcher for MetaPattern {
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         match self {
             MetaPattern::Any(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::None(pattern) => pattern.paths_with_captures(envelope),
             MetaPattern::And(pattern) => pattern.paths_with_captures(envelope),
             MetaPattern::Or(pattern) => pattern.paths_with_captures(envelope),
             MetaPattern::Not(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::Search(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::Traverse(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::Group(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::Capture(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Search(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+            MetaPattern::Traverse(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+            MetaPattern::Group(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
+            MetaPattern::Capture(pattern) => {
+                pattern.paths_with_captures(envelope)
+            }
         }
     }
 
@@ -64,7 +65,6 @@ impl Matcher for MetaPattern {
     ) {
         match self {
             MetaPattern::Any(pattern) => pattern.compile(code, lits, captures),
-            MetaPattern::None(pattern) => pattern.compile(code, lits, captures),
             MetaPattern::And(pattern) => pattern.compile(code, lits, captures),
             MetaPattern::Or(pattern) => pattern.compile(code, lits, captures),
             MetaPattern::Not(pattern) => pattern.compile(code, lits, captures),
@@ -86,7 +86,6 @@ impl Matcher for MetaPattern {
     fn is_complex(&self) -> bool {
         match self {
             MetaPattern::Any(pattern) => pattern.is_complex(),
-            MetaPattern::None(pattern) => pattern.is_complex(),
             MetaPattern::And(pattern) => pattern.is_complex(),
             MetaPattern::Or(pattern) => pattern.is_complex(),
             MetaPattern::Not(pattern) => pattern.is_complex(),
@@ -102,7 +101,6 @@ impl std::fmt::Display for MetaPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             MetaPattern::Any(pattern) => write!(f, "{}", pattern),
-            MetaPattern::None(pattern) => write!(f, "{}", pattern),
             MetaPattern::And(pattern) => write!(f, "{}", pattern),
             MetaPattern::Or(pattern) => write!(f, "{}", pattern),
             MetaPattern::Not(pattern) => write!(f, "{}", pattern),
@@ -117,7 +115,7 @@ impl std::fmt::Display for MetaPattern {
 impl MetaPattern {
     pub(crate) fn collect_capture_names(&self, out: &mut Vec<String>) {
         match self {
-            MetaPattern::Any(_) | MetaPattern::None(_) => {}
+            MetaPattern::Any(_) => {}
             MetaPattern::And(p) => {
                 for pat in p.patterns() {
                     pat.collect_capture_names(out);

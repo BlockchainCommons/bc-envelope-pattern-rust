@@ -65,9 +65,9 @@ fn parse_number_patterns() {
     assert_eq!(p, Pattern::number(42));
     assert_actual_expected!(p.to_string(), "42");
 
-    let p = Pattern::parse("3.14").unwrap();
-    assert_eq!(p, Pattern::number(3.14));
-    assert_actual_expected!(p.to_string(), "3.14");
+    let p = Pattern::parse("3.75").unwrap();
+    assert_eq!(p, Pattern::number(3.75));
+    assert_actual_expected!(p.to_string(), "3.75");
 
     let p = Pattern::parse("1...3").unwrap();
     assert_eq!(p, Pattern::number_range(1.0..=3.0));
