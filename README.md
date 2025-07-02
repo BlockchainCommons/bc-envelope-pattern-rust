@@ -46,7 +46,7 @@ The `format_paths()` and `format_paths_opt()` functions allow you to format path
 
 ## Docs
 
-The [docs/EnvelopePatternSyntax.md](docs/EnvelopePatternSyntax.md) file contains the specification for the pattern expression syntax used by this crate.
+The [docs/envelope_patex.md](docs/envelope_patex.md) file contains the specification for the pattern expression syntax used by this crate.
 
 Further documentation is forthcoming and will be added to the `docs/` directory.
 

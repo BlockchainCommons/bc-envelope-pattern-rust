@@ -42,8 +42,8 @@ This design provides the best of both worlds: the mature, well-tested CBOR patte
 
 - **CBOR/Envelope Isomorphism**: `CBOR` objects can be converted to Envelope leaves using `.into()`. Envelope leaves can be converted to `CBOR` objects using `.as_leaf()`.
 - **Easy Creation of CBOR Objects**: For tests, use `dcbor_parse::parse_dcbor_item()` to create `CBOR` objects from diagnostic notation strings. Prefer this over programmatically constructing `CBOR` objects.
-- **`dcbor-pattern` Pattern Expression (patex) Syntax**: Documented here: [../dcbor-pattern/docs/DCBORPatternSyntax.md](../dcbor-pattern/docs/DCBORPatternSyntax.md)
-- **`bc-envelope-pattern` Pattern Expression (patex) Syntax**: Documented here: [docs/EnvelopePatternSyntax.md](docs/EnvelopePatternSyntax.md)
+- **`dcbor-pattern` Pattern Expression (patex) Syntax**: Documented [here](../dcbor-pattern/docs/dcbor_patex.md).
+- **`bc-envelope-pattern` Pattern Expression (patex) Syntax**: Documented [here](docs/envelope_patex.md).
 
 
 ## Development Plan
