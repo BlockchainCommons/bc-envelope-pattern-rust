@@ -356,7 +356,7 @@ impl Pattern {
 
 impl Pattern {
     pub fn null() -> Self {
-        Pattern::Leaf(LeafPattern::Null(NullPattern::new()))
+        Pattern::Leaf(LeafPattern::Null(NullPattern))
     }
 }
 

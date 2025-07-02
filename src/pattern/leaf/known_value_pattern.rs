@@ -13,55 +13,47 @@ use crate::{
 /// dcbor_pattern::KnownValuePattern that provides envelope-specific
 /// integration.
 #[derive(Debug, Clone)]
-pub struct KnownValuePattern {
-    inner: dcbor_pattern::KnownValuePattern,
-}
+pub struct KnownValuePattern(dcbor_pattern::KnownValuePattern);
 
 // Re-export the dcbor-pattern KnownValuePattern methods through associated
 // functions
 impl KnownValuePattern {
     /// Creates a new `KnownValuePattern` that matches any known value.
     pub fn any() -> Self {
-        Self { inner: dcbor_pattern::KnownValuePattern::any() }
+        Self(dcbor_pattern::KnownValuePattern::any())
     }
 
     /// Creates a new `KnownValuePattern` that matches a specific known value.
     pub fn value(value: KnownValue) -> Self {
-        Self {
-            inner: dcbor_pattern::KnownValuePattern::value(value),
-        }
+        Self(dcbor_pattern::KnownValuePattern::value(value))
     }
 
     /// Creates a new `KnownValuePattern` that matches a known value by name.
     pub fn named(name: impl Into<String>) -> Self {
-        Self {
-            inner: dcbor_pattern::KnownValuePattern::named(name),
-        }
+        Self(dcbor_pattern::KnownValuePattern::named(name))
     }
 
     /// Creates a new `KnownValuePattern` that matches the regex for a known
     /// value name.
     pub fn regex(regex: regex::Regex) -> Self {
-        Self {
-            inner: dcbor_pattern::KnownValuePattern::regex(regex),
-        }
+        Self(dcbor_pattern::KnownValuePattern::regex(regex))
     }
 
     /// Creates a new `KnownValuePattern` from a dcbor-pattern KnownValuePattern.
     pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::KnownValuePattern) -> Self {
-        Self { inner: dcbor_pattern }
+        Self(dcbor_pattern)
     }
 }
 
 impl PartialEq for KnownValuePattern {
-    fn eq(&self, other: &Self) -> bool { self.inner == other.inner }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
 impl Eq for KnownValuePattern {}
 
 impl std::hash::Hash for KnownValuePattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state);
+        self.0.hash(state);
     }
 }
 
@@ -77,7 +69,7 @@ impl Matcher for KnownValuePattern {
 
             // Delegate to dcbor-pattern for CBOR matching
             let dcbor_paths =
-                dcbor_pattern::Matcher::paths(&self.inner, &known_value_cbor);
+                dcbor_pattern::Matcher::paths(&self.0, &known_value_cbor);
 
             // Convert dcbor paths to envelope paths
             // For KnownValue patterns, the dcbor pattern matches directly
@@ -122,7 +114,7 @@ impl Matcher for KnownValuePattern {
 impl std::fmt::Display for KnownValuePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // Delegate to the inner pattern's Display implementation
-        self.inner.fmt(f)
+        self.0.fmt(f)
     }
 }
 

@@ -85,8 +85,8 @@ fn convert_value_pattern_to_envelope_pattern(
                 known_value_pattern,
             ))
         }
-        dcbor_pattern::ValuePattern::Null(null_pattern) => {
-            LeafPattern::Null(NullPattern::from_dcbor_pattern(null_pattern))
+        dcbor_pattern::ValuePattern::Null(_) => {
+            LeafPattern::Null(NullPattern)
         }
         dcbor_pattern::ValuePattern::Digest(digest_pattern) => {
             // Digest patterns don't have a direct envelope equivalent yet
