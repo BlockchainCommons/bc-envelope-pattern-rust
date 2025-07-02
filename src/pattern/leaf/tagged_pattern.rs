@@ -2,27 +2,24 @@ use std::collections::HashMap;
 
 use bc_envelope::Envelope;
 use dcbor::prelude::*;
-use dcbor_pattern::Matcher;
+use dcbor_pattern::Matcher as DcborMatcher;
 
 use crate::{
     Pattern,
-    pattern::{Matcher as EnvelopeMatcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
+    pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
 /// Pattern for matching CBOR tagged values.
 /// This is a proxy to dcbor-pattern's TaggedPattern functionality.
 #[derive(Debug, Clone)]
-pub struct TaggedPattern {
-    /// The underlying dcbor-pattern TaggedPattern
-    pattern: dcbor_pattern::TaggedPattern,
-}
+pub struct TaggedPattern(dcbor_pattern::TaggedPattern);
 
 impl PartialEq for TaggedPattern {
     fn eq(&self, other: &Self) -> bool {
         // Compare the underlying dcbor-pattern TaggedPattern
         // We need to serialize/deserialize or compare using pattern string representation
         // since dcbor-pattern::TaggedPattern doesn't implement PartialEq directly
-        self.pattern.to_string() == other.pattern.to_string()
+        self.0.to_string() == other.0.to_string()
     }
 }
 
@@ -31,74 +28,60 @@ impl Eq for TaggedPattern {}
 impl std::hash::Hash for TaggedPattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         // Hash the string representation since we can't hash the pattern directly
-        self.pattern.to_string().hash(state);
+        self.0.to_string().hash(state);
     }
 }
 
 impl TaggedPattern {
     /// Creates a new `TaggedPattern` from a dcbor-pattern TaggedPattern.
     pub fn from_dcbor_pattern(pattern: dcbor_pattern::TaggedPattern) -> Self {
-        TaggedPattern { pattern }
+        TaggedPattern(pattern)
     }
 
     /// Creates a new `TaggedPattern` that matches any tagged value.
     pub fn any() -> Self {
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::any()
-        }
+        TaggedPattern(dcbor_pattern::TaggedPattern::any())
     }
 
     /// Creates a new `TaggedPattern` that matches a specific tag with any content.
-    pub fn value(tag: impl Into<Tag>) -> Self {
+    pub fn with_tag_any(tag: impl Into<Tag>) -> Self {
         let tag = tag.into();
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::with_tag(tag, dcbor_pattern::Pattern::any())
-        }
+        TaggedPattern(dcbor_pattern::TaggedPattern::with_tag(tag, dcbor_pattern::Pattern::any()))
     }
 
     /// Creates a new `TaggedPattern` that matches a tag by its name with any content.
-    pub fn named(name: impl Into<String>) -> Self {
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::with_tag_name(name.into(), dcbor_pattern::Pattern::any())
-        }
+    pub fn with_name_any(name: impl Into<String>) -> Self {
+        TaggedPattern(dcbor_pattern::TaggedPattern::with_name(name.into(), dcbor_pattern::Pattern::any()))
     }
 
     /// Creates a new `TaggedPattern` that matches tags whose names match the
     /// given regex pattern with any content.
-    pub fn regex(regex: regex::Regex) -> Self {
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::with_tag_name_regex(regex, dcbor_pattern::Pattern::any())
-        }
+    pub fn with_regex_any(regex: regex::Regex) -> Self {
+        TaggedPattern(dcbor_pattern::TaggedPattern::with_regex(regex, dcbor_pattern::Pattern::any()))
     }
 
     /// Creates a new `TaggedPattern` that matches a specific tag with specific content.
-    pub fn with_tag_and_content(tag: impl Into<Tag>, content_pattern: dcbor_pattern::Pattern) -> Self {
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::with_tag(tag.into(), content_pattern)
-        }
+    pub fn with_tag(tag: impl Into<Tag>, content_pattern: dcbor_pattern::Pattern) -> Self {
+        TaggedPattern(dcbor_pattern::TaggedPattern::with_tag(tag.into(), content_pattern))
     }
 
     /// Creates a new `TaggedPattern` that matches a named tag with specific content.
-    pub fn with_name_and_content(name: impl Into<String>, content_pattern: dcbor_pattern::Pattern) -> Self {
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::with_tag_name(name.into(), content_pattern)
-        }
+    pub fn with_name(name: impl Into<String>, content_pattern: dcbor_pattern::Pattern) -> Self {
+        TaggedPattern(dcbor_pattern::TaggedPattern::with_name(name.into(), content_pattern))
     }
 
     /// Creates a new `TaggedPattern` that matches tags matching a regex with specific content.
-    pub fn with_regex_and_content(regex: regex::Regex, content_pattern: dcbor_pattern::Pattern) -> Self {
-        TaggedPattern {
-            pattern: dcbor_pattern::TaggedPattern::with_tag_name_regex(regex, content_pattern)
-        }
+    pub fn with_regex(regex: regex::Regex, content_pattern: dcbor_pattern::Pattern) -> Self {
+        TaggedPattern(dcbor_pattern::TaggedPattern::with_regex(regex, content_pattern))
     }
 }
 
-impl EnvelopeMatcher for TaggedPattern {
+impl Matcher for TaggedPattern {
     fn paths_with_captures(&self, envelope: &Envelope) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Extract the CBOR value from the envelope leaf
         if let Some(cbor) = envelope.subject().as_leaf() {
             // Use dcbor-pattern to match the CBOR value
-            let (paths, captures) = self.pattern.paths_with_captures(&cbor);
+            let (paths, captures) = self.0.paths_with_captures(&cbor);
 
             // Convert dcbor-pattern paths to envelope paths
             let envelope_paths: Vec<Path> = paths.into_iter().map(|path| {
@@ -149,7 +132,7 @@ impl std::fmt::Display for TaggedPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // Delegate to the underlying dcbor-pattern Display implementation
         // but normalize spacing to ensure consistent formatting
-        let display_str = self.pattern.to_string();
+        let display_str = self.0.to_string();
 
         // Fix the spacing issue with regex patterns by normalizing multiple spaces to single space
         let normalized = display_str.replace(",  ", ", ");
@@ -193,13 +176,13 @@ mod tests {
         let envelope = Envelope::new(tagged_cbor);
 
         // Test matching tag
-        let pattern = TaggedPattern::value(100);
+        let pattern = TaggedPattern::with_tag_any(100);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test non-matching tag
-        let pattern = TaggedPattern::value(200);
+        let pattern = TaggedPattern::with_tag_any(200);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
     }
@@ -213,19 +196,19 @@ mod tests {
         let envelope = Envelope::new(tagged_cbor);
 
         // Test matching by value instead of name since tag name resolution isn't working
-        let pattern = TaggedPattern::value(100);
+        let pattern = TaggedPattern::with_tag_any(100);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0], vec![envelope.clone()]);
 
         // Test with non-matching value
-        let pattern = TaggedPattern::value(200);
+        let pattern = TaggedPattern::with_tag_any(200);
         let paths = pattern.paths(&envelope);
         assert!(paths.is_empty());
 
         // Test with non-tagged envelope
         let text_envelope = Envelope::new("test");
-        let pattern = TaggedPattern::value(100);
+        let pattern = TaggedPattern::with_tag_any(100);
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
     }
@@ -242,7 +225,7 @@ mod tests {
         // Test regex functionality with value-based matching
         // This verifies that the regex pattern structure works correctly
         let regex = regex::Regex::new(r".*").unwrap();
-        let pattern = TaggedPattern::regex(regex);
+        let pattern = TaggedPattern::with_regex_any(regex);
 
         // Since tag names aren't resolved, this won't match, but the pattern is correctly formed
         let paths = pattern.paths(&envelope);
@@ -250,13 +233,13 @@ mod tests {
 
         // Test that regex patterns work when properly formatted (display test)
         let regex = regex::Regex::new(r"^da.*").unwrap();
-        let pattern = TaggedPattern::regex(regex);
+        let pattern = TaggedPattern::with_regex_any(regex);
         assert_eq!(pattern.to_string(), "tagged(/^da.*/, *)");
 
         // Test with non-tagged envelope
         let text_envelope = Envelope::new("test");
         let regex = regex::Regex::new(r".*").unwrap();
-        let pattern = TaggedPattern::regex(regex);
+        let pattern = TaggedPattern::with_regex_any(regex);
         let paths = pattern.paths(&text_envelope);
         assert!(paths.is_empty());
     }
@@ -268,14 +251,14 @@ mod tests {
         let pattern = TaggedPattern::any();
         assert_eq!(pattern.to_string(), "tagged");
 
-        let pattern = TaggedPattern::value(100);
+        let pattern = TaggedPattern::with_tag_any(100);
         assert_eq!(pattern.to_string(), "tagged(100, *)");
 
-        let pattern = TaggedPattern::named("date");
+        let pattern = TaggedPattern::with_name_any("date");
         assert_eq!(pattern.to_string(), "tagged(date, *)");
 
         let regex = regex::Regex::new(r"^da.*").unwrap();
-        let pattern = TaggedPattern::regex(regex);
+        let pattern = TaggedPattern::with_regex_any(regex);
         // Note: We normalize dcbor-pattern's spacing for consistent formatting
         assert_eq!(pattern.to_string(), "tagged(/^da.*/, *)");
     }

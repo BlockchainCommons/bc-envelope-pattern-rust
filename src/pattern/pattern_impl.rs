@@ -373,7 +373,7 @@ impl Pattern {
     /// content. This is a proxy to dcbor-pattern's tagged functionality.
     pub fn tagged(tag: dcbor::Tag) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::value(tag.value()),
+            crate::pattern::leaf::TaggedPattern::with_tag_any(tag.value()),
         ))
     }
 
@@ -382,7 +382,7 @@ impl Pattern {
     /// functionality.
     pub fn tagged_with_value(value: u64) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::value(value),
+            crate::pattern::leaf::TaggedPattern::with_tag_any(value),
         ))
     }
 
@@ -391,7 +391,7 @@ impl Pattern {
     /// functionality.
     pub fn tagged_with_name(name: impl Into<String>) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::named(name.into()),
+            crate::pattern::leaf::TaggedPattern::with_name_any(name.into()),
         ))
     }
 
@@ -400,7 +400,7 @@ impl Pattern {
     /// tagged functionality.
     pub fn tagged_with_regex(regex: regex::Regex) -> Self {
         Pattern::Leaf(crate::pattern::leaf::LeafPattern::Tag(
-            crate::pattern::leaf::TaggedPattern::regex(regex),
+            crate::pattern::leaf::TaggedPattern::with_regex_any(regex),
         ))
     }
 
