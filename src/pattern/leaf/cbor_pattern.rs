@@ -319,12 +319,12 @@ impl Matcher for CBORPattern {
 impl std::fmt::Display for CBORPattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CBORPattern::Any => write!(f, "CBOR"),
+            CBORPattern::Any => write!(f, "cbor"),
             CBORPattern::Value(cbor) => {
-                write!(f, "CBOR({})", cbor.diagnostic_flat())
+                write!(f, "cbor({})", cbor.diagnostic_flat())
             }
             CBORPattern::Pattern(pattern) => {
-                write!(f, "CBOR(/{}/)", pattern)
+                write!(f, "cbor(/{}/)", pattern)
             }
         }
     }

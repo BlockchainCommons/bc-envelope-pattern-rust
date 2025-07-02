@@ -265,16 +265,16 @@ fn parse_known_value_patterns() {
 #[test]
 fn parse_cbor_patterns() {
     let cases: Vec<(&str, CBOR)> = vec![
-        ("CBOR(true)", true.into()),
-        ("CBOR(42)", 42.into()),
-        (r#"CBOR("hello")"#, "hello".into()),
-        ("CBOR([1, 2])", vec![1, 2].into()),
-        ("CBOR({1: 2})", {
+        ("cbor(true)", true.into()),
+        ("cbor(42)", 42.into()),
+        (r#"cbor("hello")"#, "hello".into()),
+        ("cbor([1, 2])", vec![1, 2].into()),
+        ("cbor({1: 2})", {
             let mut m = Map::new();
             m.insert(1, 2);
             m.into()
         }),
-        (r#"CBOR(1("t"))"#, CBOR::to_tagged_value(1, "t")),
+        (r#"cbor(1("t"))"#, CBOR::to_tagged_value(1, "t")),
     ];
 
     for (src, cbor) in cases {
@@ -288,35 +288,35 @@ fn parse_cbor_patterns() {
 fn parse_cbor_patterns_2() {
     bc_envelope::register_tags();
 
-    let p = Pattern::parse("CBOR").unwrap();
+    let p = Pattern::parse("cbor").unwrap();
     assert_eq!(p, Pattern::any_cbor());
-    assert_actual_expected!(p.to_string(), "CBOR");
+    assert_actual_expected!(p.to_string(), "cbor");
 
-    let p = Pattern::parse("CBOR(true)").unwrap();
+    let p = Pattern::parse("cbor(true)").unwrap();
     assert_eq!(p, Pattern::cbor(true));
-    assert_actual_expected!(p.to_string(), "CBOR(true)");
+    assert_actual_expected!(p.to_string(), "cbor(true)");
 
-    let p = Pattern::parse("CBOR([1, 2, 3])").unwrap();
+    let p = Pattern::parse("cbor([1, 2, 3])").unwrap();
     assert_eq!(p, Pattern::cbor(vec![1, 2, 3]));
-    assert_actual_expected!(p.to_string(), "CBOR([1, 2, 3])");
+    assert_actual_expected!(p.to_string(), "cbor([1, 2, 3])");
 
-    let p = Pattern::parse(r#"CBOR({"a": 1})"#).unwrap();
+    let p = Pattern::parse(r#"cbor({"a": 1})"#).unwrap();
     let mut map = Map::new();
     map.insert("a", 1);
     assert_eq!(p, Pattern::cbor(map.clone()));
-    assert_actual_expected!(p.to_string(), r#"CBOR({"a": 1})"#);
+    assert_actual_expected!(p.to_string(), r#"cbor({"a": 1})"#);
 
-    let p = Pattern::parse(r#"CBOR(1("hi"))"#).unwrap();
+    let p = Pattern::parse(r#"cbor(1("hi"))"#).unwrap();
     assert_eq!(p, Pattern::cbor(CBOR::to_tagged_value(1, "hi")));
-    assert_actual_expected!(p.to_string(), r#"CBOR(1("hi"))"#);
+    assert_actual_expected!(p.to_string(), r#"cbor(1("hi"))"#);
 
     let date = Date::from_ymd(2025, 5, 15);
     let ur = date.ur_string();
-    let expr = format!(r#"CBOR({})"#, ur);
+    let expr = format!(r#"cbor({})"#, ur);
     let p = Pattern::parse(&expr).unwrap();
     assert_eq!(p, Pattern::cbor(date.clone()));
     assert_actual_expected!(
         p.to_string(),
-        format!("CBOR({})", date.to_cbor().diagnostic_flat())
+        format!("cbor({})", date.to_cbor().diagnostic_flat())
     );
 }

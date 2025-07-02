@@ -5,9 +5,9 @@ use bc_envelope_pattern::{Matcher, Pattern, format_paths, DCBORMatcher, DCBORPat
 use dcbor_parse::parse_dcbor_item;
 use indoc::indoc;
 
-/// Test CBOR pattern path extension functionality using proper formatting and
-/// assertions. These tests verify that CBOR patterns extend paths to include
-/// the internal CBOR structure elements as individual Envelope path components.
+/// Test `cbor` pattern path extension functionality using proper formatting and
+/// assertions. These tests verify that `cbor` patterns extend paths to include
+/// the internal `cbor` structure elements as individual Envelope path components.
 
 #[test]
 fn test_cbor_pattern_simple_array_paths() {
@@ -16,7 +16,7 @@ fn test_cbor_pattern_simple_array_paths() {
     let envelope = Envelope::new(array_data);
 
     // Use `search(number)` to find all numbers in the array
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 3 numbers with extended paths
@@ -38,19 +38,19 @@ fn test_cbor_pattern_simple_array_paths() {
     assert_actual_expected!(
         actual,
         expected,
-        "CBOR pattern should return extended paths for array elements"
+        "`cbor` pattern should return extended paths for array elements"
     );
 }
 
 #[test]
 fn test_cbor_pattern_nested_structure_paths() {
-    // Create a nested CBOR structure
+    // Create a nested `cbor` structure
     let nested_cbor =
         parse_dcbor_item(r#"{"scores": [95, 87, 92], "value": 42}"#).unwrap();
     let envelope = Envelope::new(nested_cbor);
 
     // Search for all numbers in the structure
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 4 numbers: 42, 95, 87, 92
@@ -90,7 +90,7 @@ fn test_cbor_pattern_single_value_paths() {
     // Test with a single number - should match with no extension needed
     let envelope = Envelope::new(42);
 
-    let pattern = Pattern::parse("CBOR(/number/)").unwrap();
+    let pattern = Pattern::parse("cbor(/number/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find exactly one path with just the root envelope
@@ -102,7 +102,7 @@ fn test_cbor_pattern_single_value_paths() {
     assert_actual_expected!(
         actual,
         expected,
-        "Single value CBOR pattern should return just the root envelope"
+        "Single value `cbor` pattern should return just the root envelope"
     );
 }
 
@@ -115,7 +115,7 @@ fn test_cbor_pattern_text_search_paths() {
     .unwrap();
     let envelope = Envelope::new(cbor_data);
 
-    let pattern = Pattern::parse("CBOR(/search(text)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(text)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 6 text values including map keys
@@ -156,7 +156,7 @@ fn test_cbor_pattern_no_matches_paths() {
     // Test pattern that doesn't match anything
     let envelope = Envelope::new("just text");
 
-    let pattern = Pattern::parse("CBOR(/number/)").unwrap();
+    let pattern = Pattern::parse("cbor(/number/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find no paths
@@ -178,7 +178,7 @@ fn test_cbor_pattern_paths_preserve_order() {
     let array_cbor = parse_dcbor_item("[10, 20, 30]").unwrap();
     let envelope = Envelope::new(array_cbor);
 
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     assert_eq!(paths.len(), 3, "Should find 3 numbers");
@@ -219,7 +219,7 @@ fn test_cbor_pattern_complex_nested_paths() {
     .unwrap();
     let envelope = Envelope::new(complex_cbor);
 
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 3 numbers: 30, 25, 2
@@ -253,7 +253,7 @@ fn test_cbor_pattern_map_key_value_paths() {
     let map_cbor = parse_dcbor_item(r#"{"a": 1, "b": {"c": 2}}"#).unwrap();
     let envelope = Envelope::new(map_cbor);
 
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should find 2 numbers: 1 and 2
@@ -323,7 +323,7 @@ fn test_search_array_order() {
     assert_actual_expected!(dcbor_pattern::format_paths(&paths), expected);
 
     let envelope = Envelope::new(cbor);
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
     // The traversal order below should be the same as the one above.
     #[rustfmt::skip]

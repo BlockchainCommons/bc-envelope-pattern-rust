@@ -101,7 +101,7 @@ pub enum Token {
     #[token("leaf")]
     Leaf,
 
-    #[token("CBOR")]
+    #[token("cbor")]
     Cbor,
 
     #[token("date")]

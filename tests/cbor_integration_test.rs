@@ -4,7 +4,7 @@ use bc_envelope_pattern::{Matcher, Pattern};
 #[test]
 fn test_cbor_pattern_dcbor_pattern_integration() {
     // Test basic dcbor-pattern expressions - these should work reliably
-    let number_pattern = Pattern::parse(r#"CBOR(/number/)"#)
+    let number_pattern = Pattern::parse(r#"cbor(/number/)"#)
         .expect("number pattern should parse successfully");
     let envelope = Envelope::new(42);
     assert!(
@@ -13,7 +13,7 @@ fn test_cbor_pattern_dcbor_pattern_integration() {
     );
 
     // Test dcbor-pattern with array
-    let array_pattern = Pattern::parse(r#"CBOR(/[*]/)"#)
+    let array_pattern = Pattern::parse(r#"cbor(/[*]/)"#)
         .expect("array pattern should parse successfully");
     let array_envelope = Envelope::new(vec![1, 2, 3]);
     assert!(
@@ -22,7 +22,7 @@ fn test_cbor_pattern_dcbor_pattern_integration() {
     );
 
     // Test dcbor-pattern with text
-    let text_pattern = Pattern::parse(r#"CBOR(/text/)"#)
+    let text_pattern = Pattern::parse(r#"cbor(/text/)"#)
         .expect("text pattern should parse successfully");
     let text_envelope = Envelope::new("hello");
     assert!(
@@ -35,11 +35,11 @@ fn test_cbor_pattern_dcbor_pattern_integration() {
 fn test_cbor_pattern_any() {
     let envelope = Envelope::new(123);
 
-    // Test CBOR pattern
-    let any_pattern = Pattern::parse("CBOR").unwrap();
+    // Test `cbor` pattern
+    let any_pattern = Pattern::parse("cbor").unwrap();
     assert!(
         any_pattern.matches(&envelope),
-        "CBOR should match any CBOR value"
+        "`cbor` should match any CBOR value"
     );
 }
 
@@ -47,7 +47,7 @@ fn test_cbor_pattern_any() {
 fn test_cbor_pattern_exact_values() {
     // Test exact numeric match
     let envelope = Envelope::new(42);
-    let exact_pattern = Pattern::parse("CBOR(42)").unwrap();
+    let exact_pattern = Pattern::parse("cbor(42)").unwrap();
     assert!(
         exact_pattern.matches(&envelope),
         "Should match exact CBOR value"
@@ -55,7 +55,7 @@ fn test_cbor_pattern_exact_values() {
 
     // Test exact string match
     let envelope = Envelope::new("hello");
-    let text_pattern = Pattern::parse(r#"CBOR("hello")"#).unwrap();
+    let text_pattern = Pattern::parse(r#"cbor("hello")"#).unwrap();
     assert!(
         text_pattern.matches(&envelope),
         "Should match exact CBOR text"
@@ -63,7 +63,7 @@ fn test_cbor_pattern_exact_values() {
 
     // Test exact array match
     let envelope = Envelope::new(vec![1, 2, 3]);
-    let array_pattern = Pattern::parse("CBOR([1, 2, 3])").unwrap();
+    let array_pattern = Pattern::parse("cbor([1, 2, 3])").unwrap();
     assert!(
         array_pattern.matches(&envelope),
         "Should match exact CBOR array"
@@ -80,7 +80,7 @@ fn test_cbor_pattern_complex_structures() {
 
     // Match with exact diagnostic notation
     let pattern2 =
-        Pattern::parse(r#"CBOR({"name": "Alice", "age": 42})"#).unwrap();
+        Pattern::parse(r#"cbor({"name": "Alice", "age": 42})"#).unwrap();
     assert!(
         pattern2.matches(&envelope),
         "Diagnostic notation should match map"
@@ -90,54 +90,54 @@ fn test_cbor_pattern_complex_structures() {
 #[test]
 fn test_cbor_pattern_debug_parser() {
     // Let's test what the parser actually supports
-    println!("Testing basic CBOR parsing...");
+    println!("Testing basic `cbor` parsing...");
 
-    // Test basic CBOR patterns that should work
-    assert!(Pattern::parse("CBOR").is_ok());
-    assert!(Pattern::parse("CBOR(42)").is_ok());
-    assert!(Pattern::parse(r#"CBOR("hello")"#).is_ok());
-    assert!(Pattern::parse("CBOR([1, 2, 3])").is_ok());
+    // Test basic `cbor` patterns that should work
+    assert!(Pattern::parse("cbor").is_ok());
+    assert!(Pattern::parse("cbor(42)").is_ok());
+    assert!(Pattern::parse(r#"cbor("hello")"#).is_ok());
+    assert!(Pattern::parse("cbor([1, 2, 3])").is_ok());
 
     // Test dcbor-pattern syntax
-    let dcbor_result = Pattern::parse(r#"CBOR(/number/)"#);
-    println!("CBOR(/number/) parse result: {:?}", dcbor_result);
+    let dcbor_result = Pattern::parse(r#"cbor(/number/)"#);
+    println!("cbor(/number/) parse result: {:?}", dcbor_result);
 
-    let dcbor_array_result = Pattern::parse(r#"CBOR(/[*]/)"#);
-    println!("CBOR(/[*]/) parse result: {:?}", dcbor_array_result);
+    let dcbor_array_result = Pattern::parse(r#"cbor(/[*]/)"#);
+    println!("cbor(/[*]/) parse result: {:?}", dcbor_array_result);
 }
 
 #[test]
 fn test_cbor_pattern_parsing_errors() {
     // Test invalid dcbor-pattern syntax - "uint" is not a valid dcbor-pattern
     // keyword
-    let invalid_pattern = Pattern::parse(r#"CBOR(/uint/)"#);
+    let invalid_pattern = Pattern::parse(r#"cbor(/uint/)"#);
     assert!(
         invalid_pattern.is_err(),
         "Invalid dcbor-pattern should fail to parse"
     );
 
     // Test another invalid keyword
-    let invalid_pattern2 = Pattern::parse(r#"CBOR(/int/)"#);
+    let invalid_pattern2 = Pattern::parse(r#"cbor(/int/)"#);
     assert!(
         invalid_pattern2.is_err(),
         "Invalid dcbor-pattern should fail to parse"
     );
 
     // Test invalid diagnostic notation
-    let invalid_diag = Pattern::parse(r#"CBOR({invalid: syntax)"#);
+    let invalid_diag = Pattern::parse(r#"cbor({invalid: syntax)"#);
     assert!(
         invalid_diag.is_err(),
         "Invalid diagnostic notation should fail to parse"
     );
 
     // Test valid dcbor-pattern syntax should work
-    let valid_pattern = Pattern::parse(r#"CBOR(/number/)"#);
+    let valid_pattern = Pattern::parse(r#"cbor(/number/)"#);
     assert!(
         valid_pattern.is_ok(),
         "Valid dcbor-pattern should parse successfully"
     );
 
-    let valid_pattern2 = Pattern::parse(r#"CBOR(/text/)"#);
+    let valid_pattern2 = Pattern::parse(r#"cbor(/text/)"#);
     assert!(
         valid_pattern2.is_ok(),
         "Valid dcbor-pattern should parse successfully"
@@ -148,7 +148,7 @@ fn test_cbor_pattern_parsing_errors() {
 fn test_dcbor_patterns_work_directly() {
     // These should work without any fallbacks - dcbor-pattern integration is
     // complete
-    let number_pattern = Pattern::parse(r#"CBOR(/number/)"#)
+    let number_pattern = Pattern::parse(r#"cbor(/number/)"#)
         .expect("number pattern should parse");
     let envelope = Envelope::new(42);
     assert!(
@@ -157,7 +157,7 @@ fn test_dcbor_patterns_work_directly() {
     );
 
     let array_pattern =
-        Pattern::parse(r#"CBOR(/[*]/)"#).expect("array of any pattern should parse");
+        Pattern::parse(r#"cbor(/[*]/)"#).expect("array of any pattern should parse");
     let array_envelope = Envelope::new(vec![1, 2, 3]);
     assert!(
         array_pattern.matches(&array_envelope),
@@ -165,7 +165,7 @@ fn test_dcbor_patterns_work_directly() {
     );
 
     let text_pattern =
-        Pattern::parse(r#"CBOR(/text/)"#).expect("text pattern should parse");
+        Pattern::parse(r#"cbor(/text/)"#).expect("text pattern should parse");
     let text_envelope = Envelope::new("hello");
     assert!(
         text_pattern.matches(&text_envelope),

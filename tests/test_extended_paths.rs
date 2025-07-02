@@ -7,13 +7,13 @@ use dcbor_parse::parse_dcbor_item;
 
 #[test]
 fn test_cbor_pattern_extended_paths() {
-    // Test that CBOR patterns now return extended paths that include the internal CBOR structure
+    // Test that `cbor` patterns now return extended paths that include the internal `cbor` structure
 
     // Test with a simple array - should return paths to each number
     let array_data = vec![1, 2, 3];
     let envelope = Envelope::new(array_data.clone());
 
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should return 3 paths, one for each number in the array
@@ -31,7 +31,7 @@ fn test_cbor_pattern_extended_paths() {
             084fed08 LEAF 3
     "#}.trim();
 
-    assert_actual_expected!(actual, expected, "CBOR pattern should return extended paths for array elements");
+    assert_actual_expected!(actual, expected, "`cbor` pattern should return extended paths for array elements");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn test_cbor_pattern_extended_paths_nested_structure() {
     let nested_cbor = parse_dcbor_item(r#"{"name": "Alice", "scores": [95, 87, 92]}"#).unwrap();
     let envelope = Envelope::new(nested_cbor.clone());
 
-    let pattern = Pattern::parse("CBOR(/search(number)/)").unwrap();
+    let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should return 3 paths, one for each score in the array
@@ -69,7 +69,7 @@ fn test_cbor_pattern_extended_paths_single_match() {
     // Test with a pattern that matches the root element itself
     let envelope = Envelope::new(42);
 
-    let pattern = Pattern::parse("CBOR(/number/)").unwrap();
+    let pattern = Pattern::parse("cbor(/number/)").unwrap();
     let paths = pattern.paths(&envelope);
 
     // Should return 1 path
@@ -79,29 +79,29 @@ fn test_cbor_pattern_extended_paths_single_match() {
     let actual = format_paths(&paths);
     let expected = "7f83f7bd LEAF 42";
 
-    assert_actual_expected!(actual, expected, "Single value CBOR pattern should return just the root envelope");
+    assert_actual_expected!(actual, expected, "Single value `cbor` pattern should return just the root envelope");
 }
 
 #[test]
 fn test_cbor_pattern_no_extended_paths_for_non_pattern() {
-    // Test that non-pattern CBOR matchers still work as before
+    // Test that non-pattern `cbor` matchers still work as before
     let envelope = Envelope::new(42);
 
-    // Test CBOR() - should match any CBOR
-    let any_pattern = Pattern::parse("CBOR").unwrap();
+    // Test cbor() - should match any `cbor`
+    let any_pattern = Pattern::parse("cbor").unwrap();
     let paths = any_pattern.paths(&envelope);
     assert_eq!(paths.len(), 1);
 
     let actual = format_paths(&paths);
     let expected = "7f83f7bd LEAF 42";
-    assert_actual_expected!(actual, expected, "CBOR without pattern should return just the root envelope");
+    assert_actual_expected!(actual, expected, "`cbor` without pattern should return just the root envelope");
 
-    // Test CBOR(42) - should match the exact value
-    let exact_pattern = Pattern::parse("CBOR(42)").unwrap();
+    // Test cbor(42) - should match the exact value
+    let exact_pattern = Pattern::parse("cbor(42)").unwrap();
     let paths = exact_pattern.paths(&envelope);
     assert_eq!(paths.len(), 1);
 
     let actual = format_paths(&paths);
     let expected = "7f83f7bd LEAF 42";
-    assert_actual_expected!(actual, expected, "CBOR with exact value should return just the root envelope");
+    assert_actual_expected!(actual, expected, "`cbor` with exact value should return just the root envelope");
 }
