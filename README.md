@@ -1,4 +1,9 @@
-# Blockchain Commons Pattern Matcher for Gordian Envelope
+# Blockchain Commons## Getting Started
+
+```toml
+[dependencies]
+bc-envelope-pattern = "0.2.0"
+```rn Matcher for Gordian Envelope
 
 ### _by Wolf McNally and Blockchain Commons_
 
@@ -22,7 +27,7 @@ This crate provides a pattern matcher and text syntax pattern parser for Gordian
 
 ```toml
 [dependencies]
-bc-envelope-pattern = "0.1.0"
+bc-envelope-pattern = "0.2.0"
 ```
 
 ## The Pattern Matcher
@@ -55,3 +60,11 @@ Further documentation is forthcoming and will be added to the `docs/` directory.
 The [`envelope` command-line tool](https://crates.io/crates/bc-envelope-cli) provides a powerful interface for working with Gordian Envelope patterns. You can use it to match patterns against envelopes, extract data, and format the output in various ways.
 
 ## Version History
+
+### 0.2.0 - July 03, 2025
+
+- Major integration with dcbor-pattern for enhanced CBOR matching
+- Implement capture functionality for pattern matching
+- Add comprehensive test suite for CBOR integration
+- Update dependencies to latest versions
+- Remove feature flags to simplify API
