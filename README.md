@@ -53,3 +53,5 @@ Further documentation is forthcoming and will be added to the `docs/` directory.
 ## Tools
 
 The [`envelope` command-line tool](https://crates.io/crates/bc-envelope-cli) provides a powerful interface for working with Gordian Envelope patterns. You can use it to match patterns against envelopes, extract data, and format the output in various ways.
+
+## Version History
