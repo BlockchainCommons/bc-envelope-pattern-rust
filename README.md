@@ -1,9 +1,4 @@
-# Blockchain Commons## Getting Started
-
-```toml
-[dependencies]
-bc-envelope-pattern = "0.2.0"
-```rn Matcher for Gordian Envelope
+# Blockchain Commons Pattern Matcher for Gordian Envelope
 
 ### _by Wolf McNally and Blockchain Commons_
 
