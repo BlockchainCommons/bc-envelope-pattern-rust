@@ -40,18 +40,18 @@ impl ObscuredPattern {
 impl Matcher for ObscuredPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
             let is_hit = match self {
-                ObscuredPattern::Any => envelope.is_obscured(),
-                ObscuredPattern::Elided => envelope.is_elided(),
-                ObscuredPattern::Encrypted => envelope.is_encrypted(),
-                ObscuredPattern::Compressed => envelope.is_compressed(),
+                ObscuredPattern::Any => haystack.is_obscured(),
+                ObscuredPattern::Elided => haystack.is_elided(),
+                ObscuredPattern::Encrypted => haystack.is_encrypted(),
+                ObscuredPattern::Compressed => haystack.is_compressed(),
             };
 
             if is_hit {
-                vec![vec![envelope.clone()]]
+                vec![vec![haystack.clone()]]
             } else {
                 vec![]
             }

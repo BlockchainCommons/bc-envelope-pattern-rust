@@ -22,10 +22,10 @@ impl Default for AnyPattern {
 impl Matcher for AnyPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Always return a path containing the envelope itself.
-        (vec![vec![envelope.clone()]], HashMap::new())
+        (vec![vec![haystack.clone()]], HashMap::new())
     }
 
     fn compile(

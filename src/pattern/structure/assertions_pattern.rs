@@ -36,10 +36,10 @@ impl AssertionsPattern {
 impl Matcher for AssertionsPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let mut paths = Vec::new();
-        for assertion in envelope.assertions() {
+        for assertion in haystack.assertions() {
             match self {
                 AssertionsPattern::Any => {
                     paths.push(vec![assertion.clone()]);

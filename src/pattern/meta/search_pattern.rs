@@ -21,7 +21,7 @@ impl SearchPattern {
 impl Matcher for SearchPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
             let result_paths = RefCell::new(Vec::new());
@@ -62,7 +62,7 @@ impl Matcher for SearchPattern {
             };
 
             // Start walking from the root with an empty path
-            envelope.walk(false, Vec::new(), &visitor);
+            haystack.walk(false, Vec::new(), &visitor);
 
             let mut seen = std::collections::HashSet::new();
             let mut unique = Vec::new();

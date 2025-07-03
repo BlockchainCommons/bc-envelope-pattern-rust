@@ -41,11 +41,11 @@ impl ByteStringPattern {
 impl Matcher for ByteStringPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Try to extract CBOR from the envelope using the existing as_leaf()
         // method
-        if let Some(cbor) = envelope.subject().as_leaf() {
+        if let Some(cbor) = haystack.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // ByteStringPattern doesn't support captures, so we only get paths
             let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
@@ -53,7 +53,7 @@ impl Matcher for ByteStringPattern {
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
             if !dcbor_paths.is_empty() {
-                let envelope_paths = vec![vec![envelope.clone()]];
+                let envelope_paths = vec![vec![haystack.clone()]];
                 let envelope_captures = HashMap::new(); // No captures for simple byte string patterns
                 (envelope_paths, envelope_captures)
             } else {
@@ -63,10 +63,6 @@ impl Matcher for ByteStringPattern {
             // Not a leaf envelope, no match
             (vec![], HashMap::new())
         }
-    }
-
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        self.paths_with_captures(envelope).0
     }
 
     fn compile(

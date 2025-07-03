@@ -37,11 +37,11 @@ impl TraversePattern {
 impl Matcher for TraversePattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
             // Match head first
-            let head_paths = self.first.paths(envelope);
+            let head_paths = self.first.paths(haystack);
             // If there's no further traversal, return head paths
             if let Some(rest_seq) = &self.rest {
                 let mut result = Vec::new();

@@ -147,15 +147,15 @@ impl std::hash::Hash for CBORPattern {
 impl Matcher for CBORPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, std::collections::HashMap<String, Vec<Path>>) {
-        let subject = envelope.subject();
+        let subject = haystack.subject();
 
         // Special case for KnownValue
         if let Some(known_value) = subject.as_known_value() {
             return match self {
                 CBORPattern::Any => (
-                    vec![vec![envelope.clone()]],
+                    vec![vec![haystack.clone()]],
                     std::collections::HashMap::new(),
                 ),
                 CBORPattern::Value(expected_cbor) => {
@@ -163,7 +163,7 @@ impl Matcher for CBORPattern {
                     let known_value_cbor = known_value.to_cbor();
                     if &known_value_cbor == expected_cbor {
                         (
-                            vec![vec![envelope.clone()]],
+                            vec![vec![haystack.clone()]],
                             std::collections::HashMap::new(),
                         )
                     } else {
@@ -179,7 +179,7 @@ impl Matcher for CBORPattern {
                     if !dcbor_paths.is_empty() {
                         // Convert dcbor paths to envelope paths by extending
                         // the base envelope path
-                        let base_path = vec![envelope.clone()];
+                        let base_path = vec![haystack.clone()];
                         let envelope_paths: Vec<Path> = dcbor_paths
                             .into_iter()
                             .map(|dcbor_path| {
@@ -203,7 +203,7 @@ impl Matcher for CBORPattern {
                         let envelope_captures =
                             Self::convert_dcbor_captures_to_envelope_captures(
                                 dcbor_captures,
-                                envelope,
+                                haystack,
                             );
                         (envelope_paths, envelope_captures)
                     } else {
@@ -221,13 +221,13 @@ impl Matcher for CBORPattern {
 
         match self {
             CBORPattern::Any => (
-                vec![vec![envelope.clone()]],
+                vec![vec![haystack.clone()]],
                 std::collections::HashMap::new(),
             ),
             CBORPattern::Value(expected_cbor) => {
                 if subject_cbor == *expected_cbor {
                     (
-                        vec![vec![envelope.clone()]],
+                        vec![vec![haystack.clone()]],
                         std::collections::HashMap::new(),
                     )
                 } else {
@@ -241,7 +241,7 @@ impl Matcher for CBORPattern {
                 if !dcbor_paths.is_empty() {
                     // Convert dcbor paths to envelope paths by extending the
                     // base envelope path
-                    let base_path = vec![envelope.clone()];
+                    let base_path = vec![haystack.clone()];
 
                     let envelope_paths: Vec<Path> = dcbor_paths
                         .into_iter()
@@ -275,7 +275,7 @@ impl Matcher for CBORPattern {
                     let envelope_captures =
                         Self::convert_dcbor_captures_to_envelope_captures(
                             dcbor_captures,
-                            envelope,
+                            haystack,
                         );
                     (envelope_paths, envelope_captures)
                 } else {
@@ -283,10 +283,6 @@ impl Matcher for CBORPattern {
                 }
             }
         }
-    }
-
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        self.paths_with_captures(envelope).0
     }
 
     fn compile(

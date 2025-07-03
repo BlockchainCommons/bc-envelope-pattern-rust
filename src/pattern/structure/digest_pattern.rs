@@ -78,10 +78,10 @@ impl DigestPattern {
 impl Matcher for DigestPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
-            let digest = envelope.digest();
+            let digest = haystack.digest();
             let is_hit = match self {
                 DigestPattern::Digest(pattern_digest) => *pattern_digest == *digest,
                 DigestPattern::Prefix(prefix) => digest.data().starts_with(prefix),
@@ -89,7 +89,7 @@ impl Matcher for DigestPattern {
             };
 
             if is_hit {
-                vec![vec![envelope.clone()]]
+                vec![vec![haystack.clone()]]
             } else {
                 vec![]
             }

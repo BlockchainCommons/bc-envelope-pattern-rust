@@ -18,14 +18,14 @@ impl AndPattern {
 impl Matcher for AndPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = if self
             .patterns()
             .iter()
-            .all(|pattern| pattern.matches(envelope))
+            .all(|pattern| pattern.matches(haystack))
         {
-            vec![vec![envelope.clone()]]
+            vec![vec![haystack.clone()]]
         } else {
             vec![]
         };

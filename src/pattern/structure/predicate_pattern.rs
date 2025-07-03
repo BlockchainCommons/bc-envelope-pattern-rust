@@ -23,10 +23,10 @@ impl PredicatePattern {
 impl Matcher for PredicatePattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
-            if let Some(predicate) = envelope.as_predicate() {
+            if let Some(predicate) = haystack.as_predicate() {
                 match self {
                     PredicatePattern::Any => {
                         vec![vec![predicate.clone()]]

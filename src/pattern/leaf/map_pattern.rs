@@ -33,12 +33,12 @@ impl MapPattern {
 impl Matcher for MapPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = if let Some(cbor_value) = envelope.subject().as_leaf() {
+        let paths = if let Some(cbor_value) = haystack.subject().as_leaf() {
             // Use dcbor-pattern to match against the CBOR value directly
             if self.0.matches(&cbor_value) {
-                vec![vec![envelope.clone()]]
+                vec![vec![haystack.clone()]]
             } else {
                 vec![]
             }

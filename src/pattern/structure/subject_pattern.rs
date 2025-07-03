@@ -21,10 +21,10 @@ impl SubjectPattern {
 impl Matcher for SubjectPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
-            let subject = envelope.subject();
+            let subject = haystack.subject();
             match self {
                 SubjectPattern::Any => {
                     vec![vec![subject.clone()]]

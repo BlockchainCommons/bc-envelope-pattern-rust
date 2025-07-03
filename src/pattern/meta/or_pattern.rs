@@ -18,14 +18,14 @@ impl OrPattern {
 impl Matcher for OrPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = if self
             .patterns()
             .iter()
-            .any(|pattern| pattern.matches(envelope))
+            .any(|pattern| pattern.matches(haystack))
         {
-            vec![vec![envelope.clone()]]
+            vec![vec![haystack.clone()]]
         } else {
             vec![]
         };

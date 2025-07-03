@@ -49,11 +49,11 @@ impl std::hash::Hash for TextPattern {
 impl Matcher for TextPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Try to extract CBOR from the envelope using the existing as_leaf()
         // method
-        if let Some(cbor) = envelope.subject().as_leaf() {
+        if let Some(cbor) = haystack.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // TextPattern doesn't support captures, so we only get paths
             let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
@@ -61,7 +61,7 @@ impl Matcher for TextPattern {
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
             if !dcbor_paths.is_empty() {
-                let envelope_paths = vec![vec![envelope.clone()]];
+                let envelope_paths = vec![vec![haystack.clone()]];
                 let envelope_captures = HashMap::new(); // No captures for simple text patterns
                 (envelope_paths, envelope_captures)
             } else {

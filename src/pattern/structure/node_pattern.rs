@@ -33,22 +33,22 @@ impl NodePattern {
 impl Matcher for NodePattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
-            if !envelope.is_node() {
+            if !haystack.is_node() {
                 return (vec![], HashMap::new());
             }
 
             let is_hit = match self {
                 NodePattern::Any => true,
                 NodePattern::AssertionsInterval(range) => {
-                    range.contains(envelope.assertions().len())
+                    range.contains(haystack.assertions().len())
                 }
             };
 
             if is_hit {
-                vec![vec![envelope.clone()]]
+                vec![vec![haystack.clone()]]
             } else {
                 vec![]
             }

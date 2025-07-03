@@ -42,27 +42,27 @@ pub enum LeafPattern {
 impl Matcher for LeafPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         match self {
-            LeafPattern::Cbor(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Cbor(pattern) => pattern.paths_with_captures(haystack),
             LeafPattern::Number(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
-            LeafPattern::Text(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Text(pattern) => pattern.paths_with_captures(haystack),
             LeafPattern::ByteString(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
-            LeafPattern::Tag(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Tag(pattern) => pattern.paths_with_captures(haystack),
             LeafPattern::Array(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
-            LeafPattern::Map(pattern) => pattern.paths_with_captures(envelope),
-            LeafPattern::Bool(pattern) => pattern.paths_with_captures(envelope),
-            LeafPattern::Null(pattern) => pattern.paths_with_captures(envelope),
-            LeafPattern::Date(pattern) => pattern.paths_with_captures(envelope),
+            LeafPattern::Map(pattern) => pattern.paths_with_captures(haystack),
+            LeafPattern::Bool(pattern) => pattern.paths_with_captures(haystack),
+            LeafPattern::Null(pattern) => pattern.paths_with_captures(haystack),
+            LeafPattern::Date(pattern) => pattern.paths_with_captures(haystack),
             LeafPattern::KnownValue(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
         }
     }

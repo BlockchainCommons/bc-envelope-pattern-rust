@@ -103,11 +103,11 @@ impl std::hash::Hash for NumberPattern {
 impl Matcher for NumberPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Try to extract CBOR from the envelope using the existing as_leaf()
         // method
-        let paths = if let Some(cbor) = envelope.subject().as_leaf() {
+        let paths = if let Some(cbor) = haystack.subject().as_leaf() {
             // Delegate to dcbor-pattern for CBOR matching using paths() method
             // NumberPattern doesn't support captures, so we only get paths
             let dcbor_paths = dcbor_pattern::Matcher::paths(&self.0, &cbor);
@@ -115,7 +115,7 @@ impl Matcher for NumberPattern {
             // For simple leaf patterns, if dcbor-pattern found matches, return
             // the envelope
             if !dcbor_paths.is_empty() {
-                vec![vec![envelope.clone()]]
+                vec![vec![haystack.clone()]]
             } else {
                 vec![]
             }

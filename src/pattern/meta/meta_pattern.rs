@@ -35,24 +35,24 @@ pub enum MetaPattern {
 impl Matcher for MetaPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         match self {
-            MetaPattern::Any(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::And(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::Or(pattern) => pattern.paths_with_captures(envelope),
-            MetaPattern::Not(pattern) => pattern.paths_with_captures(envelope),
+            MetaPattern::Any(pattern) => pattern.paths_with_captures(haystack),
+            MetaPattern::And(pattern) => pattern.paths_with_captures(haystack),
+            MetaPattern::Or(pattern) => pattern.paths_with_captures(haystack),
+            MetaPattern::Not(pattern) => pattern.paths_with_captures(haystack),
             MetaPattern::Search(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
             MetaPattern::Traverse(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
             MetaPattern::Group(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
             MetaPattern::Capture(pattern) => {
-                pattern.paths_with_captures(envelope)
+                pattern.paths_with_captures(haystack)
             }
         }
     }

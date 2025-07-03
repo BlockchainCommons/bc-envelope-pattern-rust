@@ -43,15 +43,15 @@ impl Default for WrappedPattern {
 impl Matcher for WrappedPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
-            let subject = envelope.subject();
+            let subject = haystack.subject();
             if subject.is_wrapped() {
                 match self {
                     WrappedPattern::Any => {
                         // Just match the wrapped envelope itself, don't descend
-                        vec![vec![envelope.clone()]]
+                        vec![vec![haystack.clone()]]
                     }
                     WrappedPattern::Unwrap(pattern) => {
                         // Match the content of the wrapped envelope
@@ -61,7 +61,7 @@ impl Matcher for WrappedPattern {
                                 .into_iter()
                                 .map(|mut path| {
                                     // Add the current envelope to the path
-                                    path.insert(0, envelope.clone());
+                                    path.insert(0, haystack.clone());
                                     path
                                 })
                                 .collect()

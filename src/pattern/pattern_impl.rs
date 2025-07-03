@@ -101,15 +101,11 @@ pub enum Pattern {
 }
 
 impl Matcher for Pattern {
-    fn paths(&self, env: &Envelope) -> Vec<Path> {
-        self.paths_with_captures(env).0
-    }
-
     fn paths_with_captures(
         &self,
-        env: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let results = self.vm_run(env);
+        let results = self.vm_run(haystack);
         let mut paths = Vec::new();
         let mut captures: HashMap<String, Vec<Path>> = HashMap::new();
         for (p, caps) in results {

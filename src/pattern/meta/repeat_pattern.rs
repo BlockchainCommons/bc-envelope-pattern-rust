@@ -45,7 +45,7 @@ impl GroupPattern {
 impl Matcher for GroupPattern {
     fn paths_with_captures(
         &self,
-        _envelope: &Envelope,
+        _haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         panic!(
             "GroupPattern does not support paths_with_captures directly; use compile instead"

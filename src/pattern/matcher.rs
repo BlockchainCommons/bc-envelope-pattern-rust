@@ -13,16 +13,16 @@ pub trait Matcher: std::fmt::Debug + std::fmt::Display + Clone {
     /// Return all matching paths along with any named captures.
     fn paths_with_captures(
         &self,
-        _envelope: &Envelope,
+        _haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>);
 
     /// Return only the matching paths, discarding any captures.
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        self.paths_with_captures(envelope).0
+    fn paths(&self, haystack: &Envelope) -> Vec<Path> {
+        self.paths_with_captures(haystack).0
     }
 
-    fn matches(&self, envelope: &Envelope) -> bool {
-        !self.paths(envelope).is_empty()
+    fn matches(&self, haystack: &Envelope) -> bool {
+        !self.paths(haystack).is_empty()
     }
 
     fn compile(

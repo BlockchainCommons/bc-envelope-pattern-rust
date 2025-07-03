@@ -23,12 +23,12 @@ impl NotPattern {
 impl Matcher for NotPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // If the inner pattern doesn't match, then we return the current
         // envelope as a match
-        let paths = if !self.pattern().matches(envelope) {
-            vec![vec![envelope.clone()]]
+        let paths = if !self.pattern().matches(haystack) {
+            vec![vec![haystack.clone()]]
         } else {
             vec![]
         };

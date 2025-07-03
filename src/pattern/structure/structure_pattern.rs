@@ -34,18 +34,18 @@ pub enum StructurePattern {
 impl Matcher for StructurePattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         match self {
-            StructurePattern::Assertions(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Digest(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Leaf(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Node(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Object(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Obscured(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Predicate(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Subject(pattern) => pattern.paths_with_captures(envelope),
-            StructurePattern::Wrapped(pattern) => pattern.paths_with_captures(envelope),
+            StructurePattern::Assertions(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Digest(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Leaf(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Node(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Object(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Obscured(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Predicate(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Subject(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Wrapped(pattern) => pattern.paths_with_captures(haystack),
         }
     }
 

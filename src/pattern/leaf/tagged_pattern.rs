@@ -66,10 +66,10 @@ impl TaggedPattern {
 impl Matcher for TaggedPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // Extract the CBOR value from the envelope leaf
-        if let Some(cbor) = envelope.subject().as_leaf() {
+        if let Some(cbor) = haystack.subject().as_leaf() {
             // Use dcbor-pattern to match the CBOR value
             let (paths, captures) = self.0.paths_with_captures(&cbor);
 
@@ -78,10 +78,10 @@ impl Matcher for TaggedPattern {
                 .into_iter()
                 .map(|path| {
                     if path.is_empty() {
-                        vec![envelope.clone()]
+                        vec![haystack.clone()]
                     } else {
                         // For tagged patterns, if there's a match, return the envelope itself
-                        vec![envelope.clone()]
+                        vec![haystack.clone()]
                     }
                 })
                 .collect();
@@ -94,10 +94,10 @@ impl Matcher for TaggedPattern {
                         .into_iter()
                         .map(|path| {
                             if path.is_empty() {
-                                vec![envelope.clone()]
+                                vec![haystack.clone()]
                             } else {
                                 // For tagged patterns, captures should also point to the envelope
-                                vec![envelope.clone()]
+                                vec![haystack.clone()]
                             }
                         })
                         .collect();

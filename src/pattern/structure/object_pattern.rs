@@ -23,10 +23,10 @@ impl ObjectPattern {
 impl Matcher for ObjectPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         let paths = {
-            if let Some(object) = envelope.as_object() {
+            if let Some(object) = haystack.as_object() {
                 match self {
                     ObjectPattern::Any => {
                         vec![vec![object.clone()]]

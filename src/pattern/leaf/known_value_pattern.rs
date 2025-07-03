@@ -57,8 +57,8 @@ impl std::hash::Hash for KnownValuePattern {
 }
 
 impl Matcher for KnownValuePattern {
-    fn paths(&self, envelope: &Envelope) -> Vec<Path> {
-        let subject = envelope.subject();
+    fn paths(&self, haystack: &Envelope) -> Vec<Path> {
+        let subject = haystack.subject();
 
         // Special case for KnownValue - use as_known_value() instead of
         // as_leaf()
@@ -79,7 +79,7 @@ impl Matcher for KnownValuePattern {
                 .map(|_dcbor_path| {
                     // For leaf patterns like KnownValue, we just return the
                     // envelope itself
-                    vec![envelope.clone()]
+                    vec![haystack.clone()]
                 })
                 .collect()
         } else {
@@ -89,10 +89,10 @@ impl Matcher for KnownValuePattern {
 
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         // For now, delegate to the base implementation
-        (self.paths(envelope), HashMap::new())
+        (self.paths(haystack), HashMap::new())
     }
 
     fn compile(

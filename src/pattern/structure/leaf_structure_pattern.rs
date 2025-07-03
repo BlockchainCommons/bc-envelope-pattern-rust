@@ -24,10 +24,10 @@ impl Default for LeafStructurePattern {
 impl Matcher for LeafStructurePattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        let paths = if envelope.is_leaf() || envelope.is_known_value() {
-            vec![vec![envelope.clone()]]
+        let paths = if haystack.is_leaf() || haystack.is_known_value() {
+            vec![vec![haystack.clone()]]
         } else {
             vec![]
         };

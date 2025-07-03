@@ -18,11 +18,11 @@ pub struct NullPattern;
 impl Matcher for NullPattern {
     fn paths_with_captures(
         &self,
-        envelope: &Envelope,
+        haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
-        if let Some(cbor) = envelope.subject().as_leaf() {
+        if let Some(cbor) = haystack.subject().as_leaf() {
             if dcbor_pattern::NullPattern.matches(&cbor) {
-                (vec![vec![envelope.clone()]], HashMap::new())
+                (vec![vec![haystack.clone()]], HashMap::new())
             } else {
                 (vec![], HashMap::new())
             }
