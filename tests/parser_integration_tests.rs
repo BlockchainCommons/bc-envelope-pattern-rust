@@ -163,9 +163,9 @@ fn test_parser_precedence_demonstration() {
     );
 
     // Map patterns should now use dcbor-pattern syntax
-    let map_pattern = Pattern::parse("{*}").unwrap();
+    let map_pattern = Pattern::parse("map").unwrap();
     let map_str = map_pattern.to_string();
-    assert_eq!(map_str, "{*}", "Map pattern should use dcbor-pattern syntax");
+    assert_eq!(map_str, "map", "Map pattern should use dcbor-pattern syntax");
 }
 
 #[test]

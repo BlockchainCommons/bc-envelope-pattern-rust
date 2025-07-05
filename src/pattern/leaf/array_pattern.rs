@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn test_array_pattern_display() {
-        assert_eq!(ArrayPattern::any().to_string(), "[*]");
+        assert_eq!(ArrayPattern::any().to_string(), "array");
         assert_eq!(ArrayPattern::count(3).to_string(), "[{3}]");
         assert_eq!(ArrayPattern::interval(2..=5).to_string(), "[{2,5}]");
         assert_eq!(ArrayPattern::interval(3..).to_string(), "[{3,}]");

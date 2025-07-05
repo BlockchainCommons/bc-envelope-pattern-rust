@@ -113,9 +113,9 @@ fn parse_leaf_pattern() {
 
 #[test]
 fn parse_array_patterns() {
-    let p = Pattern::parse("[*]").unwrap();
+    let p = Pattern::parse("array").unwrap();
     assert_eq!(p, Pattern::any_array());
-    assert_actual_expected!(p.to_string(), "[*]");
+    assert_actual_expected!(p.to_string(), "array");
 
     let p = Pattern::parse("[{3}]").unwrap();
     assert_eq!(p, Pattern::array_with_count(3));
@@ -182,8 +182,8 @@ fn parse_date_patterns() {
 #[test]
 fn parse_map_patterns() {
     // dcbor-pattern map syntax - any map
-    let p = Pattern::parse("{*}").unwrap();
-    assert_actual_expected!(p.to_string(), "{*}");
+    let p = Pattern::parse("map").unwrap();
+    assert_actual_expected!(p.to_string(), "map");
 
     // dcbor-pattern map syntax - specific count
     let p = Pattern::parse("{{3}}").unwrap();

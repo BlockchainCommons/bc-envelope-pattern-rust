@@ -131,7 +131,7 @@ mod tests {
     #[test]
     fn test_map_pattern_display() {
         let pattern = MapPattern::any();
-        assert_eq!(pattern.to_string(), "{*}");
+        assert_eq!(pattern.to_string(), "map");
 
         let pattern = MapPattern::interval(2..=2);
         assert_eq!(pattern.to_string(), "{{2}}");

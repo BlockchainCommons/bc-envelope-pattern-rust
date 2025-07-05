@@ -4,21 +4,17 @@ This syntax is inspired by regular expressions but is specifically designed for 
 
 The patex syntax is designed to be flexible and expressive. Patterns can be composed of *leaf patterns*, *structure patterns*, and combinators known as *meta-patterns*.
 
-Keywords like `bool`, `array`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
-
-Spaces may used to separate different parts of the pattern.
+Keywords like `bool`, `number`, etc., are case-sensitive. Patterns can include specific values, ranges, or regexes to match against the corresponding parts of the envelope.
 
 Parentheses are used to group patterns or specify ranges. The syntax `(pattern)` is really just the repeat pattern with a repeat that matches the pattern exactly once.
 
-The syntax integrates the dCBOR diagnostic notation for matching CBOR values, so we will use the `dcbor-parse` crate to parse these values. For patterns that don't match envelope-specific syntax, the parser will fall back to using dcbor-pattern syntax, providing seamless integration between the two pattern systems.
+White space is ignored between tokens, so you can use it to make patterns more readable. The syntax examples below include white space both to show where it can be used and to show where it *cannot* be used (i.e., between characters of a token like `*?`)
 
-The result of successful parsing is a `Pattern` object, which can be used to match against Gordian Envelope.
-
-White space is ignored between tokens, so you can use it to make patterns more readable. The syntax examples below includ white space both to show where it can be used and to show where it *cannot* be used (i.e., between characters of a token like `*?`)
-
-# Leaf Patterns
+## Leaf Patterns
 
 All leaf patterns match Envelope leaves, which are CBOR values.
+
+### dCBOR Value Patterns
 
 - Boolean
     - `bool`
@@ -51,19 +47,19 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `known`
         - Matches any known value. (See the `known-values` crate for more information.)
     - `'value'`
-        - Matches the specified known value, which is a u64 value. dCBOR prints known values enclosed in single quotes, so we use that syntax here for familiarity.
+        - Matches the specified known value, which is a u64 value. dCBOR prints known values enclosed in single quotes, so we use that syntax here for familiarity. Note: This is a non-prefixed single-quoted pattern.
     - `'name'`
-        - Matches the known value with the specified name. Again we use single quotes here for familiarity.
+        - Matches the known value with the specified name. Again we use single quotes here for familiarity. Note: This is a non-prefixed single-quoted pattern.
     - `'/regex/'`
-        - Matches a known value with a name that matches the specified regex.
+        - Matches a known value with a name that matches the specified regex. We do not use the single quotes here. Note: This is a non-prefixed single-quoted pattern.
 - Null
     - `null`
         - Matches the null value.
 - Number
     - `number`
-        - Matches any number.
+        - keyword `number` matches any number.
     - `value`
-        - Matches the specified number.
+        - Bare numeric value matches the specified number.
     - `value...value`
         - Matches a number within the specified range.
     - `>=value`
@@ -77,18 +73,27 @@ All leaf patterns match Envelope leaves, which are CBOR values.
     - `NaN`
         - Matches the NaN (Not a Number) value.
     - `Infinity`
-        - Matches positive infinity.
+        - Matches the Infinity value.
     - `-Infinity`
-        - Matches negative infinity.
+        - Matches the negative Infinity value.
 - Text
     - `text`
         - Matches any text value.
     - `"string"`
-        - Matches a text value with the specified string. Gordian Envelope and CBOR diagnostic notation use double quotes for text strings, so we use that syntax here for familiarity.
-    - `/regex/`
+        - Matches a text value with the specified string. dCBOR diagnostic notation uses double quotes for text strings, so we use that syntax here for familiarity.
+    - `/text-regex/`
         - Matches a text value that matches the specified regex. No double quotes are used here, as the regex is not a string but a pattern to match against the text value.
+- Digest
+    - `digest`
+        - Matches any digest value.
+    - `digest'hex'`
+        - Matches a digest whose value starts with the specified hex prefix. Up to 32 bytes can be specified, which is the length of the full SHA-256 digest.
+    - `digest'ur:digest/value'`
+        - Matches the specified `ur:digest` value, parsed using `Digest::from_ur_string()`.
+    - `digest'/regex/'`
+        - Matches a digest value that matches the specified binary regex.
 - Array
-    - `[*]`
+    - `array`
         - Matches any array.
     - `[{n}]`
         - Matches an array with exactly `n` elements.
@@ -96,16 +101,17 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches an array with between `n` and `m` elements, inclusive.
     - `[{n,}]`
         - Matches an array with at least `n` elements.
-    - `[dcbor-patex, dcbor-patex, ...]`
+    - `[patex, patex, ...]`
         - Matches an array where the elements match the specified pattern. The pattern can be a simple pattern, a sequence of patterns, or patterns with repeat quantifiers.
         - Examples:
+            - `[*]` - Array containing exactly one element of any type
             - `[42]` - Array containing exactly one element: the number 42
             - `["a", "b", "c"]` - Array containing exactly ["a", "b", "c"] in sequence
             - `[(*)*, 42, (*)*]` - Array containing 42 anywhere within it
             - `[42, (*)*]` - Array starting with 42, followed by any elements
             - `[(*)*, 42]` - Array ending with 42, preceded by any elements
 - Map
-    - `{*}`
+    - `map`
         - Matches any map.
     - `{{n}}`
         - Matches a map with exactly `n` entries.
@@ -113,17 +119,20 @@ All leaf patterns match Envelope leaves, which are CBOR values.
         - Matches a map with between `n` and `m` entries, inclusive.
     - `{{n,}}`
         - Matches a map with at least `n` entries.
-    - `{key-dcbor-patex: value-dcbor-patex, ...}`
-        - Matches a map with the specified key-value patterns.
+    - `{patex: patex, patex: patex, ...}`
+        - Matches if the specified patterns match the map's keys and values (order isn't important).
 - Tagged
     - `tagged`
         - Matches any CBOR tagged value.
-    - `tagged ( value, dcbor-patex )`
+    - `tagged ( value, patex )`
         - Matches the specified CBOR tagged value with content that matches the given pattern. The tag value is a u64 value, formatted as a bare integer with no delimiters apart from the enclosing parentheses.
-    - `tagged ( name, dcbor-patex )`
-        - Matches the CBOR tagged value with the specified name and content that matches the given pattern. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
-    - `tagged ( /regex/, dcbor-patex )`
+    - `tagged ( name, patex )`
+        - Matches the CBOR tagged value with the specified name and content that matches the given patex. The tag name is formatted as a bare alphanumeric string (including hyphens and underscores) with no delimiters apart from the enclosing parentheses.
+    - `tagged ( /regex/, patex )`
         - Matches a CBOR tagged value with a name that matches the specified regex and content that matches the given pattern.
+
+### Envelope dCBOR Patterns
+
 - CBOR
     - `cbor`
         - Matches any subject CBOR value.

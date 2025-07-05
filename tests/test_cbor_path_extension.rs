@@ -284,7 +284,7 @@ fn test_cbor_pattern_map_key_value_paths() {
 fn test_search_array_order() {
     let cbor =
         dcbor_parse::parse_dcbor_item(r#"[[1, 2, 3], [4, 5, 6]]"#).unwrap();
-    let dcbor_pattern = DCBORPattern::parse("search([*])").unwrap();
+    let dcbor_pattern = DCBORPattern::parse("search(array)").unwrap();
 
     let paths = dcbor_pattern.paths(&cbor);
     #[rustfmt::skip]
