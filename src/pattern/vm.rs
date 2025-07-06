@@ -2,10 +2,11 @@
 //!
 //! The VM runs byte-code produced by `Pattern::compile` (implemented later).
 
-use super::{Matcher, Path, Pattern};
-use crate::{Quantifier, Reluctance};
 use bc_components::DigestProvider;
 use bc_envelope::prelude::*;
+
+use super::{Matcher, Path, Pattern};
+use crate::{Quantifier, Reluctance};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,11 +28,13 @@ impl Axis {
             (Axis::Subject, EnvelopeCase::Node { subject, .. }) => {
                 vec![(subject.clone(), EdgeType::Subject)]
             }
-            (Axis::Assertion, EnvelopeCase::Node { assertions, .. }) => assertions
-                .iter()
-                .cloned()
-                .map(|a| (a, EdgeType::Assertion))
-                .collect(),
+            (Axis::Assertion, EnvelopeCase::Node { assertions, .. }) => {
+                assertions
+                    .iter()
+                    .cloned()
+                    .map(|a| (a, EdgeType::Assertion))
+                    .collect()
+            }
             (Axis::Predicate, EnvelopeCase::Assertion(a)) => {
                 vec![(a.predicate().clone(), EdgeType::Predicate)]
             }

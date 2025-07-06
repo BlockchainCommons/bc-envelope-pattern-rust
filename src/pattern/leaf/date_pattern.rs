@@ -13,26 +13,20 @@ use crate::{
 pub struct DatePattern(dcbor_pattern::DatePattern);
 
 impl PartialEq for DatePattern {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
 impl Eq for DatePattern {}
 
 impl std::hash::Hash for DatePattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
 }
 
 // Re-export the dcbor-pattern DatePattern methods through associated
 // functions
 impl DatePattern {
     /// Creates a new `DatePattern` that matches any date.
-    pub fn any() -> Self {
-        Self(dcbor_pattern::DatePattern::any())
-    }
+    pub fn any() -> Self { Self(dcbor_pattern::DatePattern::any()) }
 
     /// Creates a new `DatePattern` that matches a specific date.
     pub fn value(date: Date) -> Self {

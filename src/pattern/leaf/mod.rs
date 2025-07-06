@@ -12,7 +12,10 @@ mod number_pattern;
 mod tagged_pattern;
 mod text_pattern;
 
+use std::collections::HashMap;
+
 pub(crate) use array_pattern::ArrayPattern;
+use bc_envelope::prelude::*;
 pub(crate) use bool_pattern::BoolPattern;
 pub(crate) use byte_string_pattern::ByteStringPattern;
 pub(crate) use cbor_pattern::CBORPattern;
@@ -23,10 +26,6 @@ pub(crate) use null_pattern::NullPattern;
 pub(crate) use number_pattern::NumberPattern;
 pub(crate) use tagged_pattern::TaggedPattern;
 pub(crate) use text_pattern::TextPattern;
-
-use std::collections::HashMap;
-
-use bc_envelope::prelude::*;
 
 use crate::{
     Pattern,

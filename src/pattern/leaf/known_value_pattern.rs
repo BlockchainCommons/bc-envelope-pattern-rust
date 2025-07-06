@@ -18,9 +18,7 @@ pub struct KnownValuePattern(dcbor_pattern::KnownValuePattern);
 // functions
 impl KnownValuePattern {
     /// Creates a new `KnownValuePattern` that matches any known value.
-    pub fn any() -> Self {
-        Self(dcbor_pattern::KnownValuePattern::any())
-    }
+    pub fn any() -> Self { Self(dcbor_pattern::KnownValuePattern::any()) }
 
     /// Creates a new `KnownValuePattern` that matches a specific known value.
     pub fn value(value: KnownValue) -> Self {
@@ -38,8 +36,11 @@ impl KnownValuePattern {
         Self(dcbor_pattern::KnownValuePattern::regex(regex))
     }
 
-    /// Creates a new `KnownValuePattern` from a dcbor-pattern KnownValuePattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::KnownValuePattern) -> Self {
+    /// Creates a new `KnownValuePattern` from a dcbor-pattern
+    /// KnownValuePattern.
+    pub fn from_dcbor_pattern(
+        dcbor_pattern: dcbor_pattern::KnownValuePattern,
+    ) -> Self {
         Self(dcbor_pattern)
     }
 }
@@ -51,9 +52,7 @@ impl PartialEq for KnownValuePattern {
 impl Eq for KnownValuePattern {}
 
 impl std::hash::Hash for KnownValuePattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
 }
 
 impl Matcher for KnownValuePattern {

@@ -9,18 +9,17 @@ mod repeat_pattern;
 mod search_pattern;
 mod traverse_pattern;
 
+use std::collections::HashMap;
+
 pub(crate) use and_pattern::AndPattern;
 pub(crate) use any_pattern::AnyPattern;
+use bc_envelope::prelude::*;
 pub(crate) use capture_pattern::CapturePattern;
 pub(crate) use not_pattern::NotPattern;
 pub(crate) use or_pattern::OrPattern;
 pub(crate) use repeat_pattern::GroupPattern;
 pub(crate) use search_pattern::SearchPattern;
 pub(crate) use traverse_pattern::TraversePattern;
-
-use std::collections::HashMap;
-
-use bc_envelope::prelude::*;
 
 use crate::{
     Pattern,

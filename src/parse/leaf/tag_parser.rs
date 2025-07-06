@@ -1,14 +1,14 @@
 use crate::{
-    Error, Pattern, Result,
+    DCBORPattern, Error, Pattern, Result,
     parse::{Token, utils},
-    DCBORPattern,
 };
 
 pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
     let mut lookahead = lexer.clone();
     match lookahead.next() {
         Some(Ok(Token::ParenOpen)) => {
-            // For parenthesized cases, delegate to dcbor-pattern for full parsing
+            // For parenthesized cases, delegate to dcbor-pattern for full
+            // parsing
             lexer.next(); // consume opening paren
             let remainder = lexer.remainder();
 
@@ -36,7 +36,8 @@ pub(crate) fn parse_tag(lexer: &mut logos::Lexer<Token>) -> Result<Pattern> {
                                     tagged_pattern,
                                 ))
                             } else {
-                                // This shouldn't happen if we constructed the expression correctly
+                                // This shouldn't happen if we constructed the
+                                // expression correctly
                                 Err(Error::UnexpectedToken(
                                     Box::new(Token::ParenClose),
                                     lexer.span(),

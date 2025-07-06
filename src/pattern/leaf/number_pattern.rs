@@ -16,9 +16,7 @@ pub struct NumberPattern(dcbor_pattern::NumberPattern);
 // functions
 impl NumberPattern {
     /// Creates a new `NumberPattern` that matches any number.
-    pub fn any() -> Self {
-        Self(dcbor_pattern::NumberPattern::any())
-    }
+    pub fn any() -> Self { Self(dcbor_pattern::NumberPattern::any()) }
 
     /// Creates a new `NumberPattern` that matches the exact number.
     pub fn exact<T>(value: T) -> Self
@@ -74,9 +72,7 @@ impl NumberPattern {
     }
 
     /// Creates a new `NumberPattern` that matches NaN values.
-    pub fn nan() -> Self {
-        Self(dcbor_pattern::NumberPattern::nan())
-    }
+    pub fn nan() -> Self { Self(dcbor_pattern::NumberPattern::nan()) }
 
     /// Creates a new `NumberPattern` from a dcbor-pattern NumberPattern.
     pub fn from_dcbor_pattern(
@@ -87,17 +83,13 @@ impl NumberPattern {
 }
 
 impl PartialEq for NumberPattern {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
 }
 
 impl Eq for NumberPattern {}
 
 impl std::hash::Hash for NumberPattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
 }
 
 impl Matcher for NumberPattern {

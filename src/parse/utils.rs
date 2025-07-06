@@ -2,7 +2,7 @@
 
 use dcbor_parse::parse_dcbor_item_partial;
 
-use crate::{Error, Pattern, Result, DCBORPattern};
+use crate::{DCBORPattern, Error, Pattern, Result};
 
 pub(crate) fn skip_ws(src: &str, pos: &mut usize) {
     while let Some(ch) = src[*pos..].chars().next() {
@@ -118,14 +118,17 @@ pub(crate) fn parse_array_inner(src: &str) -> Result<(Pattern, usize)> {
 
         // Parse the first number
         let start_pos = pos;
-        while pos < src.len() && src[pos..].chars().next().unwrap().is_ascii_digit() {
+        while pos < src.len()
+            && src[pos..].chars().next().unwrap().is_ascii_digit()
+        {
             pos += 1;
         }
         if pos == start_pos {
             return Err(Error::InvalidRange(pos..pos));
         }
 
-        let first_num: usize = src[start_pos..pos].parse()
+        let first_num: usize = src[start_pos..pos]
+            .parse()
             .map_err(|_| Error::InvalidNumberFormat(start_pos..pos))?;
 
         skip_ws(src, &mut pos);
@@ -159,11 +162,15 @@ pub(crate) fn parse_array_inner(src: &str) -> Result<(Pattern, usize)> {
                 } else if ch.is_ascii_digit() {
                     // {n,m} - range
                     let start_pos = pos;
-                    while pos < src.len() && src[pos..].chars().next().unwrap().is_ascii_digit() {
+                    while pos < src.len()
+                        && src[pos..].chars().next().unwrap().is_ascii_digit()
+                    {
                         pos += 1;
                     }
-                    let second_num: usize = src[start_pos..pos].parse()
-                        .map_err(|_| Error::InvalidNumberFormat(start_pos..pos))?;
+                    let second_num: usize =
+                        src[start_pos..pos].parse().map_err(|_| {
+                            Error::InvalidNumberFormat(start_pos..pos)
+                        })?;
 
                     skip_ws(src, &mut pos);
                     if pos >= src.len() || !src[pos..].starts_with('}') {
@@ -171,7 +178,10 @@ pub(crate) fn parse_array_inner(src: &str) -> Result<(Pattern, usize)> {
                     }
                     pos += 1;
                     skip_ws(src, &mut pos);
-                    return Ok((Pattern::array_with_range(first_num..=second_num), pos));
+                    return Ok((
+                        Pattern::array_with_range(first_num..=second_num),
+                        pos,
+                    ));
                 } else {
                     return Err(Error::InvalidRange(pos..pos));
                 }

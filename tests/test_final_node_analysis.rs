@@ -14,7 +14,10 @@ fn test_node_pattern_behavior() {
 
     let test_cases = vec![
         ("Plain CBOR", Envelope::new(42)),
-        ("Known value", Envelope::new(known_values::KnownValue::new(42))),
+        (
+            "Known value",
+            Envelope::new(known_values::KnownValue::new(42)),
+        ),
         ("1 assertion", {
             let mut env = Envelope::new("subject");
             env = env.add_assertion("key", "value");
@@ -51,13 +54,17 @@ fn test_node_pattern_behavior() {
             let matches = pattern.matches(envelope);
             print!("{:>12}", if matches { "✓" } else { "✗" });
         }
-        println!(" (is_node: {}, assertions: {})",
-                envelope.is_node(),
-                envelope.assertions().len());
+        println!(
+            " (is_node: {}, assertions: {})",
+            envelope.is_node(),
+            envelope.assertions().len()
+        );
     }
 
     println!("\nKey findings:");
-    println!("- NODE({{0}}) never matches anything because nodes by definition have assertions");
+    println!(
+        "- NODE({{0}}) never matches anything because nodes by definition have assertions"
+    );
     println!("- Only envelopes with assertions have is_node() == true");
     println!("- Plain CBOR and known values are leaves, not nodes");
 }
@@ -74,7 +81,10 @@ fn test_final_comparison() {
 
     println!("Testing envelope: {:?}", envelope);
     println!("LEAF matches: {}", leaf_pattern.matches(&envelope));
-    println!("NODE({{0}}) matches: {}", node_zero_pattern.matches(&envelope));
+    println!(
+        "NODE({{0}}) matches: {}",
+        node_zero_pattern.matches(&envelope)
+    );
     println!("is_leaf(): {}", envelope.is_leaf());
     println!("is_node(): {}", envelope.is_node());
     println!("assertions().len(): {}", envelope.assertions().len());
@@ -82,6 +92,8 @@ fn test_final_comparison() {
     println!("\nConclusion:");
     println!("LEAF and NODE({{0}}) are NOT equivalent:");
     println!("- LEAF matches terminal nodes in envelope trees");
-    println!("- NODE({{0}}) matches structural nodes with zero assertions (which don't exist)");
+    println!(
+        "- NODE({{0}}) matches structural nodes with zero assertions (which don't exist)"
+    );
     println!("- They serve completely different purposes");
 }

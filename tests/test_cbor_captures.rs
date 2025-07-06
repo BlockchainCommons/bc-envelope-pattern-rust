@@ -177,10 +177,9 @@ fn test_nested_dcbor_captures() {
     let envelope = Envelope::new(vec![vec!["Alice", "95"], vec!["Bob", "85"]]);
 
     // Create `cbor` pattern with nested captures:
-    let pattern = Pattern::parse(
-        "cbor(/@users(search([@name(text), @score(text)]))/)",
-    )
-    .unwrap();
+    let pattern =
+        Pattern::parse("cbor(/@users(search([@name(text), @score(text)]))/)")
+            .unwrap();
 
     // Execute pattern
     let (paths, captures) = pattern.paths_with_captures(&envelope);
@@ -266,8 +265,7 @@ fn test_mixed_envelope_and_dcbor_captures() {
 
     // Create pattern with envelope capture wrapping `cbor` pattern with dcbor
     // capture @envelope_level(cbor(/@dcbor_level(42)/))
-    let cbor_pattern =
-        Pattern::parse("cbor(/@dcbor_level(42)/)").unwrap();
+    let cbor_pattern = Pattern::parse("cbor(/@dcbor_level(42)/)").unwrap();
     let pattern = Pattern::capture("envelope_level", cbor_pattern);
 
     // Execute pattern
@@ -327,8 +325,7 @@ fn test_capture_name_conflicts() {
 
     // Create pattern with same capture name at envelope and dcbor levels
     // @same_name(cbor(/@same_name(42)/))
-    let cbor_pattern =
-        Pattern::parse("cbor(/@same_name(42)/)").unwrap();
+    let cbor_pattern = Pattern::parse("cbor(/@same_name(42)/)").unwrap();
     let pattern = Pattern::capture("same_name", cbor_pattern);
 
     // Execute pattern

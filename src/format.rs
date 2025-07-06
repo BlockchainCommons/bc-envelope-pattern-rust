@@ -12,9 +12,7 @@ pub enum PathElementFormat {
 }
 
 impl Default for PathElementFormat {
-    fn default() -> Self {
-        PathElementFormat::Summary(None)
-    }
+    fn default() -> Self { PathElementFormat::Summary(None) }
 }
 
 /// Options for formatting paths.
@@ -50,9 +48,7 @@ impl Default for FormatPathsOpts {
 
 impl FormatPathsOpts {
     /// Creates a new FormatPathsOpts with default values.
-    pub fn new() -> Self {
-        Self::default()
-    }
+    pub fn new() -> Self { Self::default() }
 
     /// Sets whether to indent each path element.
     /// If true, each element will be indented by 4 spaces per level.
@@ -78,9 +74,7 @@ impl FormatPathsOpts {
 }
 
 impl AsRef<FormatPathsOpts> for FormatPathsOpts {
-    fn as_ref(&self) -> &FormatPathsOpts {
-        self
-    }
+    fn as_ref(&self) -> &FormatPathsOpts { self }
 }
 
 pub fn envelope_summary(env: &Envelope) -> String {

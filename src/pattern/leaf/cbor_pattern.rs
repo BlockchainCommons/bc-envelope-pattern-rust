@@ -19,9 +19,7 @@ pub enum CBORPattern {
 
 impl CBORPattern {
     /// Creates a new `CBORPattern` that matches any CBOR value.
-    pub fn any() -> Self {
-        CBORPattern::Any
-    }
+    pub fn any() -> Self { CBORPattern::Any }
 
     /// Creates a new `CBORPattern` that matches a specific CBOR value.
     pub fn value(cbor: impl CBOREncodable) -> Self {

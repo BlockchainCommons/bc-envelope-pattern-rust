@@ -11,8 +11,6 @@ mod structure;
 pub mod dcbor_integration;
 
 // Re-export all types
-pub use matcher::{Matcher, Path, compile_as_atomic};
-
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -21,6 +19,7 @@ use std::{
 
 use bc_envelope::prelude::*;
 use known_values::KnownValue;
+pub use matcher::{Matcher, Path, compile_as_atomic};
 
 use self::{
     leaf::{
@@ -38,7 +37,6 @@ use self::{
         SubjectPattern, WrappedPattern,
     },
 };
-
 use crate::{
     DCBORPattern, Quantifier, Reluctance,
     pattern::{leaf::CBORPattern, vm::Instr},
@@ -264,9 +262,7 @@ impl Pattern {
         Pattern::Leaf(LeafPattern::KnownValue(KnownValuePattern::regex(regex)))
     }
 
-    pub fn unit() -> Self {
-        Self::known_value(known_values::UNIT)
-    }
+    pub fn unit() -> Self { Self::known_value(known_values::UNIT) }
 }
 
 impl Pattern {
@@ -306,9 +302,7 @@ impl Pattern {
 }
 
 impl Pattern {
-    pub fn null() -> Self {
-        Pattern::Leaf(LeafPattern::Null(NullPattern))
-    }
+    pub fn null() -> Self { Pattern::Leaf(LeafPattern::Null(NullPattern)) }
 }
 
 impl Pattern {
@@ -495,9 +489,7 @@ impl Pattern {
 
 impl Pattern {
     /// Creates a new `Pattern` that matches any element.
-    pub fn any() -> Self {
-        Pattern::Meta(MetaPattern::Any(AnyPattern::new()))
-    }
+    pub fn any() -> Self { Pattern::Meta(MetaPattern::Any(AnyPattern::new())) }
 }
 
 impl Pattern {

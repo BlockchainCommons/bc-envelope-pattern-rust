@@ -2,12 +2,12 @@
 
 use std::collections::HashMap;
 
+use bc_envelope::prelude::*;
+
 use crate::{
     Matcher, Path, Quantifier,
     pattern::{Pattern, vm::Instr},
 };
-
-use bc_envelope::prelude::*;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct GroupPattern {
@@ -32,14 +32,10 @@ impl GroupPattern {
     }
 
     /// Returns the sub-pattern of this group pattern.
-    pub fn pattern(&self) -> &Pattern {
-        &self.pattern
-    }
+    pub fn pattern(&self) -> &Pattern { &self.pattern }
 
     /// Returns the quantifier of this group pattern.
-    pub fn quantifier(&self) -> &Quantifier {
-        &self.quantifier
-    }
+    pub fn quantifier(&self) -> &Quantifier { &self.quantifier }
 }
 
 impl Matcher for GroupPattern {

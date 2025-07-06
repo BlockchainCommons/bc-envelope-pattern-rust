@@ -1,5 +1,6 @@
-use crate::{Error, Pattern, Result};
 use bc_envelope::prelude::*;
+
+use crate::{Error, Pattern, Result};
 
 pub(crate) fn parse_date_content(content: String) -> Result<Pattern> {
     // Parse the dcbor-pattern date syntax: iso-8601, iso-8601...iso-8601, etc.

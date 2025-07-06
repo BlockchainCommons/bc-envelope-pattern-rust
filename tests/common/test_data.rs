@@ -104,10 +104,7 @@ pub fn credential() -> Envelope {
     .add_assertion("firstName", "James")
     .add_assertion("lastName", "Maxwell")
     .add_assertion("issueDate", Date::from_string("2020-01-01").unwrap())
-    .add_assertion(
-        "expirationDate",
-        Date::from_string("2028-01-01").unwrap(),
-    )
+    .add_assertion("expirationDate", Date::from_string("2028-01-01").unwrap())
     .add_assertion("photo", "This is James Maxwell's photo.")
     .add_assertion("certificateNumber", "123-456-789")
     .add_assertion("subject", "RF and Microwave Engineering")

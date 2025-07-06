@@ -10,15 +10,11 @@ pub struct LeafStructurePattern;
 
 impl LeafStructurePattern {
     /// Creates a new LeafStructurePattern.
-    pub fn new() -> Self {
-        LeafStructurePattern
-    }
+    pub fn new() -> Self { LeafStructurePattern }
 }
 
 impl Default for LeafStructurePattern {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 impl Matcher for LeafStructurePattern {
@@ -41,18 +37,18 @@ impl Matcher for LeafStructurePattern {
         captures: &mut Vec<String>,
     ) {
         compile_as_atomic(
-            &Pattern::Structure(crate::pattern::structure::StructurePattern::Leaf(
-                LeafStructurePattern::new(),
-            )),
+            &Pattern::Structure(
+                crate::pattern::structure::StructurePattern::Leaf(
+                    LeafStructurePattern::new(),
+                ),
+            ),
             code,
             literals,
             captures,
         );
     }
 
-    fn is_complex(&self) -> bool {
-        false
-    }
+    fn is_complex(&self) -> bool { false }
 }
 
 impl std::fmt::Display for LeafStructurePattern {

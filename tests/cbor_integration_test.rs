@@ -156,8 +156,8 @@ fn test_dcbor_patterns_work_directly() {
         "number pattern should match integer"
     );
 
-    let array_pattern =
-        Pattern::parse(r#"cbor(/array/)"#).expect("array of any pattern should parse");
+    let array_pattern = Pattern::parse(r#"cbor(/array/)"#)
+        .expect("array of any pattern should parse");
     let array_envelope = Envelope::new(vec![1, 2, 3]);
     assert!(
         array_pattern.matches(&array_envelope),

@@ -17,9 +17,7 @@ pub struct ByteStringPattern(dcbor_pattern::ByteStringPattern);
 // functions
 impl ByteStringPattern {
     /// Creates a new `ByteStringPattern` that matches any byte string.
-    pub fn any() -> Self {
-        Self(dcbor_pattern::ByteStringPattern::any())
-    }
+    pub fn any() -> Self { Self(dcbor_pattern::ByteStringPattern::any()) }
 
     /// Creates a new `ByteStringPattern` that matches a specific byte string.
     pub fn value(value: impl AsRef<[u8]>) -> Self {
@@ -32,8 +30,11 @@ impl ByteStringPattern {
         Self(dcbor_pattern::ByteStringPattern::regex(regex))
     }
 
-    /// Creates a new `ByteStringPattern` from a dcbor-pattern ByteStringPattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::ByteStringPattern) -> Self {
+    /// Creates a new `ByteStringPattern` from a dcbor-pattern
+    /// ByteStringPattern.
+    pub fn from_dcbor_pattern(
+        dcbor_pattern: dcbor_pattern::ByteStringPattern,
+    ) -> Self {
         Self(dcbor_pattern)
     }
 }
@@ -93,9 +94,7 @@ impl PartialEq for ByteStringPattern {
 impl Eq for ByteStringPattern {}
 
 impl std::hash::Hash for ByteStringPattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
 }
 
 #[cfg(test)]
@@ -169,10 +168,7 @@ mod tests {
             r#"h'010203'"#
         );
         let regex = regex::bytes::Regex::new(r"^\d+$").unwrap();
-        assert_eq!(
-            ByteStringPattern::regex(regex).to_string(),
-            r"h'/^\d+$/'"
-        );
+        assert_eq!(ByteStringPattern::regex(regex).to_string(), r"h'/^\d+$/'");
     }
 
     #[test]

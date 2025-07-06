@@ -3,7 +3,7 @@ use std::{collections::HashMap, ops::RangeBounds};
 use bc_envelope::prelude::*;
 
 use crate::{
-    DCBORPattern, DCBORMatcher, Pattern,
+    DCBORMatcher, DCBORPattern, Pattern,
     pattern::{Matcher, Path, compile_as_atomic, leaf::LeafPattern, vm::Instr},
 };
 
@@ -14,9 +14,7 @@ pub struct ArrayPattern(dcbor_pattern::ArrayPattern);
 
 impl ArrayPattern {
     /// Creates a new `ArrayPattern` that matches any array.
-    pub fn any() -> Self {
-        ArrayPattern(dcbor_pattern::ArrayPattern::any())
-    }
+    pub fn any() -> Self { ArrayPattern(dcbor_pattern::ArrayPattern::any()) }
 
     /// Creates a new `ArrayPattern` that matches arrays with a count
     /// of elements in the specified range.

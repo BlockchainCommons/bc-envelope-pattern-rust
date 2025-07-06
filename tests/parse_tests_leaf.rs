@@ -1,5 +1,5 @@
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Pattern, DCBORPattern};
+use bc_envelope_pattern::{DCBORPattern, Pattern};
 use known_values::KnownValue;
 mod common;
 

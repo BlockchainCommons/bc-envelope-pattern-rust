@@ -1,5 +1,5 @@
+use bc_envelope_pattern::{DCBORMatcher, DCBORPattern};
 use dcbor::prelude::*;
-use bc_envelope_pattern::{DCBORPattern, DCBORMatcher};
 
 fn main() {
     // Test if dcbor-pattern captures work directly

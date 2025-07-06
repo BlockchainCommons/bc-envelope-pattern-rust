@@ -1,13 +1,16 @@
 mod common;
 
 use bc_envelope::prelude::*;
-use bc_envelope_pattern::{Matcher, Pattern, format_paths, DCBORMatcher, DCBORPattern};
+use bc_envelope_pattern::{
+    DCBORMatcher, DCBORPattern, Matcher, Pattern, format_paths,
+};
 use dcbor_parse::parse_dcbor_item;
 use indoc::indoc;
 
 /// Test `cbor` pattern path extension functionality using proper formatting and
 /// assertions. These tests verify that `cbor` patterns extend paths to include
-/// the internal `cbor` structure elements as individual Envelope path components.
+/// the internal `cbor` structure elements as individual Envelope path
+/// components.
 
 #[test]
 fn test_cbor_pattern_simple_array_paths() {

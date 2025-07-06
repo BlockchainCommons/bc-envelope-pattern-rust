@@ -18,5 +18,7 @@ pub(crate) use known_value_parser::parse_known_value;
 // parse_map is no longer used after migration to dcbor-pattern map syntax
 // pub(crate) use map_parser::parse_map;
 pub(crate) use null_parser::parse_null;
-pub(crate) use number_parser::{parse_number_range_or_comparison, parse_comparison_number};
+pub(crate) use number_parser::{
+    parse_comparison_number, parse_number_range_or_comparison,
+};
 pub(crate) use tag_parser::parse_tag;

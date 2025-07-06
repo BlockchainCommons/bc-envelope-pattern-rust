@@ -11,13 +11,9 @@ pub struct NotPattern(Box<Pattern>);
 
 impl NotPattern {
     /// Creates a new `NotPattern` with the given pattern.
-    pub fn new(pattern: Pattern) -> Self {
-        NotPattern(Box::new(pattern))
-    }
+    pub fn new(pattern: Pattern) -> Self { NotPattern(Box::new(pattern)) }
 
-    pub fn pattern(&self) -> &Pattern {
-        &self.0
-    }
+    pub fn pattern(&self) -> &Pattern { &self.0 }
 }
 
 impl Matcher for NotPattern {

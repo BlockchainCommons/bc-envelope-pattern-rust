@@ -5,21 +5,17 @@ fn create_test_envelopes() -> Vec<Envelope> {
     vec![
         // Pure leaf - just a CBOR value
         Envelope::new("hello"),
-
         // Known value leaf
         Envelope::new(known_values::KnownValue::new(42)),
-
         // Node with zero assertions - question: does this exist?
         // Let's try creating a subject without any assertions
         Envelope::new("subject"),
-
         // Node with one assertion
         {
             let mut env = Envelope::new("subject");
             env = env.add_assertion("key", "value");
             env
         },
-
         // Node with multiple assertions
         {
             let mut env = Envelope::new("subject");
@@ -27,7 +23,6 @@ fn create_test_envelopes() -> Vec<Envelope> {
             env = env.add_assertion("key2", "value2");
             env
         },
-
         // Wrapped envelope (node containing a leaf)
         Envelope::new(Envelope::new("wrapped")),
     ]
@@ -54,7 +49,10 @@ fn test_leaf_vs_node_zero_comparison() {
         let leaf_matches = leaf_pattern.matches(envelope);
         let node_zero_matches = node_zero_pattern.matches(envelope);
 
-        println!("{}: LEAF={}, NODE({{0}})={}", desc, leaf_matches, node_zero_matches);
+        println!(
+            "{}: LEAF={}, NODE({{0}})={}",
+            desc, leaf_matches, node_zero_matches
+        );
 
         // Additional debugging info
         println!("  is_leaf(): {}", envelope.is_leaf());
@@ -81,14 +79,20 @@ fn test_structural_differences() {
     println!("Structural differences test:");
     println!("CBOR leaf (42):");
     println!("  LEAF matches: {}", leaf_pattern.matches(&cbor_leaf));
-    println!("  NODE({{0}}) matches: {}", node_zero_pattern.matches(&cbor_leaf));
+    println!(
+        "  NODE({{0}}) matches: {}",
+        node_zero_pattern.matches(&cbor_leaf)
+    );
     println!("  is_leaf(): {}", cbor_leaf.is_leaf());
     println!("  is_node(): {}", cbor_leaf.is_node());
     println!();
 
     println!("Bare node (subject=42, no assertions):");
     println!("  LEAF matches: {}", leaf_pattern.matches(&bare_node));
-    println!("  NODE({{0}}) matches: {}", node_zero_pattern.matches(&bare_node));
+    println!(
+        "  NODE({{0}}) matches: {}",
+        node_zero_pattern.matches(&bare_node)
+    );
     println!("  is_leaf(): {}", bare_node.is_leaf());
     println!("  is_node(): {}", bare_node.is_node());
     println!();
@@ -98,7 +102,7 @@ fn test_structural_differences() {
 fn test_envelope_structure_details() {
     // Let's understand the envelope structure better
     let cbor_leaf = Envelope::new(42);
-    let bare_node = Envelope::new(42);  // Same as cbor_leaf - no distinction in bc-envelope
+    let bare_node = Envelope::new(42); // Same as cbor_leaf - no distinction in bc-envelope
     let node_with_assertion = {
         let mut env = Envelope::new(42);
         env = env.add_assertion("key", "value");
@@ -128,6 +132,9 @@ fn test_envelope_structure_details() {
     println!("  is_leaf(): {}", node_with_assertion.is_leaf());
     println!("  is_node(): {}", node_with_assertion.is_node());
     println!("  subject(): {:?}", node_with_assertion.subject());
-    println!("  assertions().len(): {}", node_with_assertion.assertions().len());
+    println!(
+        "  assertions().len(): {}",
+        node_with_assertion.assertions().len()
+    );
     println!();
 }

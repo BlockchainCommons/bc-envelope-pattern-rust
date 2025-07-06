@@ -24,7 +24,9 @@ impl BoolPattern {
     }
 
     /// Creates a new `BoolPattern` from a dcbor-pattern BoolPattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::BoolPattern) -> Self {
+    pub fn from_dcbor_pattern(
+        dcbor_pattern: dcbor_pattern::BoolPattern,
+    ) -> Self {
         Self(dcbor_pattern)
     }
 }
@@ -36,9 +38,7 @@ impl PartialEq for BoolPattern {
 impl Eq for BoolPattern {}
 
 impl std::hash::Hash for BoolPattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
 }
 
 impl Matcher for BoolPattern {

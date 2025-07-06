@@ -9,13 +9,9 @@ use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 pub struct SearchPattern(Box<Pattern>);
 
 impl SearchPattern {
-    pub fn new(pattern: Pattern) -> Self {
-        SearchPattern(Box::new(pattern))
-    }
+    pub fn new(pattern: Pattern) -> Self { SearchPattern(Box::new(pattern)) }
 
-    pub fn pattern(&self) -> &Pattern {
-        &self.0
-    }
+    pub fn pattern(&self) -> &Pattern { &self.0 }
 }
 
 impl Matcher for SearchPattern {

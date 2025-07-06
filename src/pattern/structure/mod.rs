@@ -10,7 +10,10 @@ mod predicate_pattern;
 mod subject_pattern;
 mod wrapped_pattern;
 
+use std::collections::HashMap;
+
 pub(crate) use assertions_pattern::AssertionsPattern;
+use bc_envelope::prelude::*;
 pub(crate) use digest_pattern::DigestPattern;
 pub(crate) use leaf_structure_pattern::LeafStructurePattern;
 pub(crate) use node_pattern::NodePattern;
@@ -19,10 +22,6 @@ pub(crate) use obscured_pattern::ObscuredPattern;
 pub(crate) use predicate_pattern::PredicatePattern;
 pub(crate) use subject_pattern::SubjectPattern;
 pub(crate) use wrapped_pattern::WrappedPattern;
-
-use std::collections::HashMap;
-
-use bc_envelope::prelude::*;
 
 use crate::pattern::{Matcher, Path, Pattern, vm::Instr};
 
@@ -55,15 +54,33 @@ impl Matcher for StructurePattern {
         haystack: &Envelope,
     ) -> (Vec<Path>, HashMap<String, Vec<Path>>) {
         match self {
-            StructurePattern::Assertions(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Digest(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Leaf(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Node(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Object(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Obscured(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Predicate(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Subject(pattern) => pattern.paths_with_captures(haystack),
-            StructurePattern::Wrapped(pattern) => pattern.paths_with_captures(haystack),
+            StructurePattern::Assertions(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Digest(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Leaf(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Node(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Object(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Obscured(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Predicate(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Subject(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
+            StructurePattern::Wrapped(pattern) => {
+                pattern.paths_with_captures(haystack)
+            }
         }
     }
 

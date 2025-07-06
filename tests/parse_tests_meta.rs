@@ -75,7 +75,10 @@ fn parse_operator_precedence() {
     let expected = Pattern::or(vec![left_seq, right_seq]);
 
     assert_eq!(p, expected);
-    assert_eq!(p.to_string(), "* -> true & false -> !* | * -> true & false -> *");
+    assert_eq!(
+        p.to_string(),
+        "* -> true & false -> !* | * -> true & false -> *"
+    );
 }
 
 #[test]

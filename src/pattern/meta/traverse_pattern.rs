@@ -14,7 +14,9 @@ impl TraversePattern {
     /// Creates a new `TraversePattern` with the given patterns.
     pub fn new(patterns: Vec<Pattern>) -> Self {
         let mut iter = patterns.into_iter();
-        let first_pat = iter.next().unwrap_or_else(|| Pattern::not_matching(Pattern::any()));
+        let first_pat = iter
+            .next()
+            .unwrap_or_else(|| Pattern::not_matching(Pattern::any()));
         // Build rest as a recursive TraversePattern if more remain
         let rest_patterns: Vec<Pattern> = iter.collect();
         let rest = if rest_patterns.is_empty() {

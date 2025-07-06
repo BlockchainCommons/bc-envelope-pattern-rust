@@ -83,9 +83,15 @@ impl Matcher for DigestPattern {
         let paths = {
             let digest = haystack.digest();
             let is_hit = match self {
-                DigestPattern::Digest(pattern_digest) => *pattern_digest == *digest,
-                DigestPattern::Prefix(prefix) => digest.data().starts_with(prefix),
-                DigestPattern::BinaryRegex(regex) => regex.is_match(digest.data()),
+                DigestPattern::Digest(pattern_digest) => {
+                    *pattern_digest == *digest
+                }
+                DigestPattern::Prefix(prefix) => {
+                    digest.data().starts_with(prefix)
+                }
+                DigestPattern::BinaryRegex(regex) => {
+                    regex.is_match(digest.data())
+                }
             };
 
             if is_hit {

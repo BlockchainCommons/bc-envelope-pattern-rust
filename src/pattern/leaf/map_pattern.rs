@@ -14,9 +14,7 @@ pub struct MapPattern(dcbor_pattern::MapPattern);
 
 impl MapPattern {
     /// Creates a new `MapPattern` that matches any map.
-    pub fn any() -> Self {
-        MapPattern(dcbor_pattern::MapPattern::any())
-    }
+    pub fn any() -> Self { MapPattern(dcbor_pattern::MapPattern::any()) }
 
     /// Creates a new `MapPattern` that matches maps with a specific count of
     /// entries.

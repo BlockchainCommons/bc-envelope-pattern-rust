@@ -29,7 +29,9 @@ impl TextPattern {
     }
 
     /// Creates a new `TextPattern` from a dcbor-pattern TextPattern.
-    pub fn from_dcbor_pattern(dcbor_pattern: dcbor_pattern::TextPattern) -> Self {
+    pub fn from_dcbor_pattern(
+        dcbor_pattern: dcbor_pattern::TextPattern,
+    ) -> Self {
         Self(dcbor_pattern)
     }
 }
@@ -41,9 +43,7 @@ impl PartialEq for TextPattern {
 impl Eq for TextPattern {}
 
 impl std::hash::Hash for TextPattern {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
 }
 
 impl Matcher for TextPattern {
