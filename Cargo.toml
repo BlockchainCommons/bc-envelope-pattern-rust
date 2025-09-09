@@ -20,7 +20,7 @@ categories = ["data-structures", "encoding"] # https://crates.io/category_slugs
 [dependencies]
 bc-envelope = "^0.33.0"
 known-values = "^0.7.0"
-dcbor = { version = "^0.22.0", features = ["anyhow", "multithreaded"] }
+dcbor = { version = "^0.22.0", features = ["multithreaded"] }
 dcbor-parse = "^0.3.0"
 dcbor-pattern = "^0.3.0"
 bc-components = "^0.24.0"
@@ -28,7 +28,7 @@ bc-ur = "^0.12.0"
 
 regex = "^1.11.1"
 hex = "^0.4.3"
-thiserror = "^1.0.48"
+thiserror = "^2.0"
 logos = "0.15.0"
 
 [dev-dependencies]

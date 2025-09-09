@@ -52,25 +52,25 @@ fn test_parser_dcbor_pattern_compatible_syntax() {
 
     // Boolean patterns
     let bool_any = Pattern::parse("bool").unwrap();
-    assert!(bool_any.paths_with_captures(&env_true).0.len() > 0);
-    assert!(bool_any.paths_with_captures(&env_false).0.len() > 0);
+    assert!(!bool_any.paths_with_captures(&env_true).0.is_empty());
+    assert!(!bool_any.paths_with_captures(&env_false).0.is_empty());
     assert_eq!(bool_any.paths_with_captures(&env_number).0.len(), 0);
 
     let bool_true = Pattern::parse("true").unwrap();
-    assert!(bool_true.paths_with_captures(&env_true).0.len() > 0);
+    assert!(!bool_true.paths_with_captures(&env_true).0.is_empty());
     assert_eq!(bool_true.paths_with_captures(&env_false).0.len(), 0);
 
     let bool_false = Pattern::parse("false").unwrap();
-    assert!(bool_false.paths_with_captures(&env_false).0.len() > 0);
+    assert!(!bool_false.paths_with_captures(&env_false).0.is_empty());
     assert_eq!(bool_false.paths_with_captures(&env_true).0.len(), 0);
 
     // Number patterns
     let number_any = Pattern::parse("number").unwrap();
-    assert!(number_any.paths_with_captures(&env_number).0.len() > 0);
+    assert!(!number_any.paths_with_captures(&env_number).0.is_empty());
     assert_eq!(number_any.paths_with_captures(&env_text).0.len(), 0);
 
     let number_specific = Pattern::parse("42").unwrap();
-    assert!(number_specific.paths_with_captures(&env_number).0.len() > 0);
+    assert!(!number_specific.paths_with_captures(&env_number).0.is_empty());
     assert_eq!(
         number_specific
             .paths_with_captures(&Envelope::new(43))
@@ -81,11 +81,11 @@ fn test_parser_dcbor_pattern_compatible_syntax() {
 
     // Text patterns
     let text_any = Pattern::parse("text").unwrap();
-    assert!(text_any.paths_with_captures(&env_text).0.len() > 0);
+    assert!(!text_any.paths_with_captures(&env_text).0.is_empty());
     assert_eq!(text_any.paths_with_captures(&env_number).0.len(), 0);
 
     let text_specific = Pattern::parse("\"hello\"").unwrap();
-    assert!(text_specific.paths_with_captures(&env_text).0.len() > 0);
+    assert!(!text_specific.paths_with_captures(&env_text).0.is_empty());
     assert_eq!(
         text_specific
             .paths_with_captures(&Envelope::new("world"))
@@ -102,17 +102,15 @@ fn test_parser_mixed_envelope_and_dcbor_syntax() {
 
     // This should work - searching for a number using dcbor syntax
     let search_number = Pattern::parse("search(42)").unwrap();
-    assert!(search_number.paths_with_captures(&env).0.len() > 0);
+    assert!(!search_number.paths_with_captures(&env).0.is_empty());
 
     // Boolean OR with mixed syntax
     let bool_or_number = Pattern::parse("true | 42").unwrap();
-    assert!(bool_or_number.paths_with_captures(&env).0.len() > 0);
+    assert!(!bool_or_number.paths_with_captures(&env).0.is_empty());
     assert!(
-        bool_or_number
+        !bool_or_number
             .paths_with_captures(&Envelope::new(true))
-            .0
-            .len()
-            > 0
+            .0.is_empty()
     );
     assert_eq!(
         bool_or_number
@@ -184,7 +182,7 @@ fn test_conversion_layer_works_correctly() {
     let env_true = Envelope::new(true);
     let env_false = Envelope::new(false);
 
-    assert!(envelope_bool.paths_with_captures(&env_true).0.len() > 0);
+    assert!(!envelope_bool.paths_with_captures(&env_true).0.is_empty());
     assert_eq!(envelope_bool.paths_with_captures(&env_false).0.len(), 0);
 
     // Test that the converted pattern has reasonable display format

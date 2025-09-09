@@ -31,14 +31,12 @@ fn create_test_envelopes() -> Vec<Envelope> {
 #[test]
 fn test_leaf_vs_node_zero_comparison() {
     let envelopes = create_test_envelopes();
-    let descriptions = vec![
-        "Pure leaf (hello)",
+    let descriptions = ["Pure leaf (hello)",
         "Known value leaf",
         "Node with 0 assertions?",
         "Node with 1 assertion",
         "Node with 2 assertions",
-        "Wrapped envelope",
-    ];
+        "Wrapped envelope"];
 
     let leaf_pattern = Pattern::leaf();
     let node_zero_pattern = Pattern::node_with_assertions_count(0);
