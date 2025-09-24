@@ -70,7 +70,12 @@ fn test_parser_dcbor_pattern_compatible_syntax() {
     assert_eq!(number_any.paths_with_captures(&env_text).0.len(), 0);
 
     let number_specific = Pattern::parse("42").unwrap();
-    assert!(!number_specific.paths_with_captures(&env_number).0.is_empty());
+    assert!(
+        !number_specific
+            .paths_with_captures(&env_number)
+            .0
+            .is_empty()
+    );
     assert_eq!(
         number_specific
             .paths_with_captures(&Envelope::new(43))
@@ -110,7 +115,8 @@ fn test_parser_mixed_envelope_and_dcbor_syntax() {
     assert!(
         !bool_or_number
             .paths_with_captures(&Envelope::new(true))
-            .0.is_empty()
+            .0
+            .is_empty()
     );
     assert_eq!(
         bool_or_number
