@@ -159,12 +159,11 @@ fn test_cbor_pattern_paths_preserve_order() {
     // Extract the numbers from the paths to verify order
     let mut found_numbers = Vec::new();
     for path in &paths {
-        if let Some(last_element) = path.last() {
-            if let Some(cbor) = last_element.as_leaf() {
-                if let dcbor::CBORCase::Unsigned(n) = cbor.as_case() {
-                    found_numbers.push(*n);
-                }
-            }
+        if let Some(last_element) = path.last()
+            && let Some(cbor) = last_element.as_leaf()
+            && let dcbor::CBORCase::Unsigned(n) = cbor.as_case()
+        {
+            found_numbers.push(*n);
         }
     }
 

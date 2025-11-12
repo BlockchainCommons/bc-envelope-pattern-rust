@@ -45,17 +45,17 @@ impl Matcher for AssertionsPattern {
                     paths.push(vec![assertion.clone()]);
                 }
                 AssertionsPattern::WithPredicate(pattern) => {
-                    if let Some(predicate) = assertion.as_predicate() {
-                        if pattern.matches(&predicate) {
-                            paths.push(vec![assertion.clone()]);
-                        }
+                    if let Some(predicate) = assertion.as_predicate()
+                        && pattern.matches(&predicate)
+                    {
+                        paths.push(vec![assertion.clone()]);
                     }
                 }
                 AssertionsPattern::WithObject(pattern) => {
-                    if let Some(object) = assertion.as_object() {
-                        if pattern.matches(&object) {
-                            paths.push(vec![assertion.clone()]);
-                        }
+                    if let Some(object) = assertion.as_object()
+                        && pattern.matches(&object)
+                    {
+                        paths.push(vec![assertion.clone()]);
                     }
                 }
             }

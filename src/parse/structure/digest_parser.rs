@@ -54,7 +54,7 @@ fn parse_digest_inner(src: &str) -> Result<(Pattern, usize)> {
             return Err(Error::InvalidHexString(pos..pos));
         }
         let hex_str = &src[start..pos];
-        if hex_str.len() % 2 != 0 {
+        if !hex_str.len().is_multiple_of(2) {
             return Err(Error::InvalidHexString(pos..pos));
         }
         let bytes = hex::decode(hex_str)

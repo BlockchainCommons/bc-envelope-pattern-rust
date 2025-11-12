@@ -368,11 +368,10 @@ fn run_thread(
                                         .capture_names
                                         .iter()
                                         .position(|n| n == name)
+                                        && capture_idx < th.captures.len()
                                     {
-                                        if capture_idx < th.captures.len() {
-                                            th.captures[capture_idx]
-                                                .extend(capture_paths.clone());
-                                        }
+                                        th.captures[capture_idx]
+                                            .extend(capture_paths.clone());
                                     }
                                 }
                             }
@@ -411,11 +410,10 @@ fn run_thread(
                                     .capture_names
                                     .iter()
                                     .position(|n| n == name)
+                                    && capture_idx < fork.captures.len()
                                 {
-                                    if capture_idx < fork.captures.len() {
-                                        fork.captures[capture_idx]
-                                            .extend(capture_paths.clone());
-                                    }
+                                    fork.captures[capture_idx]
+                                        .extend(capture_paths.clone());
                                 }
                             }
                         }
@@ -692,19 +690,18 @@ fn run_thread(
                     th.pc += 1;
                 }
                 CaptureEnd(id) => {
-                    if th.capture_stack.len() > id {
-                        if let Some(start_idx) = th.capture_stack[id].pop() {
-                            if th.captures.len() > id {
-                                let mut end = th.path.len();
-                                if let Some(Instr::ExtendTraversal) =
-                                    prog.code.get(th.pc + 1)
-                                {
-                                    end = end.saturating_sub(1);
-                                }
-                                let cap = th.path[start_idx..end].to_vec();
-                                th.captures[id].push(cap);
-                            }
+                    if th.capture_stack.len() > id
+                        && let Some(start_idx) = th.capture_stack[id].pop()
+                        && th.captures.len() > id
+                    {
+                        let mut end = th.path.len();
+                        if let Some(Instr::ExtendTraversal) =
+                            prog.code.get(th.pc + 1)
+                        {
+                            end = end.saturating_sub(1);
                         }
+                        let cap = th.path[start_idx..end].to_vec();
+                        th.captures[id].push(cap);
                     }
                     th.pc += 1;
                 }
