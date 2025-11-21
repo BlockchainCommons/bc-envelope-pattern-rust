@@ -119,14 +119,12 @@ fn test_redacted_credential_patterns() {
     let credential = credential();
 
     // Get the digest of the first obscured element
-    let first_obscured_digest =
-        obscured_elements.first().unwrap().digest().into_owned();
+    let first_obscured_digest = obscured_elements.first().unwrap().digest();
 
     // Find the digest of the first obscured element in the un-redacted
     // credential
-    let found_paths =
-        Pattern::search(Pattern::digest(first_obscured_digest.clone()))
-            .paths(&credential);
+    let found_paths = Pattern::search(Pattern::digest(first_obscured_digest))
+        .paths(&credential);
     // println!("{}", format_paths(&found_paths));
     assert_eq!(found_paths.len(), 1);
 
@@ -141,7 +139,7 @@ fn test_redacted_credential_patterns() {
 
     // The digest of the found element should match the first obscured element
     assert_eq!(
-        found_element.digest().into_owned(),
+        found_element.digest(),
         first_obscured_digest,
         "The found element's digest should match the first obscured element's digest"
     );

@@ -154,7 +154,7 @@ fn parse_date_patterns() {
 
     let p = Pattern::parse("date'2023-12-25'").unwrap();
     let d = Date::from_string("2023-12-25").unwrap();
-    assert_eq!(p, Pattern::date(d.clone()));
+    assert_eq!(p, Pattern::date(d));
     assert_actual_expected!(p.to_string(), "date'2023-12-25'");
 
     let p = Pattern::parse("date'2023-12-24...2023-12-26'").unwrap();
@@ -165,12 +165,12 @@ fn parse_date_patterns() {
 
     let p = Pattern::parse("date'2023-12-24...'").unwrap();
     let start = Date::from_string("2023-12-24").unwrap();
-    assert_eq!(p, Pattern::date_earliest(start.clone()));
+    assert_eq!(p, Pattern::date_earliest(start));
     assert_actual_expected!(p.to_string(), "date'2023-12-24...'");
 
     let p = Pattern::parse("date'...2023-12-26'").unwrap();
     let end = Date::from_string("2023-12-26").unwrap();
-    assert_eq!(p, Pattern::date_latest(end.clone()));
+    assert_eq!(p, Pattern::date_latest(end));
     assert_actual_expected!(p.to_string(), "date'...2023-12-26'");
 
     let p = Pattern::parse("date'/2023-.*/'").unwrap();
@@ -314,7 +314,7 @@ fn parse_cbor_patterns_2() {
     let ur = date.ur_string();
     let expr = format!(r#"cbor({})"#, ur);
     let p = Pattern::parse(&expr).unwrap();
-    assert_eq!(p, Pattern::cbor(date.clone()));
+    assert_eq!(p, Pattern::cbor(date));
     assert_actual_expected!(
         p.to_string(),
         format!("cbor({})", date.to_cbor().diagnostic_flat())

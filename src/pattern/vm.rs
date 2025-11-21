@@ -521,7 +521,7 @@ fn run_thread(
                             }
                             let digests: Vec<_> = result_path
                                 .iter()
-                                .map(|e| e.digest().into_owned())
+                                .map(|e| e.digest())
                                 .collect();
                             if th.seen.insert(digests) {
                                 out.push((result_path, result_caps));

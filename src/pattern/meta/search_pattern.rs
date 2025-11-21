@@ -64,7 +64,7 @@ impl Matcher for SearchPattern {
             let mut unique = Vec::new();
             for path in result_paths.into_inner() {
                 let digest_path: Vec<_> =
-                    path.iter().map(|e| e.digest().into_owned()).collect();
+                    path.iter().map(|e| e.digest()).collect();
                 if seen.insert(digest_path) {
                     unique.push(path);
                 }

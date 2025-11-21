@@ -84,7 +84,7 @@ impl Matcher for DigestPattern {
             let digest = haystack.digest();
             let is_hit = match self {
                 DigestPattern::Digest(pattern_digest) => {
-                    *pattern_digest == *digest
+                    *pattern_digest == digest
                 }
                 DigestPattern::Prefix(prefix) => {
                     digest.data().starts_with(prefix)
@@ -139,8 +139,8 @@ mod tests {
     #[test]
     fn test_digest_pattern_display() {
         let data: &[u8] = b"test";
-        let digest = data.digest().into_owned();
-        let pattern = DigestPattern::digest(digest.clone());
+        let digest = data.digest();
+        let pattern = DigestPattern::digest(digest);
         assert_eq!(format!("{}", pattern), format!("digest({})", digest));
         let prefix = vec![0x74, 0x65, 0x73]; // "tes"
         let pattern = DigestPattern::prefix(prefix.clone());

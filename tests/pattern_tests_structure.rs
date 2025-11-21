@@ -150,11 +150,11 @@ fn test_assertion_predicate_pattern() {
 #[test]
 fn test_digest_pattern() {
     let envelope = Envelope::new("Hello, World!");
-    let digest = envelope.digest().into_owned();
+    let digest = envelope.digest();
     let prefix = digest.data()[..4].to_vec(); // First 4 bytes
 
     // Test exact digest matching
-    assert!(Pattern::digest(digest.clone()).matches(&envelope));
+    assert!(Pattern::digest(digest).matches(&envelope));
     assert!(!Pattern::digest(Digest::from_data([0; 32])).matches(&envelope));
 
     // Test hex prefix matching
@@ -167,18 +167,16 @@ fn test_digest_pattern() {
     // Test with envelope that has assertions
     let envelope_with_assertions =
         envelope.clone().add_assertion("test", "value");
-    let digest_with_assertions = envelope_with_assertions.digest().into_owned();
+    let digest_with_assertions = envelope_with_assertions.digest();
 
+    assert!(!Pattern::digest(digest).matches(&envelope_with_assertions));
     assert!(
-        !Pattern::digest(digest.clone()).matches(&envelope_with_assertions)
-    );
-    assert!(
-        Pattern::digest(digest_with_assertions.clone())
+        Pattern::digest(digest_with_assertions)
             .matches(&envelope_with_assertions)
     );
 
     // Test paths
-    let paths = Pattern::digest(digest.clone()).paths(&envelope);
+    let paths = Pattern::digest(digest).paths(&envelope);
     #[rustfmt::skip]
     let expected = indoc! {r#"
         0a852327 LEAF "Hello, World!"
@@ -193,7 +191,7 @@ fn test_digest_pattern() {
 #[test]
 fn test_digest_pattern_binary_regex() {
     let envelope = Envelope::new("Hello, World!");
-    let digest = envelope.digest().into_owned();
+    let digest = envelope.digest();
     let digest_bytes = digest.data();
 
     // IMPORTANT: Binary regex patterns must use the (?s-u) flags to work
@@ -269,7 +267,7 @@ fn test_digest_pattern_binary_regex() {
 
     // Test with different envelope to ensure digest changes
     let envelope2 = Envelope::new("Different content");
-    let digest2 = envelope2.digest().into_owned();
+    let digest2 = envelope2.digest();
 
     // Verify the digests are actually different
     assert_ne!(digest.data(), digest2.data());
@@ -319,7 +317,7 @@ fn test_digest_pattern_binary_regex() {
     // Test envelope with assertions (should match differently)
     let envelope_with_assertions =
         envelope.clone().add_assertion("test", "value");
-    let digest_with_assertions = envelope_with_assertions.digest().into_owned();
+    let digest_with_assertions = envelope_with_assertions.digest();
 
     // Should still match 32-byte pattern
     let universal_pattern = regex::bytes::Regex::new(r"(?s-u)^.{32}$").unwrap();

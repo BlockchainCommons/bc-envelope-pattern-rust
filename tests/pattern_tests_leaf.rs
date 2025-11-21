@@ -156,13 +156,13 @@ fn test_date_pattern() {
 
     // Create a date envelope
     let date = Date::from_ymd(2023, 12, 25);
-    let envelope = Envelope::new(date.clone());
+    let envelope = Envelope::new(date);
 
     // Matches a bare subject that is a date.
     assert!(Pattern::any_date().matches(&envelope));
-    assert!(Pattern::date(date.clone()).matches(&envelope));
+    assert!(Pattern::date(date).matches(&envelope));
     assert!(!Pattern::date(Date::from_ymd(2023, 12, 24)).matches(&envelope));
-    assert!(Pattern::cbor(date.clone()).matches(&envelope));
+    assert!(Pattern::cbor(date).matches(&envelope));
     assert!(!Pattern::cbor(Date::from_ymd(2023, 12, 24)).matches(&envelope));
 
     // Test date range matching
@@ -188,7 +188,7 @@ fn test_date_pattern() {
     // Matches a subject that is a date with an assertion.
     let envelope = envelope.add_assertion("type", "christmas");
     assert!(Pattern::any_date().matches(&envelope));
-    assert!(Pattern::date(date.clone()).matches(&envelope));
+    assert!(Pattern::date(date).matches(&envelope));
 
     // The matched paths include the assertion.
     let paths = Pattern::any_date().paths(&envelope);
@@ -213,7 +213,7 @@ fn test_date_pattern() {
 
     // Test with date-time (not just date)
     let date_with_time = Date::from_ymd_hms(2023, 12, 25, 15, 30, 45);
-    let envelope_with_time = Envelope::new(date_with_time.clone());
+    let envelope_with_time = Envelope::new(date_with_time);
 
     assert!(Pattern::any_date().matches(&envelope_with_time));
     assert!(

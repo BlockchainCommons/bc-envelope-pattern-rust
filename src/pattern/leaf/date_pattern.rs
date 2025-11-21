@@ -129,7 +129,7 @@ mod tests {
     fn test_date_pattern_any() {
         // Create a date envelope
         let date = Date::from_ymd(2023, 12, 25);
-        let envelope = Envelope::new(date.clone());
+        let envelope = Envelope::new(date);
 
         let pattern = DatePattern::any();
         let paths = pattern.paths(&envelope);
@@ -146,10 +146,10 @@ mod tests {
     fn test_date_pattern_specific() {
         // Create a date envelope
         let date = Date::from_ymd(2023, 12, 25);
-        let envelope = Envelope::new(date.clone());
+        let envelope = Envelope::new(date);
 
         // Test matching date
-        let pattern = DatePattern::value(date.clone());
+        let pattern = DatePattern::value(date);
         let paths = pattern.paths(&envelope);
         assert_eq!(paths.len(), 1);
 
@@ -163,7 +163,7 @@ mod tests {
     #[test]
     fn test_date_pattern_range() {
         let date = Date::from_ymd(2023, 12, 25);
-        let envelope = Envelope::new(date.clone());
+        let envelope = Envelope::new(date);
 
         // Test date within range
         let start = Date::from_ymd(2023, 12, 20);
@@ -191,7 +191,7 @@ mod tests {
     fn test_date_pattern_iso8601() {
         // Test date-only string (midnight)
         let date = Date::from_ymd(2023, 12, 25);
-        let envelope = Envelope::new(date.clone());
+        let envelope = Envelope::new(date);
 
         let pattern = DatePattern::string("2023-12-25");
         let paths = pattern.paths(&envelope);
@@ -204,7 +204,7 @@ mod tests {
 
         // Test date with time
         let date_with_time = Date::from_ymd_hms(2023, 12, 25, 15, 30, 45);
-        let envelope_with_time = Envelope::new(date_with_time.clone());
+        let envelope_with_time = Envelope::new(date_with_time);
 
         let pattern = DatePattern::string("2023-12-25T15:30:45Z");
         let paths = pattern.paths(&envelope_with_time);
@@ -214,7 +214,7 @@ mod tests {
     #[test]
     fn test_date_pattern_regex() {
         let date = Date::from_ymd(2023, 12, 25);
-        let envelope = Envelope::new(date.clone());
+        let envelope = Envelope::new(date);
 
         // Test regex that matches year 2023
         let regex = regex::Regex::new(r"^2023-.*").unwrap();
@@ -236,7 +236,7 @@ mod tests {
 
         // Test regex with date-time
         let date_with_time = Date::from_ymd_hms(2023, 12, 25, 15, 30, 45);
-        let envelope_with_time = Envelope::new(date_with_time.clone());
+        let envelope_with_time = Envelope::new(date_with_time);
 
         let regex = regex::Regex::new(r".*T15:30:45Z$").unwrap();
         let pattern = DatePattern::regex(regex);
@@ -287,7 +287,7 @@ mod tests {
     fn test_date_pattern_dcbor_integration() {
         // Test that the dcbor-pattern integration works correctly
         let date = Date::from_ymd(2023, 12, 25);
-        let date_envelope = Envelope::new(date.clone());
+        let date_envelope = Envelope::new(date);
         let text_envelope = Envelope::new("2023-12-25");
         let number_envelope = Envelope::new(42);
 
@@ -298,7 +298,7 @@ mod tests {
         assert!(!any_pattern.matches(&number_envelope)); // Should not match number
 
         // Test exact value patterns
-        let exact_pattern = DatePattern::value(date.clone());
+        let exact_pattern = DatePattern::value(date);
         assert!(exact_pattern.matches(&date_envelope));
         assert!(!exact_pattern.matches(&text_envelope));
         assert!(!exact_pattern.matches(&number_envelope));
@@ -338,7 +338,7 @@ mod tests {
     #[test]
     fn test_date_pattern_paths_with_captures() {
         let date = Date::from_ymd(2023, 12, 25);
-        let date_envelope = Envelope::new(date.clone());
+        let date_envelope = Envelope::new(date);
         let pattern = DatePattern::value(date);
 
         let (paths, captures) = pattern.paths_with_captures(&date_envelope);
@@ -383,7 +383,7 @@ mod tests {
     #[test]
     fn test_date_pattern_earliest_latest() {
         let date = Date::from_ymd(2023, 12, 25);
-        let envelope = Envelope::new(date.clone());
+        let envelope = Envelope::new(date);
 
         // Test earliest pattern
         let earlier_date = Date::from_ymd(2023, 12, 20);

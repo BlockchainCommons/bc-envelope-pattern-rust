@@ -138,6 +138,6 @@ fn parse_digest_ur_pattern() {
     let ur = digest.ur_string();
     let expr = format!("digest({})", ur);
     let p = Pattern::parse(&expr).unwrap();
-    assert_eq!(p, Pattern::digest(digest.clone()));
+    assert_eq!(p, Pattern::digest(digest));
     assert_eq!(p.to_string(), format!("digest({})", digest));
 }
