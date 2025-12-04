@@ -18,13 +18,13 @@ keywords = [
 categories = ["data-structures", "encoding"] # https://crates.io/category_slugs
 
 [dependencies]
-bc-envelope = "^0.37.0"
-known-values = "^0.11.0"
-dcbor = { version = "^0.23.3", features = ["multithreaded"] }
-dcbor-parse = "^0.7.0"
-dcbor-pattern = "^0.7.0"
-bc-components = "^0.28.0"
-bc-ur = "^0.16.0"
+bc-envelope = "^0.38.0"
+known-values = "^0.12.0"
+dcbor = { version = "^0.24.0", features = ["multithreaded"] }
+dcbor-parse = "^0.8.0"
+dcbor-pattern = "^0.8.0"
+bc-components = "^0.29.0"
+bc-ur = "^0.17.0"
 
 regex = "^1.11.1"
 hex = "^0.4.3"
@@ -36,4 +36,4 @@ hex-literal = "^0.4.1"
 indoc = "^2.0.0"
 bc-rand = "^0.4.2"
 anyhow = "^1.0.0"
-bc-tags = "^0.9.0"
+bc-tags = "^0.10.0"

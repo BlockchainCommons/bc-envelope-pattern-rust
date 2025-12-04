@@ -52,11 +52,8 @@ impl Seed {
 
     pub fn creation_date(&self) -> Option<Date> { self.creation_date }
 
-    pub fn set_creation_date(
-        &mut self,
-        creation_date: Option<impl AsRef<Date>>,
-    ) {
-        self.creation_date = creation_date.map(|s| *s.as_ref());
+    pub fn set_creation_date(&mut self, creation_date: Option<Date>) {
+        self.creation_date = creation_date;
     }
 }
 
@@ -132,7 +129,7 @@ impl TryFrom<Envelope> for Seed {
     type Error = dcbor::Error;
 
     fn try_from(envelope: Envelope) -> dcbor::Result<Self> {
-        envelope.check_type(&known_values::SEED_TYPE)?;
+        envelope.check_type_value(&known_values::SEED_TYPE)?;
         let data = envelope
             .subject()
             .try_leaf()?
@@ -151,8 +148,9 @@ impl TryFrom<Envelope> for Seed {
             .unwrap_or_default()
             .to_string();
         let creation_date = envelope
-            .extract_optional_object_for_predicate::<Date>(known_values::DATE)?
-            .map(|s| *s.as_ref());
+            .extract_optional_object_for_predicate::<Date>(
+                known_values::DATE,
+            )?;
         Ok(Self::new_opt(data, name, note, creation_date))
     }
 }
