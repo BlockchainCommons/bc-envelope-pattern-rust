@@ -32,7 +32,7 @@ thiserror = "^2.0"
 logos = "0.15.0"
 
 [dev-dependencies]
-hex-literal = "^0.4.1"
+hex-literal = "^1.1.0"
 indoc = "^2.0.0"
 bc-rand = "^0.4.2"
 anyhow = "^1.0.0"
