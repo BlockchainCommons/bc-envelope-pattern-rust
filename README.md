@@ -22,7 +22,7 @@ This crate provides a pattern matcher and text syntax pattern parser for Gordian
 
 ```toml
 [dependencies]
-bc-envelope-pattern = "0.9.0"
+bc-envelope-pattern = "0.10.0"
 ```
 
 ## The Pattern Matcher
@@ -55,6 +55,10 @@ Further documentation is forthcoming and will be added to the `docs/` directory.
 The [`envelope` command-line tool](https://crates.io/crates/bc-envelope-cli) provides a powerful interface for working with Gordian Envelope patterns. You can use it to match patterns against envelopes, extract data, and format the output in various ways.
 
 ## Version History
+
+### 0.10.0 - December 5, 2025
+
+- Align to dependencies.
 
 ### 0.9.0 - December 3, 2025
 
