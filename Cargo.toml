@@ -18,11 +18,11 @@ keywords = [
 categories = ["data-structures", "encoding"] # https://crates.io/category_slugs
 
 [dependencies]
-bc-envelope = "^0.40.0"
-known-values = "^0.14.0"
+bc-envelope = "^0.41.0"
+known-values = "^0.15.0"
 dcbor = { version = "^0.25.0", features = ["multithreaded"] }
-dcbor-parse = "^0.10.0"
-dcbor-pattern = "^0.10.0"
+dcbor-parse = "^0.11.0"
+dcbor-pattern = "^0.11.0"
 bc-components = "^0.31.0"
 bc-ur = "^0.19.0"
 
