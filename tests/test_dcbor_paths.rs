@@ -26,6 +26,7 @@ fn test_dcbor_pattern_extended_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         4bd40828 LEAF {"nested": {"value": 42}, "numbers": [1, 2, 3]}
@@ -84,6 +85,7 @@ fn test_dcbor_pattern_array_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         4cd61f73 LEAF [1, "hello", true]
@@ -112,6 +114,7 @@ fn test_dcbor_pattern_array_elements() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]
@@ -160,6 +163,7 @@ fn test_cbor_pattern_multiple_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         832e44f1 LEAF {"value": 42, "numbers": [1, 2, 3]}
@@ -197,6 +201,7 @@ fn test_array_element_access() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]

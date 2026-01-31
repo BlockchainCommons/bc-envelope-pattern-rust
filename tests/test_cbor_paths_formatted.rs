@@ -23,6 +23,7 @@ fn test_cbor_pattern_simple_array_paths() {
 
     // Expected: 3 paths, each with root envelope + specific number envelope
     // Note: The order matches what dcbor-pattern returns (corrected order)
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]

@@ -11,6 +11,7 @@ fn test_subject_pattern() {
     let any_subject_pat = Pattern::any_subject();
     let matching_paths = any_subject_pat.paths(&envelope);
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected_1 = indoc! {r#"
         13941b48 LEAF "Alice"
@@ -19,6 +20,7 @@ fn test_subject_pattern() {
 
     let envelope_with_assertions = envelope.add_assertion("knows", "Bob");
     let matching_paths = any_subject_pat.paths(&envelope_with_assertions);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected_2 = indoc! {r#"
         8955db5e NODE "Alice" [ "knows": "Bob" ]
@@ -48,7 +50,7 @@ fn test_wrapped_pattern() {
     // Matches a wrapped envelope with any subject.
     let wrapped_envelope = envelope.wrap();
     let paths = Pattern::unwrap().paths(&wrapped_envelope);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
@@ -60,7 +62,7 @@ fn test_wrapped_pattern() {
     let wrapped_envelope_with_assertion =
         wrapped_envelope.add_assertion("an", "assertion");
     let paths = Pattern::unwrap().paths(&wrapped_envelope_with_assertion);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         169aba00 NODE { 42 } [ "an": "assertion" ]
@@ -73,6 +75,7 @@ fn test_wrapped_pattern() {
     // first element is the original wrapped envelope including assertions,
     // and the second element is the still-wrapped subject.
     let paths = Pattern::unwrap().paths(&wrapped_twice);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         52d47c15 WRAPPED { { 42 } [ "an": "assertion" ] }
@@ -83,6 +86,7 @@ fn test_wrapped_pattern() {
     let wrapped_twice_pattern =
         Pattern::traverse(vec![Pattern::unwrap(), Pattern::unwrap()]);
     let paths = wrapped_twice_pattern.paths(&wrapped_twice);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         52d47c15 WRAPPED { { 42 } [ "an": "assertion" ] }
@@ -105,6 +109,7 @@ fn test_assertion_pattern() {
 
     // Returns a path for each assertion in the envelope.
     let paths = Pattern::any_assertion().paths(&envelope_with_assertions);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         78d666eb ASSERTION "knows": "Bob"
@@ -124,6 +129,7 @@ fn test_assertion_predicate_pattern() {
     // the specified pattern.
     let paths = Pattern::assertion_with_predicate(Pattern::text("knows"))
         .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         78d666eb ASSERTION "knows": "Bob"
@@ -136,14 +142,14 @@ fn test_assertion_predicate_pattern() {
         Pattern::any_object(),
     ]);
     let paths = pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         78d666eb ASSERTION "knows": "Bob"
             13b74194 LEAF "Bob"
         7af83724 ASSERTION "knows": "Charlie"
             ee8e3b02 LEAF "Charlie"
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
 }
 
@@ -177,6 +183,7 @@ fn test_digest_pattern() {
 
     // Test paths
     let paths = Pattern::digest(digest).paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         0a852327 LEAF "Hello, World!"
@@ -252,6 +259,7 @@ fn test_digest_pattern_binary_regex() {
         regex::bytes::Regex::new(r"(?s-u)^.{32}$").unwrap(),
     )
     .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         0a852327 LEAF "Hello, World!"
@@ -381,6 +389,7 @@ fn test_node_pattern() {
 
     // Test paths
     let paths = Pattern::any_node().paths(&single_assertion_envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         8955db5e NODE "Alice" [ "knows": "Bob" ]

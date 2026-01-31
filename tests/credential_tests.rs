@@ -11,6 +11,7 @@ use crate::common::test_data::{credential, redacted_credential};
 #[test]
 fn test_credential() {
     let env = credential();
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     assert_actual_expected!(env.format(), indoc! {r#"
         {
@@ -34,10 +35,12 @@ fn test_credential() {
             'signed': Signature
         ]
     "#}.trim());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     assert_actual_expected!(env.format_flat(), indoc! {r#"
         { ARID(4676635a) [ 'isA': "Certificate of Completion", "certificateNumber": "123-456-789", "continuingEducationUnits": 1, "expirationDate": 2028-01-01, "firstName": "James", "issueDate": 2020-01-01, "lastName": "Maxwell", "photo": "This is James Maxwell's photo.", "professionalDevelopmentHours": 15, "subject": "RF and Microwave Engineering", "topics": ["Subject 1", "Subject 2"], 'controller': "Example Electrical Engineering Board", 'issuer': "Example Electrical Engineering Board" ] } [ 'note': "Signed by Example Electrical Engineering Board", 'signed': Signature ]
     "#}.trim());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     assert_actual_expected!(env.tree_format(), indoc! {r#"
         0b721f78 NODE
@@ -150,6 +153,7 @@ fn test_wrapped_repeat() {
     // The pattern should match both the outer node and its unwrapped subject
     // node since the `wrapped` repetition can consume the wrapper around the
     // subject.
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
@@ -179,6 +183,7 @@ fn test_search_wrapped_repeat() {
     // `8122ffa9 NODE`. Consequently there are two matching paths: one that
     // descends through the wrapper and another that matches the inner node
     // directly.
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         0b721f78 NODE { ARID(4676635a) [ 'isA': "Certificate of Completion", "certifica…
@@ -201,6 +206,7 @@ fn test_search_wrapped_repeat() {
 #[test]
 fn test_redacted_credential() {
     let env = redacted_credential();
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     assert_actual_expected!(env.format(), indoc! {r#"
         {
@@ -218,6 +224,7 @@ fn test_redacted_credential() {
             'signed': Signature
         ]
     "#}.trim());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     assert_actual_expected!(env.tree_format(), indoc! {r#"
         0b721f78 NODE

@@ -41,6 +41,7 @@ fn test_fold() {
     let s = "hello";
     let folded = fold(s);
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         '' [
@@ -57,6 +58,7 @@ fn test_fold() {
     "#}.trim();
     assert_actual_expected!(folded.format(), expected);
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected =  indoc! {r#"
         b229d3cb NODE
@@ -198,6 +200,7 @@ fn repeat_any_greedy() {
 
     let env = wrap_n(Envelope::new(42), 4);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3a0b1e87 WRAPPED { { { { 42 } } } }
@@ -217,6 +220,7 @@ fn repeat_any_lazy() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3a0b1e87 WRAPPED { { { { 42 } } } }
@@ -236,6 +240,7 @@ fn repeat_any_possessive() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3a0b1e87 WRAPPED { { { { 42 } } } }
@@ -255,6 +260,7 @@ fn repeat_some_greedy() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         75659622 WRAPPED { { { 42 } } }
@@ -273,6 +279,7 @@ fn repeat_some_lazy() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         75659622 WRAPPED { { { 42 } } }
@@ -291,6 +298,7 @@ fn repeat_some_possessive() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         75659622 WRAPPED { { { 42 } } }
@@ -308,6 +316,7 @@ fn repeat_optional_greedy() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         7f83f7bd LEAF 42
@@ -315,6 +324,7 @@ fn repeat_optional_greedy() {
     assert_actual_expected!(format_paths(&paths), expected);
 
     let paths = pat.paths(&wrap_n(Envelope::new(42), 1));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
@@ -330,12 +340,14 @@ fn repeat_optional_lazy() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 1));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
@@ -351,12 +363,14 @@ fn repeat_optional_possessive() {
         Pattern::any_cbor(),
     ]);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 0));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         7f83f7bd LEAF 42
     "#}.trim();
     assert_actual_expected!(format_paths(&paths), expected);
     let paths = pat.paths(&wrap_n(Envelope::new(42), 1));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
@@ -374,6 +388,7 @@ fn repeat_range_greedy() {
     let env = wrap_n(Envelope::new(42), 3);
     assert!(pat.matches(&env));
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         75659622 WRAPPED { { { 42 } } }
@@ -392,6 +407,7 @@ fn repeat_range_lazy() {
     ]);
     let env = wrap_n(Envelope::new(42), 3);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         75659622 WRAPPED { { { 42 } } }
@@ -410,6 +426,7 @@ fn repeat_range_possessive() {
     ]);
     let env = wrap_n(Envelope::new(42), 3);
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         75659622 WRAPPED { { { 42 } } }
@@ -440,6 +457,7 @@ fn repeat_any_modes() {
     assert_eq!(greedy_paths, lazy_paths);
     assert!(possessive_paths.is_empty());
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         ee8cade0 WRAPPED { { "data" } }
@@ -461,27 +479,30 @@ fn repeat_optional_modes() {
     };
 
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
+    // expected-text-output-rubric:
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
             7f83f7bd LEAF 42
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
+    // expected-text-output-rubric:
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
             7f83f7bd LEAF 42
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
+    // expected-text-output-rubric:
+    #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
             7f83f7bd LEAF 42
-    "#}
-    .trim();
+    "#}.trim();
     assert_actual_expected!(format_paths(&possessive_paths), expected);
 }
 
@@ -489,6 +510,7 @@ fn repeat_optional_modes() {
 fn repeat_some_order() {
     let env = wrap_n(Envelope::new("x"), 2);
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 WRAPPED
@@ -505,6 +527,7 @@ fn repeat_some_order() {
     };
 
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 WRAPPED { { "x" } }
@@ -514,6 +537,7 @@ fn repeat_some_order() {
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 WRAPPED { { "x" } }
@@ -522,6 +546,7 @@ fn repeat_some_order() {
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         06bb2465 WRAPPED { { "x" } }
@@ -543,6 +568,7 @@ fn repeat_range_order() {
     };
 
     let greedy_paths = pat(Reluctance::Greedy).paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         88e28c8b WRAPPED { { { { "x" } } } }
@@ -553,6 +579,7 @@ fn repeat_range_order() {
     assert_actual_expected!(format_paths(&greedy_paths), expected);
 
     let lazy_paths = pat(Reluctance::Lazy).paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         88e28c8b WRAPPED { { { { "x" } } } }
@@ -562,6 +589,7 @@ fn repeat_range_order() {
     assert_actual_expected!(format_paths(&lazy_paths), expected);
 
     let possessive_paths = pat(Reluctance::Possessive).paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         88e28c8b WRAPPED { { { { "x" } } } }
@@ -585,6 +613,7 @@ fn test_repeat() {
 
     let env = env.add_assertion("knows", "Bob");
     let paths = pat.paths(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         8955db5e NODE "Alice" [ "knows": "Bob" ]
@@ -593,6 +622,7 @@ fn test_repeat() {
 
     let wrapped_env = env.wrap();
     let paths = pat.paths(&wrapped_env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
@@ -609,6 +639,7 @@ fn test_repeat() {
 
     let pat = Pattern::parse("@cap((wrapped)*)>unwrap>node").unwrap();
     let (paths, captures) = pat.paths_with_captures(&wrapped_env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
@@ -617,6 +648,7 @@ fn test_repeat() {
     assert_actual_expected!(format_paths(&paths), expected);
     let caps = captures.get("cap").unwrap();
     assert_eq!(caps.len(), 1);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected_cap = indoc! {r#"
         fd881a24 WRAPPED { "Alice" [ "knows": "Bob" ] }
@@ -626,6 +658,7 @@ fn test_repeat() {
     let wrapped_env = wrapped_env.wrap();
     let pat = Pattern::parse("@cap((wrapped>unwrap)*)>node").unwrap();
     let (paths, captures) = pat.paths_with_captures(&wrapped_env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
@@ -635,6 +668,7 @@ fn test_repeat() {
     assert_actual_expected!(format_paths(&paths), expected);
     let caps = captures.get("cap").unwrap();
     assert_eq!(caps.len(), 1);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected_cap = indoc! {r#"
         3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
@@ -650,6 +684,7 @@ fn test_capture() {
         .wrap()
         .wrap();
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3defda74 WRAPPED
@@ -668,6 +703,7 @@ fn test_capture() {
     let (paths, captures) = pat.paths_with_captures(&env);
     // Pattern matches the `wrapped` elements leading to the `node`,
     // and the `node` itself.
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }
@@ -679,6 +715,7 @@ fn test_capture() {
     assert_eq!(caps.len(), 1);
     // The capture contains the `wrapped` elements leading to the `node`, but
     // not the `NODE` itself.
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected_cap = indoc! {r#"
         3defda74 WRAPPED { { "Alice" [ "knows": "Bob" ] } }

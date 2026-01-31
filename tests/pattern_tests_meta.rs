@@ -36,6 +36,7 @@ fn test_and_pattern() {
 
     // The path includes the assertion.
     let paths = number_range_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6cb2ea4a NODE 42 [ "an": "assertion" ]
@@ -47,6 +48,7 @@ fn test_and_pattern() {
     let number_range_with_subject_pattern =
         Pattern::traverse(vec![number_range_pattern, Pattern::any_subject()]);
     let paths = number_range_with_subject_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6cb2ea4a NODE 42 [ "an": "assertion" ]
@@ -85,6 +87,7 @@ fn test_or_pattern() {
 
     // The match path includes the assertion.
     let paths = foo_or_greater_than_40_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6cb2ea4a NODE 42 [ "an": "assertion" ]
@@ -96,6 +99,7 @@ fn test_or_pattern() {
         Pattern::any_subject(),
     ]);
     let paths = foo_or_greater_than_40_with_subject_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6cb2ea4a NODE 42 [ "an": "assertion" ]
@@ -115,6 +119,7 @@ fn test_one_element_traversal_pattern() {
     assert_eq!(format!("{}", number_pattern), r#"42"#);
 
     let envelope = Envelope::new(42);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         7f83f7bd LEAF 42
@@ -137,7 +142,7 @@ fn test_wrapped_traversal() {
     let wrapped_3 = wrapped_2.wrap();
     let wrapped_4 = wrapped_3.wrap();
 
-    // println!("{}", wrapped_4.tree_format());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         25cb582c WRAPPED
@@ -148,7 +153,7 @@ fn test_wrapped_traversal() {
     "#}.trim();
     assert_actual_expected!(wrapped_4.tree_format(), expected);
 
-    // println!("{}", wrapped_4.format_flat());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         { { { { "data" } } } }
@@ -159,7 +164,7 @@ fn test_wrapped_traversal() {
     let wrapped_1_pattern =
         Pattern::traverse(vec![Pattern::wrapped(), Pattern::unwrap()]);
     let paths = wrapped_1_pattern.paths(&wrapped_4);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         25cb582c WRAPPED { { { { "data" } } } }
@@ -172,7 +177,7 @@ fn test_wrapped_traversal() {
     let wrapped_2_pattern =
         Pattern::traverse(vec![Pattern::unwrap(), Pattern::unwrap()]);
     let paths = wrapped_2_pattern.paths(&wrapped_4);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         25cb582c WRAPPED { { { { "data" } } } }
@@ -188,7 +193,7 @@ fn test_wrapped_traversal() {
         Pattern::unwrap(),
     ]);
     let paths = wrapped_3_pattern.paths(&wrapped_4);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         25cb582c WRAPPED { { { { "data" } } } }
@@ -206,7 +211,7 @@ fn test_wrapped_traversal() {
         Pattern::unwrap(),
     ]);
     let paths = wrapped_4_pattern.paths(&wrapped_4);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         25cb582c WRAPPED { { { { "data" } } } }
@@ -239,6 +244,7 @@ fn optional_wrapped_pattern() {
     let wrapped = inner.wrap();
 
     let inner_paths = optional_wrapped_pattern.paths(&inner);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected  = indoc! {r#"
         7f83f7bd LEAF 42
@@ -246,6 +252,7 @@ fn optional_wrapped_pattern() {
     assert_actual_expected!(format_paths(&inner_paths), expected);
 
     let wrapped_paths = optional_wrapped_pattern.paths(&wrapped);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         58b1ac6a WRAPPED { 42 }
@@ -266,6 +273,7 @@ fn test_search_pattern() {
         .add_assertion("age", 30);
 
     let text_search_paths = text_search_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
@@ -287,6 +295,7 @@ fn test_search_pattern() {
     let bob_search_pattern = Pattern::search(Pattern::text("Bob"));
     assert_eq!(format!("{}", bob_search_pattern), r#"search("Bob")"#);
     let bob_search_paths = bob_search_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
@@ -299,6 +308,7 @@ fn test_search_pattern() {
     let number_search_pattern = Pattern::search(Pattern::any_number());
     assert_eq!(format!("{}", number_search_pattern), r#"search(number)"#);
     let number_search_paths = number_search_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
@@ -317,6 +327,7 @@ fn test_search_pattern() {
     );
     let number_object_search_paths =
         number_object_search_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a47bb3d4 NODE "Alice" [ "age": 30, "knows": "Bob" ]
@@ -346,6 +357,7 @@ fn test_search_pattern_nested() {
     let text_search_paths = text_search_pattern.paths(&envelope);
 
     assert_eq!(text_search_paths.len(), 9);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a69103e9 NODE "Alice" [ "department": "Engineering", "knows": "Carol" [ "title": "Engineer" ] ]
@@ -410,7 +422,7 @@ fn test_search_pattern_with_wrapped() {
     let envelope = Envelope::new("Alice").add_assertion("data", inner.wrap());
 
     let secret_text_search_paths = secret_text_search_pattern.paths(&envelope);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
@@ -435,6 +447,7 @@ fn test_search_pattern_with_wrapped() {
     );
     let secret_regex_search_paths =
         secret_regex_search_pattern.paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         1435493d NODE "Alice" [ "data": { "secret" [ "classification": "top-secret" ] } ]
@@ -466,7 +479,7 @@ fn test_search_pattern_credential() {
     let text_search_pattern = Pattern::search(Pattern::any_text());
 
     let cred = credential();
-    // println!("{}", cred.tree_format());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         0b721f78 NODE
@@ -528,6 +541,7 @@ fn test_search_pattern_credential() {
         .iter()
         .map(|path| vec![(*path.last().unwrap()).clone()])
         .collect();
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         9e3bff3a LEAF "certificateNumber"
@@ -573,6 +587,7 @@ fn test_search_pattern_credential() {
         .iter()
         .map(|path| vec![(*path.last().unwrap()).clone()])
         .collect();
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         54b3e1e7 ASSERTION "professionalDevelopmentHours": 15

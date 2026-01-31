@@ -31,6 +31,7 @@ fn test_bool_pattern() {
     // The matched paths include the assertion. In other words, the
     // path just includes the envelope itself as its only element.
     let paths = Pattern::any_bool().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         50d1019e NODE true [ "an": "assertion" ]
@@ -43,6 +44,7 @@ fn test_bool_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_bool(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         50d1019e NODE true [ "an": "assertion" ]
@@ -82,6 +84,7 @@ fn test_number_pattern() {
 
     // The matched paths include the assertion.
     let paths = Pattern::any_number().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6cb2ea4a NODE 42 [ "an": "assertion" ]
@@ -94,6 +97,7 @@ fn test_number_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_number(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6cb2ea4a NODE 42 [ "an": "assertion" ]
@@ -128,6 +132,7 @@ fn test_text_pattern() {
 
     // The matched paths include the assertion.
     let paths = Pattern::any_text().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         80a8c700 NODE "hello" [ "greeting": "world" ]
@@ -140,6 +145,7 @@ fn test_text_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_text(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         80a8c700 NODE "hello" [ "greeting": "world" ]
@@ -192,6 +198,7 @@ fn test_date_pattern() {
 
     // The matched paths include the assertion.
     let paths = Pattern::any_date().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         20f45d77 NODE 2023-12-25 [ "type": "christmas" ]
@@ -204,6 +211,7 @@ fn test_date_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_date(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         20f45d77 NODE 2023-12-25 [ "type": "christmas" ]
@@ -256,6 +264,7 @@ fn test_known_value_pattern() {
     // The matched paths include the assertion. In other words, the
     // path just includes the envelope itself as its only element.
     let paths = Pattern::any_known_value().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         813f39cd NODE 'date' [ "meaning": "timestamp" ]
@@ -264,6 +273,7 @@ fn test_known_value_pattern() {
 
     // Test matching by name
     let paths = Pattern::known_value_named("date").paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         813f39cd NODE 'date' [ "meaning": "timestamp" ]
@@ -278,6 +288,7 @@ fn test_known_value_pattern() {
         Pattern::any_subject(),
     ])
     .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         813f39cd NODE 'date' [ "meaning": "timestamp" ]
@@ -337,6 +348,7 @@ fn test_known_value_regex_pattern() {
         Pattern::any_subject(),
     ])
     .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         813f39cd NODE 'date' [ "meaning": "timestamp" ]
@@ -388,6 +400,7 @@ fn test_byte_string_pattern() {
 
     // The matched paths include the assertion.
     let paths = Pattern::any_byte_string().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         19c2bef3 NODE Bytes(5) [ "type": "greeting" ]
@@ -402,6 +415,7 @@ fn test_byte_string_pattern() {
         Pattern::any_subject(),
     ])
     .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         19c2bef3 NODE Bytes(5) [ "type": "greeting" ]
@@ -481,6 +495,7 @@ fn test_array_pattern() {
 
     // The matched paths include the assertion
     let paths = Pattern::any_array().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         70db8c16 NODE [1, 2, 3] [ "type": "list" ]
@@ -498,6 +513,7 @@ fn test_array_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_array(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         70db8c16 NODE [1, 2, 3] [ "type": "list" ]
@@ -540,6 +556,7 @@ fn test_map_pattern() {
 
     // The matched paths include the assertion
     let paths = Pattern::any_map().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         1d96ee45 NODE {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
@@ -557,6 +574,7 @@ fn test_map_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_map(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         1d96ee45 NODE {"key1": "value1", "key2": "value2"} [ "type": "dictionary" ]
@@ -584,6 +602,7 @@ fn test_null_pattern() {
 
     // The matched paths include the assertion.
     let paths = Pattern::null().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a72948d7 NODE null [ "type": "null_value" ]
@@ -596,6 +615,7 @@ fn test_null_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::null(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         a72948d7 NODE null [ "type": "null_value" ]
@@ -641,6 +661,7 @@ fn test_tag_pattern() {
 
     // The matched paths include the assertion
     let paths = Pattern::any_tag().paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         b9457c8d NODE 100("tagged_content") [ "format": "tagged" ]
@@ -651,6 +672,7 @@ fn test_tag_pattern() {
     let paths =
         Pattern::traverse(vec![Pattern::any_tag(), Pattern::any_subject()])
             .paths(&envelope);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         b9457c8d NODE 100("tagged_content") [ "format": "tagged" ]
@@ -704,7 +726,7 @@ fn test_tag_pattern_named() {
     // Test paths for matched envelope
     let paths =
         Pattern::tagged_name("date", DCBORPattern::any()).paths(&envelope);
-    // println!("{}", format_paths(&paths));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3854ff69 LEAF 2023-12-25

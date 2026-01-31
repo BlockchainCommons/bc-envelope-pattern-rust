@@ -54,6 +54,7 @@ fn test_node_pattern_with_traversal() {
     ])
     .paths(&envelope);
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         3599f346 NODE "Person" [ "age": 25, "name": "Alice" ]
@@ -65,7 +66,7 @@ fn test_node_pattern_with_traversal() {
 #[test]
 fn test_redacted_credential_patterns() {
     let redacted_credential = redacted_credential();
-    // println!("{}", redacted_credential.format());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         {
@@ -102,7 +103,7 @@ fn test_redacted_credential_patterns() {
         .iter()
         .map(|el| vec![el.clone()])
         .collect();
-    // println!("{}", format_paths(&formatted_obscured));
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         1f9ff098 ELIDED
@@ -130,7 +131,7 @@ fn test_redacted_credential_patterns() {
 
     // Get the last element of the found path
     let found_element = found_paths[0].last().unwrap();
-    // println!("{}", found_element.format());
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         "certificateNumber": "123-456-789"

@@ -31,7 +31,7 @@ fn test_simple_dcbor_capture() {
         FormatPathsOpts::default(),
     );
 
-    // Follow the rubric: run test to see actual output, then set expected
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @num
@@ -77,6 +77,7 @@ fn test_dcbor_capture_with_search() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @values
@@ -140,6 +141,7 @@ fn test_multiple_dcbor_captures() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @names
@@ -226,6 +228,7 @@ fn test_nested_dcbor_captures() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @name
@@ -300,6 +303,7 @@ fn test_mixed_envelope_and_dcbor_captures() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @dcbor_level
@@ -351,6 +355,7 @@ fn test_capture_name_conflicts() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @same_name
@@ -400,6 +405,7 @@ fn test_array_traversal_captures() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @text
@@ -499,6 +505,7 @@ fn test_cbor_captures_performance() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @nums
@@ -574,6 +581,7 @@ fn test_comprehensive_cbor_captures() {
         FormatPathsOpts::default(),
     );
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @data

@@ -27,6 +27,7 @@ fn test_cbor_pattern_simple_array_paths() {
 
     // Format the paths for comparison
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         4abc3113 LEAF [1, 2, 3]
@@ -65,6 +66,7 @@ fn test_cbor_pattern_nested_structure_paths() {
 
     // Format the paths and verify the nested structure
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         df80ebe9 LEAF {"value": 42, "scores": [95, 87, 92]}
@@ -129,6 +131,7 @@ fn test_cbor_pattern_text_search_paths() {
     );
 
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         6254f700 LEAF {"name": "Alice", "count": 2, "items": ["apple", "banana"]}
@@ -187,6 +190,7 @@ fn test_cbor_pattern_paths_preserve_order() {
     assert_eq!(paths.len(), 3, "Should find 3 numbers");
 
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         5e81a0f3 LEAF [10, 20, 30]
@@ -229,6 +233,7 @@ fn test_cbor_pattern_complex_nested_paths() {
     assert_eq!(paths.len(), 3, "Should find 3 numbers in complex structure");
 
     let actual = format_paths(&paths);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         e341ba42 LEAF {"total": 2, "users": [{"age": 30, "name": "Alice"}, {"age": 25, "name": "Bob"}]}
@@ -290,6 +295,7 @@ fn test_search_array_order() {
     let dcbor_pattern = DCBORPattern::parse("search(array)").unwrap();
 
     let paths = dcbor_pattern.paths(&cbor);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         [[1, 2, 3], [4, 5, 6]]
@@ -302,6 +308,7 @@ fn test_search_array_order() {
 
     let pattern = DCBORPattern::parse("search(number)").unwrap();
     let paths = pattern.paths(&cbor);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         [[1, 2, 3], [4, 5, 6]]
@@ -329,6 +336,7 @@ fn test_search_array_order() {
     let pattern = Pattern::parse("cbor(/search(number)/)").unwrap();
     let paths = pattern.paths(&envelope);
     // The traversal order below should be the same as the one above.
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         88c5c85e LEAF [[1, 2, 3], [4, 5, 6]]

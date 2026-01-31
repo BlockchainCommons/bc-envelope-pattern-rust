@@ -11,6 +11,7 @@ fn capture_simple_number() {
     assert_actual_expected!(pat.to_string(), "@num(42)");
 
     let (paths, caps) = pat.paths_with_captures(&env);
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @num
@@ -30,6 +31,7 @@ fn capture_multiple_or() {
     let (paths, caps) = pat.paths_with_captures(&env);
 
     // TODO: The output contains duplicates, which is incorrect.
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @num
@@ -51,6 +53,7 @@ fn capture_nested_number() {
     let pat = Pattern::parse("@outer(@inner(42))").unwrap();
     let (paths, caps) = pat.paths_with_captures(&env);
 
+    // expected-text-output-rubric:
     #[rustfmt::skip]
     let expected = indoc! {r#"
         @inner

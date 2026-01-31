@@ -21,6 +21,7 @@ fn test_cbor_pattern_extended_paths() {
     assert_eq!(paths.len(), 3, "Should find 3 numbers in the array");
 
     // Format the paths for comparison
+    // expected-text-output-rubric:
     let actual = format_paths(&paths);
     #[rustfmt::skip]
     let expected = indoc! {r#"
@@ -58,6 +59,7 @@ fn test_cbor_pattern_extended_paths_nested_structure() {
     );
 
     // Format the paths for comparison
+    // expected-text-output-rubric:
     let actual = format_paths(&paths);
     #[rustfmt::skip]
     let expected = indoc! {r#"

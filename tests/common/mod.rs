@@ -9,6 +9,7 @@ pub mod test_seed;
 ///
 /// Use this rubric for all tests expecting formatted output:
 ///
+/// // expected-text-output-rubric:
 /// #[rustfmt::skip]
 /// let expected = indoc! {r#"
 ///     Some multiline
