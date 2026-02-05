@@ -1,6 +1,6 @@
 [package]
 name = "bc-envelope-pattern"
-version = "0.13.0"
+version = "0.14.0"
 edition = "2024"
 description = "Pattern matcher for Gordian Envelope"
 authors = ["Blockchain Commons"]
